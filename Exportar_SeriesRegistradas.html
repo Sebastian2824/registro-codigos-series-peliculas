@@ -278,6 +278,12 @@
       mostrarPagina();
     }
 
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+}
+
     function mostrarPagina() {
       const tablaBody = document.querySelector("#tablaSeries tbody");
       tablaBody.innerHTML = "";
@@ -294,7 +300,7 @@
     <td>${d.idioma}</td>
     <td>${d.servidor}</td>
     <td>${d.episodio}</td>
-    <td style="max-width: 300px; word-break: break-word;">${d.iframe || ""}</td>
+    <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.iframe || "")}</td>
     <td><button onclick="copiarIframe('${encodeURIComponent(d.iframe || "")}')">📋</button></td>
   `;
   tablaBody.appendChild(fila);
