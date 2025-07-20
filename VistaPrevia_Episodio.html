@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Vista previa de Episodio</title>
+  <style>
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    h1 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 32px;
+        font-weight: 600;
+    }
+    
+    h2 {
+        color: #1a73e8;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 24px;
+        border-bottom: 2px solid #e0e9ff;
+        padding-bottom: 8px;
+    }
+    
+    label {
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    
+    select, input[type="text"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin-top: 5px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+        background-color: #f8fbff;
+    }
+    
+    select:focus, input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        outline: none;
+        background-color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    th, td {
+        border: 1px solid #e0e9ff;
+        padding: 12px 15px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+    
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+    
+    button {
+        padding: 12px 20px;
+        margin-top: 10px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+    
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    button.cancelar {
+        background-color: #dc3545;
+        margin-left: 10px;
+    }
+    
+    button.cancelar:hover {
+        background-color: #bb2d3b;
+    }
+    
+    .row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .row select, .row input {
+        flex: 1;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        padding: 20px;
+        background-color: #f8fbff;
+        border-radius: 10px;
+        border: 1px solid #e0e9ff;
+    }
+    
+    .acciones {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    /* Estilo para los botones dentro de las celdas de la tabla */
+    td button {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* Estilo para los inputs dentro de la tabla */
+    td input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d3e3fd;
+        border-radius: 6px;
+        background-color: white;
+    }
+    
+    /* Estilo para el botón de agregar fila */
+    #btnAgregarFila {
+        background-color: #34a853;
+        margin-top: 15px;
+    }
+    
+    #btnAgregarFila:hover {
+        background-color: #2d9249;
+    }
+</style>
+</head>
+<body>
+  <div class="main-container">
+    <h2>Vista previa del Episodio</h2>
+
+    <label for="serie">Serie:</label>
+    <select id="serie"></select>
+
+    <label for="temporada">Temporada:</label>
+    <select id="temporada"></select>
+
+    <label for="idioma">Idioma:</label>
+    <select id="idioma"></select>
+
+    <label for="servidor">Servidor:</label>
+    <select id="servidor"></select>
+
+    <label for="episodio">Episodio:</label>
+    <select id="episodio"></select>
+
+    <h3>Reproductor:</h3>
+    <div id="reproductor">Selecciona un episodio para ver el video</div>
+  </div>
+
+  <script type="module">
+    // Configura Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const selectSerie = document.getElementById('serie');
+    const selectTemporada = document.getElementById('temporada');
+    const selectIdioma = document.getElementById('idioma');
+    const selectServidor = document.getElementById('servidor');
+    const selectEpisodio = document.getElementById('episodio');
+    const reproductor = document.getElementById('reproductor');
+
+    async function cargarSeries() {
+      const seriesSnapshot = await getDocs(collection(db, 'animes-series'));
+      selectSerie.innerHTML = '<option value="">Seleccione serie</option>';
+      seriesSnapshot.forEach(doc => {
+        selectSerie.innerHTML += `<option value="${doc.id}">${doc.id}</option>`;
+      });
+    }
+
+    async function cargarTemporadas(serie) {
+      const temporadasRef = collection(db, 'animes-series', serie, 'Temporadas');
+      const snapshot = await getDocs(temporadasRef);
+      selectTemporada.innerHTML = '<option value="">Seleccione temporada</option>';
+      snapshot.forEach(doc => {
+        selectTemporada.innerHTML += `<option value="${doc.id}">${doc.id}</option>`;
+      });
+    }
+
+    async function cargarIdiomas(serie, temporada) {
+      const idiomasRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas');
+      const snapshot = await getDocs(idiomasRef);
+      selectIdioma.innerHTML = '<option value="">Seleccione idioma</option>';
+      snapshot.forEach(doc => {
+        selectIdioma.innerHTML += `<option value="${doc.id}">${doc.id}</option>`;
+      });
+    }
+
+    async function cargarServidores(serie, temporada, idioma) {
+      const servidoresRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores');
+      const snapshot = await getDocs(servidoresRef);
+      selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
+      snapshot.forEach(doc => {
+        selectServidor.innerHTML += `<option value="${doc.id}">${doc.id}</option>`;
+      });
+    }
+
+    async function cargarEpisodios(serie, temporada, idioma, servidor) {
+      const episodiosRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios');
+      const snapshot = await getDocs(episodiosRef);
+      selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
+      snapshot.forEach(doc => {
+        selectEpisodio.innerHTML += `<option value="${doc.id}">${doc.id}</option>`;
+      });
+    }
+
+    async function mostrarVideo(serie, temporada, idioma, servidor, episodio) {
+  const docRef = doc(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios', episodio);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    console.log("Datos del episodio:", data); // Verificación en consola
+    if (data.iframe) {
+      reproductor.innerHTML = data.iframe;
+    } else {
+      reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
+    }
+  } else {
+    reproductor.innerHTML = '⚠️ Episodio no encontrado en Firebase.';
+  }
+}
+
+
+    selectSerie.addEventListener('change', async () => {
+      const serie = selectSerie.value;
+      if (serie) {
+        await cargarTemporadas(serie);
+        selectIdioma.innerHTML = '';
+        selectServidor.innerHTML = '';
+        selectEpisodio.innerHTML = '';
+        reproductor.innerHTML = '';
+      }
+    });
+
+    selectTemporada.addEventListener('change', async () => {
+      const serie = selectSerie.value;
+      const temporada = selectTemporada.value;
+      if (temporada) {
+        await cargarIdiomas(serie, temporada);
+        selectServidor.innerHTML = '';
+        selectEpisodio.innerHTML = '';
+        reproductor.innerHTML = '';
+      }
+    });
+
+    selectIdioma.addEventListener('change', async () => {
+      const serie = selectSerie.value;
+      const temporada = selectTemporada.value;
+      const idioma = selectIdioma.value;
+      if (idioma) {
+        await cargarServidores(serie, temporada, idioma);
+        selectEpisodio.innerHTML = '';
+        reproductor.innerHTML = '';
+      }
+    });
+
+    selectServidor.addEventListener('change', async () => {
+      const serie = selectSerie.value;
+      const temporada = selectTemporada.value;
+      const idioma = selectIdioma.value;
+      const servidor = selectServidor.value;
+      if (servidor) {
+        await cargarEpisodios(serie, temporada, idioma, servidor);
+        reproductor.innerHTML = '';
+      }
+    });
+
+    selectEpisodio.addEventListener('change', () => {
+      const serie = selectSerie.value;
+      const temporada = selectTemporada.value;
+      const idioma = selectIdioma.value;
+      const servidor = selectServidor.value;
+      const episodio = selectEpisodio.value;
+      if (episodio) {
+        mostrarVideo(serie, temporada, idioma, servidor, episodio);
+      }
+    });
+
+    cargarSeries();
+  </script>
+</body>
+</html>
