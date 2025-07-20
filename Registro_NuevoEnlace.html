@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registrar Serie</title>
+  <title>Registrar Serie - Enlace</title>
   <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -127,7 +127,7 @@
 </head>
 <body>
 
-  <h2>Registrar Nueva Serie</h2>
+  <h2>Registrar Nueva Serie - Enlaces URL</h2>
 
   <label>Nombre de la serie:</label>
   <input type="text" id="serieNombre"><br><br>
@@ -142,7 +142,7 @@
   <input type="text" id="servidor"><br><br>
 
   <h3 style="display: flex; justify-content: space-between; align-items: center;">
-    <span>Episodios y Códigos de Incrustación</span>
+    <span>Episodios y Enlaces URL</span>
     <div>
       <button onclick="document.getElementById('importarTxt').click()">Importar TXT</button>
       <button onclick="document.getElementById('importarExcel').click()">Importar Excel</button>
@@ -155,14 +155,14 @@
     <thead>
       <tr>
         <th>Episodio</th>
-        <th>Código de incrustación</th>
+        <th>Enlace URL</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><input type="text" placeholder="Ej: Episodio 1"></td>
-        <td><input type="text" placeholder="<iframe>...</iframe>"></td>
+        <td><input type="text" placeholder="https://..."></td>
         <td><button onclick="eliminarFila(this)">Eliminar</button></td>
       </tr>
     </tbody>
@@ -177,7 +177,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.0/dist/xlsx.full.min.js"></script>
-
 
   <script>
     const firebaseConfig = {
@@ -198,7 +197,7 @@
       const newRow = table.insertRow();
       newRow.innerHTML = `
         <td><input type="text" placeholder="Ej: Episodio X"></td>
-        <td><input type="text" placeholder="<iframe>...</iframe>"></td>
+        <td><input type="text" placeholder="https://..."></td>
         <td><button onclick="eliminarFila(this)">Eliminar</button></td>
       `;
     }
@@ -285,17 +284,17 @@
   }
 
   // Crear documento base de la serie
-  await db.collection("animes-series").doc(nombreSerie).set({ nombre: nombreSerie }, { merge: true });
+  await db.collection("animes-series-enlaces").doc(nombreSerie).set({ nombre: nombreSerie }, { merge: true });
 
   // Crear temporada
-  await db.collection("animes-series")
+  await db.collection("animes-series-enlaces")
     .doc(nombreSerie)
     .collection("Temporadas")
     .doc(temporada)
     .set({ nombre: temporada }, { merge: true });
 
   // Crear idioma
-  await db.collection("animes-series")
+  await db.collection("animes-series-enlaces")
     .doc(nombreSerie)
     .collection("Temporadas")
     .doc(temporada)
@@ -304,7 +303,7 @@
     .set({ nombre: idioma }, { merge: true });
 
   // Crear servidor
-  await db.collection("animes-series")
+  await db.collection("animes-series-enlaces")
     .doc(nombreSerie)
     .collection("Temporadas")
     .doc(temporada)
@@ -320,7 +319,7 @@
     const codigo = fila.cells[1].querySelector("input").value.trim();
 
     if (episodio && codigo) {
-      await db.collection("animes-series")
+      await db.collection("animes-series-enlaces")
         .doc(nombreSerie)
         .collection("Temporadas")
         .doc(temporada)
@@ -330,7 +329,7 @@
         .doc(servidor)
         .collection("Episodios")
         .doc(episodio)
-        .set({ iframe: codigo }, { merge: true });
+        .set({ url: codigo }, { merge: true });
     }
   }
 

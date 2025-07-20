@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar URL de la Serie Registrada</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    h1 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 32px;
+        font-weight: 600;
+    }
+    
+    h2 {
+        color: #1a73e8;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 24px;
+        border-bottom: 2px solid #e0e9ff;
+        padding-bottom: 8px;
+    }
+    
+    label {
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    
+    select, input[type="text"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin-top: 5px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+        background-color: #f8fbff;
+    }
+    
+    select:focus, input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        outline: none;
+        background-color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    th, td {
+        border: 1px solid #e0e9ff;
+        padding: 12px 15px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+    
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+    
+    button {
+        padding: 12px 20px;
+        margin-top: 10px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+    
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    button.cancelar {
+        background-color: #dc3545;
+        margin-left: 10px;
+    }
+    
+    button.cancelar:hover {
+        background-color: #bb2d3b;
+    }
+    
+    .row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .row select, .row input {
+        flex: 1;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        padding: 20px;
+        background-color: #f8fbff;
+        border-radius: 10px;
+        border: 1px solid #e0e9ff;
+    }
+    
+    .acciones {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    /* Estilo para los botones dentro de las celdas de la tabla */
+    td button {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* Estilo para los inputs dentro de la tabla */
+    td input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d3e3fd;
+        border-radius: 6px;
+        background-color: white;
+    }
+    
+    /* Estilo para el botón de agregar fila */
+    #btnAgregarFila {
+        background-color: #34a853;
+        margin-top: 15px;
+    }
+    
+    #btnAgregarFila:hover {
+        background-color: #2d9249;
+    }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar URL de las Series</h1>
+
+    <div class="form-group">
+      <label>Nombre de la Serie</label>
+      <select id="serieSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Temporada</label>
+      <select id="temporadaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button onclick="nuevaEntrada('temporada')">Nueva Temporada</button>
+      <div id="nuevaTemporadaInput" class="hidden">
+        <input type="text" id="nuevaTemporada" placeholder="Ej: Temporada 02" />
+        <button onclick="cancelarEntrada('temporada')">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Idioma</label>
+      <select id="idiomaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button type="button" onclick="nuevaEntrada('idioma')">Nuevo idioma</button>
+      <div id="nuevoIdiomaInput" class="hidden">
+        <input type="text" id="nuevoIdioma" placeholder="Ej: Español" />
+        <button type="button" onclick="cancelarEntrada('idioma')">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Servidor</label>
+      <select id="servidorSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button type="button" onclick="nuevaEntrada('servidor')">Nuevo servidor</button>
+      <div id="nuevoServidorInput" class="hidden">
+        <input type="text" id="nuevoServidor" placeholder="Ej: Servidor 01" />
+        <button type="button" onclick="cancelarEntrada('servidor')">Cancelar</button>
+      </div>
+    </div>
+
+    <h2>Episodios y Enlaces URL</h2>
+    <div>
+      <button onclick="document.getElementById('importarTxt').click()">📂 Importar TXT</button>
+      <button onclick="document.getElementById('importarExcel').click()">📥 Importar Excel</button>
+      <input type="file" id="importarTxt" accept=".txt" style="display: none;" />
+      <input type="file" id="importarExcel" accept=".xlsx, .xls" style="display: none;" />
+    </div>
+    <table id="tabla-episodios">
+      <thead>
+        <tr>
+          <th>Episodio</th>
+          <th>Enlace URL</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody"></tbody>
+    </table>
+    <button onclick="agregarFila()">Agregar Fila</button>
+
+    <div class="acciones">
+      <button onclick="guardarCambios()">Actualizar</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const serieSelect = document.getElementById("serieSelect");
+    const temporadaSelect = document.getElementById("temporadaSelect");
+    const idiomaSelect = document.getElementById("idiomaSelect");
+    const servidorSelect = document.getElementById("servidorSelect");
+
+    const nuevaTemporadaInput = document.getElementById("nuevaTemporadaInput");
+    const nuevoIdiomaInput = document.getElementById("nuevoIdiomaInput");
+    const nuevoServidorInput = document.getElementById("nuevoServidorInput");
+
+    let serieActual = "";
+    let temporadaActual = "";
+    let idiomaActual = "";
+    let servidorActual = "";
+
+    async function cargarSeries() {
+      const snapshot = await db.collection("animes-series-enlaces").get();
+      serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = option.text = doc.id;
+        serieSelect.appendChild(option);
+      });
+    }
+
+    async function cargarTemporadas() {
+      temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      const snapshot = await db.collection("animes-series-enlaces").doc(serieActual).collection("Temporadas").get();
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = option.text = doc.id;
+        temporadaSelect.appendChild(option);
+      });
+    }
+
+    async function cargarIdiomas() {
+      idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      const snapshot = await db.collection("animes-series-enlaces").doc(serieActual).collection("Temporadas").doc(temporadaActual).collection("Idiomas").get();
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = option.text = doc.id;
+        idiomaSelect.appendChild(option);
+      });
+    }
+
+    async function cargarServidores() {
+      servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      const snapshot = await db.collection("animes-series-enlaces").doc(serieActual).collection("Temporadas").doc(temporadaActual).collection("Idiomas").doc(idiomaActual).collection("Servidores").get();
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = option.text = doc.id;
+        servidorSelect.appendChild(option);
+      });
+    }
+
+   async function cargarEpisodios() {
+  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+  tabla.innerHTML = "";
+
+  const temporada = temporadaSelect.value;
+  const idioma = idiomaSelect.value;
+  const servidor = servidorSelect.value;
+
+  if (!temporada || !idioma || !servidor) return;
+
+  const ref = db
+    .collection("animes-series-enlaces")
+    .doc(serieActual)
+    .collection("Temporadas")
+    .doc(temporada)
+    .collection("Idiomas")
+    .doc(idioma)
+    .collection("Servidores")
+    .doc(servidor)
+    .collection("Episodios");
+
+  const snapshot = await ref.get();
+  snapshot.forEach(doc => {
+    const fila = tabla.insertRow();
+
+    const celEpisodio = fila.insertCell();
+    const inputEpisodio = document.createElement("input");
+    inputEpisodio.type = "text";
+    inputEpisodio.value = doc.id;
+    inputEpisodio.disabled = true; // No permitir editar nombre del documento (id)
+    celEpisodio.appendChild(inputEpisodio);
+
+    const celIframe = fila.insertCell();
+    const inputIframe = document.createElement("input");
+    inputIframe.type = "text";
+    inputIframe.value = doc.data().url;
+    celIframe.appendChild(inputIframe);
+
+    const celAcciones = fila.insertCell();
+
+    // Botón Guardar
+    const btnGuardar = document.createElement("button");
+    btnGuardar.textContent = "Guardar";
+    btnGuardar.onclick = async () => {
+      const nuevoIframe = inputIframe.value.trim();
+      if (nuevoIframe !== "") {
+        await ref.doc(doc.id).update({ url: nuevoIframe });
+        alert("Episodio actualizado");
+      }
+    };
+    celAcciones.appendChild(btnGuardar);
+
+    // Botón Eliminar
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar";
+    btnEliminar.onclick = async () => {
+      if (confirm("¿Estás seguro de eliminar este episodio?")) {
+        await ref.doc(doc.id).delete();
+        fila.remove();
+      }
+    };
+    celAcciones.appendChild(btnEliminar);
+  });
+}
+
+
+function cargarParaEdicion(episodio, url) {
+  document.getElementById("input-episodio").value = episodio;
+  document.getElementById("input-codigo").value = url;
+}
+
+async function eliminarEpisodio(episodio) {
+  if (!confirm(`¿Estás seguro de eliminar el episodio "${episodio}"?`)) return;
+
+  const temporada = temporadaSelect.value;
+  const idioma = idiomaSelect.value;
+  const servidor = servidorSelect.value;
+
+  const ref = db
+    .collection("animes-series-enlaces")
+    .doc(serieActual)
+    .collection("Temporadas")
+    .doc(temporada)
+    .collection("Idiomas")
+    .doc(idioma)
+    .collection("Servidores")
+    .doc(servidor)
+    .collection("Episodios")
+    .doc(episodio);
+
+  await ref.delete();
+  await cargarEpisodios(); // Refresca la tabla
+}
+
+
+    function nuevaEntrada(tipo) {
+      if (tipo === "temporada") {
+        temporadaSelect.disabled = true;
+        nuevaTemporadaInput.classList.remove("hidden");
+      } else if (tipo === "idioma") {
+        idiomaSelect.disabled = true;
+        nuevoIdiomaInput.classList.remove("hidden");
+      } else if (tipo === "servidor") {
+        servidorSelect.disabled = true;
+        nuevoServidorInput.classList.remove("hidden");
+      }
+    }
+
+    function cancelarEntrada(tipo) {
+      if (tipo === "temporada") {
+        temporadaSelect.disabled = false;
+        nuevaTemporadaInput.classList.add("hidden");
+      } else if (tipo === "idioma") {
+        idiomaSelect.disabled = false;
+        nuevoIdiomaInput.classList.add("hidden");
+      } else if (tipo === "servidor") {
+        servidorSelect.disabled = false;
+        nuevoServidorInput.classList.add("hidden");
+      }
+    }
+
+    function agregarFila() {
+  const table = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+  const newRow = table.insertRow();
+
+  newRow.innerHTML = `
+    <td><input type="text" placeholder="Ej: Episodio X"></td>
+    <td><input type="text" placeholder="https://..."></td>
+    <td>
+      <button onclick="guardarNuevoEpisodio(this)">Guardar</button>
+      <button onclick="eliminarFila(this)">Eliminar</button>
+    </td>
+  `;
+}
+
+async function guardarNuevoEpisodio(boton) {
+  const fila = boton.parentElement.parentElement;
+  const episodioInput = fila.cells[0].querySelector('input');
+  const iframeInput = fila.cells[1].querySelector('input');
+
+  const episodioNombre = episodioInput.value.trim();
+  const url = iframeInput.value.trim();
+
+  const temporada = temporadaSelect.value || temporadaInput?.value?.trim();
+  const idioma = idiomaSelect.value || idiomaInput?.value?.trim();
+  const servidor = servidorSelect.value || servidorInput?.value?.trim();
+
+  if (!serieActual || !temporada || !idioma || !servidor || !episodioNombre || !url) {
+    alert("Por favor completa todos los campos antes de guardar.");
+    return;
+  }
+
+  try {
+    const ref = db
+      .collection("animes-series-enlaces")
+      .doc(serieActual)
+      .collection("Temporadas")
+      .doc(temporada)
+      .collection("Idiomas")
+      .doc(idioma)
+      .collection("Servidores")
+      .doc(servidor)
+      .collection("Episodios")
+      .doc(episodioNombre);
+
+    await ref.set({ url });
+
+    alert("Nuevo episodio registrado con éxito.");
+    cargarEpisodios(); // Refresca la tabla
+  } catch (error) {
+    console.error("Error al guardar episodio:", error);
+    alert("Hubo un error al guardar el episodio.");
+  }
+  location.reload();
+}
+
+
+    function eliminarFila(boton) {
+      const fila = boton.parentNode.parentNode;
+      fila.parentNode.removeChild(fila);
+    }
+    
+     document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('importarTxt').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const contenido = e.target.result;
+        const lineas = contenido.split('\n');
+
+        const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+
+        lineas.forEach(linea => {
+          if (linea.trim() === '') return;
+          const partes = linea.split(';');
+          if (partes.length !== 2) return;
+
+          const episodio = partes[0].trim();
+          const codigo = partes[1].trim();
+
+          const newRow = tabla.insertRow();
+          newRow.innerHTML = `
+            <td><input type="text" value="${episodio}"></td>
+            <td><input type="text" value="${codigo}"></td>
+            <td><button onclick="eliminarFila(this)">Eliminar</button></td>
+          `;
+        });
+
+        alert("Importación completada.");
+      };
+      reader.readAsText(file);
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Manejar importación desde archivo Excel
+    const inputExcel = document.getElementById('importarExcel');
+    if (inputExcel) {
+      inputExcel.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+
+          rows.forEach(row => {
+            if (row.length < 2) return;
+            const episodio = String(row[0]).trim();
+            const codigo = String(row[1]).trim();
+
+            if (episodio && codigo) {
+              const nuevaFila = tabla.insertRow();
+              nuevaFila.innerHTML = `
+                <td><input type="text" value="${episodio}"></td>
+                <td><input type="text" value="${codigo}"></td>
+                <td><button onclick="eliminarFila(this)">Eliminar</button></td>
+              `;
+            }
+          });
+
+          alert("Importación desde Excel completada.");
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }});
+
+    async function guardarCambios() {
+  const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
+  const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
+  const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
+
+  // 1. Validar y crear nueva temporada si existe
+  if (nuevaTemporada) {
+    temporadaActual = nuevaTemporada;
+    await db.collection("animes-series-enlaces")
+            .doc(serieActual)
+            .collection("Temporadas")
+            .doc(temporadaActual)
+            .set({ creada: true });
+  }
+
+  // 2. Validar y crear nuevo idioma si existe
+  if (nuevoIdioma) {
+    idiomaActual = nuevoIdioma;
+    await db.collection("animes-series-enlaces")
+            .doc(serieActual)
+            .collection("Temporadas")
+            .doc(temporadaActual)
+            .collection("Idiomas")
+            .doc(idiomaActual)
+            .set({ creado: true });
+  }
+
+  // 3. Validar y crear nuevo servidor si existe
+  if (nuevoServidor) {
+    servidorActual = nuevoServidor;
+    await db.collection("animes-series-enlaces")
+            .doc(serieActual)
+            .collection("Temporadas")
+            .doc(temporadaActual)
+            .collection("Idiomas")
+            .doc(idiomaActual)
+            .collection("Servidores")
+            .doc(servidorActual)
+            .set({ creado: true });
+  }
+
+  // 4. Guardar episodios escritos en la tabla
+  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+  const filas = tabla.getElementsByTagName("tr");
+
+  for (const fila of filas) {
+    const inputs = fila.getElementsByTagName("input");
+    const nombreEpisodio = inputs[0]?.value?.trim();
+    const url = inputs[1]?.value?.trim();
+
+    if (nombreEpisodio && url) {
+      await db.collection("animes-series-enlaces")
+              .doc(serieActual)
+              .collection("Temporadas")
+              .doc(temporadaActual)
+              .collection("Idiomas")
+              .doc(idiomaActual)
+              .collection("Servidores")
+              .doc(servidorActual)
+              .collection("Episodios")
+              .doc(nombreEpisodio)
+              .set({ url });
+    }
+  }
+
+  // 5. Recargar listas (por si se agregó algo nuevo)
+  cargarTemporadas();
+  cargarEpisodios();
+
+  alert("Datos guardados correctamente.");
+  location.reload();
+}
+
+
+    serieSelect.addEventListener("change", () => {
+      serieActual = serieSelect.value;
+      cargarTemporadas();
+    });
+
+    temporadaSelect.addEventListener("change", () => {
+      temporadaActual = temporadaSelect.value;
+      cargarIdiomas();
+    });
+
+    idiomaSelect.addEventListener("change", () => {
+      idiomaActual = idiomaSelect.value;
+      cargarServidores();
+    });
+
+    servidorSelect.addEventListener("change", () => {
+      servidorActual = servidorSelect.value;
+      cargarEpisodios();
+    });
+
+    document.addEventListener("DOMContentLoaded", cargarSeries);
+  </script>
+</body>
+</html>

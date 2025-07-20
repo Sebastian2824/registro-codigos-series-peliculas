@@ -131,7 +131,7 @@
 </head>
 <body>
 
-  <h2>Lista de Series Registradas</h2>
+  <h2>Lista de Series Registradas - URLs</h2>
 
   <h2>Filtro de Series</h2>
   <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
@@ -153,7 +153,7 @@
     <th>Idioma</th>
     <th>Servidor</th>
     <th>Episodio</th>
-    <th style="max-width: 300px; word-break: break-word;">Código iframe</th>
+    <th style="max-width: 300px; word-break: break-word;">Enlaces - URLs</th>
     <th>Copiar</th>
   </tr>
 </thead>
@@ -194,34 +194,34 @@
       tablaBody.innerHTML = "";
       datosCargados = [];
 
-      const seriesSnapshot = await db.collection("animes-series").get();
+      const seriesSnapshot = await db.collection("animes-series-enlaces").get();
 
       for (const serieDoc of seriesSnapshot.docs) {
         const nombreSerie = serieDoc.id;
 
-        const temporadasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").get();
+        const temporadasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").get();
 
         for (const temporadaDoc of temporadasSnapshot.docs) {
           const temporada = temporadaDoc.id;
 
-          const idiomasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+          const idiomasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
 
           for (const idiomaDoc of idiomasSnapshot.docs) {
             const idioma = idiomaDoc.id;
 
-            const servidoresSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+            const servidoresSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
 
             for (const servidorDoc of servidoresSnapshot.docs) {
               const servidor = servidorDoc.id;
 
-              const episodiosSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+              const episodiosSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
 
               for (const episodioDoc of episodiosSnapshot.docs) {
                 const episodio = episodioDoc.id;
                 const data = episodioDoc.data();
-                const iframe = data.iframe || "";
+                const url = data.url || "";
 
-                datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, iframe });
+                datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
               }
             }
           }
@@ -294,8 +294,8 @@
     <td>${d.idioma}</td>
     <td>${d.servidor}</td>
     <td>${d.episodio}</td>
-    <td style="max-width: 300px; word-break: break-word;">${d.iframe || ""}</td>
-    <td><button onclick="copiarIframe('${encodeURIComponent(d.iframe || "")}')">📋</button></td>
+    <td style="max-width: 300px; word-break: break-word;">${d.url || ""}</td>
+    <td><button onclick="copiarIframe('${encodeURIComponent(d.url || "")}')">📋</button></td>
   `;
   tablaBody.appendChild(fila);
 });
@@ -306,7 +306,7 @@
     function copiarIframe(iframeCodificado) {
   const codigo = decodeURIComponent(iframeCodificado);
   navigator.clipboard.writeText(codigo).then(() => {
-    alert("Código iframe copiado al portapapeles.");
+    alert("Enlace copiado al portapapeles.");
   }).catch(err => {
     alert("Error al copiar: " + err);
   });
@@ -314,18 +314,18 @@
 
 function copiarTodosIframe() {
   const iframes = datosFiltrados
-    .map(d => d.iframe)
+    .map(d => d.url)
     .filter(codigo => codigo && codigo.trim() !== "")
     .join("\n");
 
   if (iframes) {
     navigator.clipboard.writeText(iframes).then(() => {
-      alert("Todos los códigos iframe visibles han sido copiados.");
+      alert("Todos los enlaces visibles han sido copiados.");
     }).catch(err => {
       alert("Error al copiar: " + err);
     });
   } else {
-    alert("No hay códigos iframe para copiar.");
+    alert("No hay enlaces para copiar.");
   }
 }
 
@@ -372,7 +372,7 @@ function copiarTodosIframe() {
     function exportarTablaAExcel() {
       const tabla = document.getElementById("tablaSeries");
       const wb = XLSX.utils.table_to_book(tabla, { sheet: "Series filtradas" });
-      XLSX.writeFile(wb, "series_filtradas.xlsx");
+      XLSX.writeFile(wb, "series_filtradas_url.xlsx");
     }
 
     window.onload = cargarDatos;
