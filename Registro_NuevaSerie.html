@@ -223,7 +223,7 @@
           if (partes.length !== 2) return;
 
           const episodio = partes[0].trim();
-          const codigo = partes[1].trim();
+          const codigo = partes[1].trim().replace(/"/g, '&quot;');
 
           const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
           const newRow = table.insertRow();
@@ -253,7 +253,7 @@
         rows.forEach(row => {
           if (row.length < 2) return;
           const episodio = String(row[0]).trim();
-          const codigo = String(row[1]).trim();
+          const codigo = String(row[1]).trim().replace(/"/g, '&quot;');
 
           if (episodio && codigo) {
             const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
@@ -317,7 +317,7 @@
   // Guardar episodios
   for (let fila of filas) {
     const episodio = fila.cells[0].querySelector("input").value.trim();
-    const codigo = fila.cells[1].querySelector("input").value.trim();
+    const codigo = fila.cells[1].querySelector("input").value.trim().replace(/&quot;/g, '"');
 
     if (episodio && codigo) {
       await db.collection("animes-series")
