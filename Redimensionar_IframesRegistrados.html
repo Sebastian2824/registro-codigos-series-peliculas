@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar dimensiones de iframe</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f9ff;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      color: #1a73e8;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #1a73e8;
+    }
+
+    select, input[type="text"], textarea {
+      width: 100%;
+      padding: 12px 15px;
+      margin-top: 5px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background-color: #f8fbff;
+    }
+
+    select:focus, input[type="text"]:focus, textarea:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+      outline: none;
+      background-color: white;
+    }
+
+    textarea {
+      height: 120px;
+    }
+
+    .iframe-container {
+      background: #f8fbff;
+      padding: 15px;
+      border: 1px solid #e0e9ff;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    #formDimension {
+      display: none;
+      background: #e3f3ff;
+      padding: 20px;
+      border: 1px solid #d3e3fd;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-top: 10px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+
+    button:hover {
+      background-color: #1557b0;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar dimensiones de iframe</h1>
+
+    <div class="form-group">
+      <label>Serie</label>
+      <select id="serieSelect" onchange="cargarTemporadas()">
+        <option value="">Selecciona una serie</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Temporada</label>
+      <select id="temporadaSelect" onchange="cargarIdiomas()">
+        <option value="">Selecciona una temporada</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Idioma</label>
+      <select id="idiomaSelect" onchange="cargarServidores()">
+        <option value="">Selecciona un idioma</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Servidor</label>
+      <select id="servidorSelect" onchange="cargarEpisodios()">
+        <option value="">Selecciona un servidor</option>
+      </select>
+    </div>
+
+    <div id="episodiosContainer"></div>
+
+    <button onclick="mostrarFormulario()" id="btnModificar" style="display:none;">Modificar dimensión del video</button>
+
+    <div id="formDimension">
+      <label>Nuevo width:</label>
+      <input type="text" id="nuevoWidth" placeholder='Ej: 100%' />
+      <label>Nuevo height:</label>
+      <input type="text" id="nuevoHeight" placeholder='Ej: 500' />
+      <button onclick="aplicarCambiosDimension()">Realizar cambios</button>
+    </div>
+
+    <div style="margin-top: 30px; text-align: right;">
+      <button onclick="guardarCambios()">Guardar cambios</button>
+    </div>
+  </div>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    window.onload = () => {
+      cargarSeries();
+    };
+
+    async function cargarSeries() {
+      const snapshot = await db.collection("animes-series").get();
+      const select = document.getElementById("serieSelect");
+      select.innerHTML = `<option value="">Selecciona una serie</option>`;
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = doc.id;
+        select.appendChild(option);
+      });
+    }
+
+    async function cargarTemporadas() {
+      const serie = document.getElementById("serieSelect").value;
+      const select = document.getElementById("temporadaSelect");
+      select.innerHTML = `<option value="">Selecciona una temporada</option>`;
+      limpiarSelects("idiomaSelect", "servidorSelect");
+      limpiarContenedores();
+
+      if (!serie) return;
+
+      const snapshot = await db.collection("animes-series").doc(serie).collection("Temporadas").get();
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = doc.id;
+        select.appendChild(option);
+      });
+    }
+
+    async function cargarIdiomas() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      const select = document.getElementById("idiomaSelect");
+      select.innerHTML = `<option value="">Selecciona un idioma</option>`;
+      limpiarSelects("servidorSelect");
+      limpiarContenedores();
+
+      if (!temporada) return;
+
+      const snapshot = await db.collection("animes-series")
+        .doc(serie).collection("Temporadas")
+        .doc(temporada).collection("Idiomas").get();
+
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = doc.id;
+        select.appendChild(option);
+      });
+    }
+
+    async function cargarServidores() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      const idioma = document.getElementById("idiomaSelect").value;
+      const select = document.getElementById("servidorSelect");
+      select.innerHTML = `<option value="">Selecciona un servidor</option>`;
+      limpiarContenedores();
+
+      if (!idioma) return;
+
+      const snapshot = await db.collection("animes-series")
+        .doc(serie).collection("Temporadas")
+        .doc(temporada).collection("Idiomas")
+        .doc(idioma).collection("Servidores").get();
+
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = doc.id;
+        select.appendChild(option);
+      });
+    }
+
+    async function cargarEpisodios() {
+  const serie = document.getElementById("serieSelect").value;
+  const temporada = document.getElementById("temporadaSelect").value;
+  const idioma = document.getElementById("idiomaSelect").value;
+  const servidor = document.getElementById("servidorSelect").value;
+  const contenedor = document.getElementById("episodiosContainer");
+  contenedor.innerHTML = "";
+  document.getElementById("formDimension").style.display = "none";
+  document.getElementById("btnModificar").style.display = "none";
+
+  if (!servidor) return;
+
+  const snapshot = await db.collection("animes-series")
+    .doc(serie).collection("Temporadas")
+    .doc(temporada).collection("Idiomas")
+    .doc(idioma).collection("Servidores")
+    .doc(servidor).collection("Episodios")
+    .get();
+
+  if (snapshot.empty) return;
+
+  let tablaHTML = `
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+      <thead style="background-color: #e0ebff; text-align: left;">
+        <tr>
+          <th style="padding: 10px; border-bottom: 2px solid #b2c9f6;">Episodio</th>
+          <th style="padding: 10px; border-bottom: 2px solid #b2c9f6;">Código iframe</th>
+          <th style="padding: 10px; border-bottom: 2px solid #b2c9f6;">Width</th>
+          <th style="padding: 10px; border-bottom: 2px solid #b2c9f6;">Height</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  snapshot.forEach(doc => {
+    const episodio = doc.id;
+    const iframe = doc.data().iframe || "";
+
+  // Buscar width y height en el iframe
+const widthMatch = iframe.match(/(?:\s|^)width\s*=\s*(?:"([^"]+)"|(\d+))/i);
+const heightMatch = iframe.match(/(?:\s|^)height\s*=\s*(?:"([^"]+)"|(\d+))/i);
+
+const width = widthMatch ? (widthMatch[1] || widthMatch[2]) : '';
+const height = heightMatch ? (heightMatch[1] || heightMatch[2]) : '';
+
+
+    tablaHTML += `
+      <tr style="background-color: #f9fbff;">
+        <td style="padding: 10px; border-bottom: 1px solid #d3e3fd;">${episodio}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #d3e3fd;">
+          <textarea data-episodio="${episodio}" style="width: 100%; height: 100px;">${iframe}</textarea>
+        </td>
+        <td style="padding: 10px; border-bottom: 1px solid #d3e3fd;">${width}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #d3e3fd;">${height}</td>
+      </tr>
+    `;
+  });
+
+  tablaHTML += `
+      </tbody>
+    </table>
+  `;
+
+  contenedor.innerHTML = tablaHTML;
+
+  document.getElementById("btnModificar").style.display = "block";
+}
+
+
+    function mostrarFormulario() {
+      document.getElementById("formDimension").style.display = "block";
+    }
+
+    function aplicarCambiosDimension() {
+  const nuevoWidth = document.getElementById("nuevoWidth").value.trim();
+  const nuevoHeight = document.getElementById("nuevoHeight").value.trim();
+
+  if (!nuevoWidth || !nuevoHeight) {
+    alert("Debes ingresar valores para width y height.");
+    return;
+  }
+
+  const textareas = document.querySelectorAll("#episodiosContainer textarea");
+
+  textareas.forEach(textarea => {
+    let iframe = textarea.value;
+
+    // Detectar y reemplazar width según su estilo original
+    const widthMatch = iframe.match(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/);
+    if (widthMatch) {
+      const atributo = widthMatch[1]; // 'width' o 'WIDTH'
+      iframe = iframe.replace(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoWidth}"`);
+    } else {
+      iframe = iframe.replace(/<iframe/i, `<iframe width="${nuevoWidth}"`);
+    }
+
+    // Detectar y reemplazar height según su estilo original
+    const heightMatch = iframe.match(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/);
+    if (heightMatch) {
+      const atributo = heightMatch[1]; // 'height' o 'HEIGHT'
+      iframe = iframe.replace(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoHeight}"`);
+    } else {
+      iframe = iframe.replace(/<iframe/i, `<iframe height="${nuevoHeight}"`);
+    }
+
+    // Actualizar el contenido del textarea
+    textarea.value = iframe;
+
+    // Actualizar la tabla: buscar la fila y cambiar columnas de width y height
+    const fila = textarea.closest("tr");
+    if (fila) {
+      fila.children[2].textContent = nuevoWidth;  // Columna width
+      fila.children[3].textContent = nuevoHeight; // Columna height
+    }
+  });
+
+  alert("Las dimensiones han sido actualizadas en los campos mostrados. Pulsa 'Actualizar en Firebase' para guardar.");
+}
+
+    async function guardarCambios() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      const idioma = document.getElementById("idiomaSelect").value;
+      const servidor = document.getElementById("servidorSelect").value;
+
+      const textareas = document.querySelectorAll("#episodiosContainer textarea");
+
+      for (let textarea of textareas) {
+        const episodio = textarea.dataset.episodio;
+        const nuevoCodigo = textarea.value.trim();
+
+        await db.collection("animes-series")
+          .doc(serie).collection("Temporadas")
+          .doc(temporada).collection("Idiomas")
+          .doc(idioma).collection("Servidores")
+          .doc(servidor).collection("Episodios")
+          .doc(episodio)
+          .set({ iframe: nuevoCodigo }, { merge: true });
+      }
+
+      alert("Cambios guardados correctamente.");
+    }
+
+    function limpiarSelects(...ids) {
+      ids.forEach(id => {
+        const s = document.getElementById(id);
+        if (s) s.innerHTML = `<option value="">Selecciona una opción</option>`;
+      });
+    }
+
+    function limpiarContenedores() {
+      document.getElementById("episodiosContainer").innerHTML = "";
+      document.getElementById("formDimension").style.display = "none";
+      document.getElementById("btnModificar").style.display = "none";
+    }
+  </script>
+</body>
+</html>
