@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buscador</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .search-container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 0 0 20px 0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      width: fit-content;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    h1 {
+      color: #0077b6;
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+    }
+    #search-input {
+      width: 80%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: 2px solid #0096c7;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #search-input:focus {
+      outline: none;
+      border-color: #0077b6;
+      box-shadow: 0 0 0 3px rgba(0, 150, 199, 0.2);
+    }
+    #search-btn {
+      padding: 12px 25px;
+      margin: 15px auto;
+      background: linear-gradient(to right, #0096c7, #0077b6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 118, 182, 0.2);
+      display: block;
+    }
+    #search-btn:hover {
+      background: linear-gradient(to right, #0077b6, #005f8a);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 118, 182, 0.3);
+    }
+    .season-button {
+      padding: 12px 25px;
+      margin: 10px 5px;
+      background: linear-gradient(to right, #0096c7, #0077b6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 118, 182, 0.2);
+    }
+    .season-button:hover {
+      background: linear-gradient(to right, #0077b6, #005f8a);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 118, 182, 0.3);
+    }
+    .link-button {
+      padding: 12px 25px;
+      background: linear-gradient(to right, #00b4d8, #0096c7);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 15px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+    }
+    .link-button:hover {
+      background: linear-gradient(to right, #0096c7, #0077b6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
+    }
+    .series-image {
+      max-width: 250px;
+      height: auto;
+      margin: 15px auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: block;
+    }
+    .hidden {
+      display: none;
+    }
+    #resultado {
+      margin-top: 20px;
+      text-align: center;
+    }
+    #resultado p {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+      text-align: center;
+    }
+    #resultado button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 12px 15px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(to right, #48cae4, #00b4d8);
+      color: white;
+      border-radius: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(72, 202, 228, 0.2);
+    }
+    #resultado button:hover {
+      background: linear-gradient(to right, #00b4d8, #0096c7);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(72, 202, 228, 0.3);
+    }
+    #resultado a {
+      display: inline-block;
+      margin: 20px auto 0;
+      padding: 12px 25px;
+      background: linear-gradient(to right, #00b4d8, #0096c7);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+    }
+    #resultado a:hover {
+      background: linear-gradient(to right, #0096c7, #0077b6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <h1>Buscador</h1>
+    <input type="text" id="search-input" placeholder="Escribe el nombre de la serie">
+    <button id="search-btn">Buscar</button>
+    <div id="resultado"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById('search-btn').addEventListener('click', function () {
+      const input = document.getElementById('search-input').value.trim().toLowerCase();
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = "";
+
+      if (!input) {
+        resultadoDiv.innerHTML = "<p style='color:#d32f2f;'>Escribe el nombre o parte del nombre de la serie.</p>";
+        return;
+      }
+
+      firebase.firestore().collection("animes-series-portadas")
+        .get()
+        .then(snapshot => {
+          const coincidencias = [];
+
+          snapshot.forEach(doc => {
+            const idSerie = doc.id.toLowerCase();
+            if (idSerie.includes(input)) {
+              coincidencias.push(doc.id);
+            }
+          });
+
+          if (coincidencias.length === 0) {
+            resultadoDiv.innerHTML = "<p>No se encontró ninguna serie con ese nombre.</p>";
+          } else if (coincidencias.length === 1) {
+            mostrarTemporadas(coincidencias[0]);
+          } else {
+            resultadoDiv.innerHTML = "<p>Se encontraron varias series.</p>";
+            resultadoDiv.innerHTML += "<p>Selecciona la correcta:</p>";
+            coincidencias.forEach(serieId => {
+              const btn = document.createElement("button");
+              btn.textContent = serieId;
+              btn.onclick = () => mostrarTemporadas(serieId);
+              resultadoDiv.appendChild(btn);
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error en la búsqueda:", error);
+          resultadoDiv.innerHTML = "<p style='color:#d32f2f;'>Ocurrió un error al buscar. Intenta nuevamente.</p>";
+        });
+    });
+
+    function mostrarTemporadas(serieId) {
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = `<p>Excelente, existe la serie</p>`;
+      resultadoDiv.innerHTML += `<p><strong>${serieId}</strong></p>`;
+      resultadoDiv.innerHTML += `<p>¿Qué temporada deseas ver?</p>`;
+
+      firebase.firestore()
+        .collection("animes-series-portadas")
+        .doc(serieId)
+        .collection("Temporadas")
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            const btn = document.createElement("button");
+            btn.textContent = doc.id;
+            btn.onclick = () => mostrarDetallesTemporada(serieId, doc.id);
+            resultadoDiv.appendChild(btn);
+          });
+        });
+    }
+
+    function mostrarDetallesTemporada(serieId, temporadaId) {
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = "";
+
+      firebase.firestore()
+        .collection("animes-series-portadas")
+        .doc(serieId)
+        .collection("Temporadas")
+        .doc(temporadaId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            const img = document.createElement("img");
+            img.src = data.imagen;
+            img.className = "series-image";
+
+            const enlace = document.createElement("a");
+            enlace.href = data.enlace;
+            enlace.textContent = "Ver ahora";
+            enlace.className = "link-button";
+            enlace.target = "_blank";
+
+            resultadoDiv.appendChild(img);
+            resultadoDiv.appendChild(enlace);
+          } else {
+            resultadoDiv.innerHTML = "<p>Temporada no encontrada.</p>";
+          }
+        });
+    }
+  </script>
+</body>
+</html>
