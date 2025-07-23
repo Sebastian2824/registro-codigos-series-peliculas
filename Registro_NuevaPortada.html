@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Portada de la Serie</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    
+    h2 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 28px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+    
+    input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        outline: none;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    th, td {
+        border: 1px solid #e0e9ff;
+        padding: 12px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+    
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+    
+    button {
+        padding: 12px 20px;
+        margin-top: 15px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    #btnAgregarFila {
+        background-color: #34a853;
+        margin-right: 10px;
+    }
+    
+    #btnAgregarFila:hover {
+        background-color: #2d9249;
+    }
+    
+    #btnGuardar {
+        background-color: #1a73e8;
+        padding: 12px 30px;
+    }
+    
+    h3 {
+        color: #1a73e8;
+        border-bottom: 2px solid #d3e3fd;
+        padding-bottom: 10px;
+        margin-top: 30px;
+    }
+    
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+  <h2>Registrar Nueva Portada de la Serie</h2>
+
+  <label>Nombre de la serie:</label>
+  <input type="text" id="serieNombre"><br><br>
+
+  <label>Temporada (ej: Temporada 1):</label>
+  <input type="text" id="temporada"><br><br>
+
+  <label>Enlace de imagen de portada:</label>
+<input type="text" id="enlaceImagen"><br><br>
+
+<label>Enlace de redirección:</label>
+<input type="text" id="enlaceSitio"><br><br>
+
+ <div class="button-container">
+    <button id="btnGuardar">Guardar en Firebase</button>
+</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    window.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('btnGuardar').addEventListener('click', guardarEnFirebase);
+  }); 
+
+   async function guardarEnFirebase() {
+  const nombreSerie = document.getElementById("serieNombre").value.trim();
+  const temporada = document.getElementById("temporada").value.trim();
+  const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+  const enlaceSitio = document.getElementById("enlaceSitio").value.trim();
+
+  if (!nombreSerie || !temporada || !enlaceImagen || !enlaceSitio) {
+    alert("Por favor, completa todos los campos antes de guardar.");
+    return;
+  }
+
+  try {
+    // 1. Crear documento base de la serie
+    await db.collection("animes-series-portadas")
+      .doc(nombreSerie)
+      .set({ nombre: nombreSerie }, { merge: true });
+
+    // 2. Crear documento de la temporada dentro de la serie
+    await db.collection("animes-series-portadas")
+      .doc(nombreSerie)
+      .collection("Temporadas")
+      .doc(temporada)
+      .set({
+        imagen: enlaceImagen,
+        sitio: enlaceSitio
+      }, { merge: true });
+
+    alert("Portada registrada correctamente.");
+
+    // Opcional: limpiar campos
+    document.getElementById("serieNombre").value = "";
+    document.getElementById("temporada").value = "";
+    document.getElementById("enlaceImagen").value = "";
+    document.getElementById("enlaceSitio").value = "";
+
+  } catch (error) {
+    console.error("Error al guardar en Firebase:", error);
+    alert("Hubo un error al guardar los datos.");
+  }
+}
+
+    document.getElementById('btnGuardar').addEventListener('click', guardarEnFirebase);
+  </script>
+</body>
+</html>

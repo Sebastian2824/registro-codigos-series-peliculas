@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Imagen y Sitio de Serie</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      text-align: center;
+      color: #1a73e8;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
+      color: #1a73e8;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #f8fbff;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background-color: white;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    .hidden {
+      display: none;
+    }
+    .preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar Imagen y Sitio de Serie</h1>
+
+    <label for="serieSelect">Nombre de la Serie</label>
+    <select id="serieSelect">
+      <option value="" disabled selected>Seleccionar serie...</option>
+    </select>
+
+    <label for="temporadaSelect">Temporada</label>
+    <div class="acciones">
+      <select id="temporadaSelect">
+        <option value="" disabled selected>Seleccionar temporada...</option>
+      </select>
+      <button onclick="nuevaTemporada()">+</button>
+    </div>
+
+    <div id="nuevaTemporadaInput" class="hidden">
+      <input type="text" id="nuevaTemporada" placeholder="Ej: Temporada 2" />
+      <button onclick="cancelarNuevaTemporada()">Cancelar</button>
+    </div>
+
+    <label for="enlaceImagen">Enlace de la Imagen</label>
+    <input type="text" id="enlaceImagen" placeholder="https://ejemplo.com/imagen.jpg" />
+
+    <label for="enlaceSitio">Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio" placeholder="https://sitio.com/serie/episodios" />
+
+    <button onclick="guardarCambios()">Guardar Cambios</button>
+
+    <div class="preview" id="previewImagen"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const serieSelect = document.getElementById("serieSelect");
+    const temporadaSelect = document.getElementById("temporadaSelect");
+    const enlaceImagen = document.getElementById("enlaceImagen");
+    const enlaceSitio = document.getElementById("enlaceSitio");
+    const previewImagen = document.getElementById("previewImagen");
+    const nuevaTemporadaInput = document.getElementById("nuevaTemporada");
+
+    let creandoTemporada = false;
+
+    async function cargarSeries() {
+      const snapshot = await db.collection("animes-series-portadas").get();
+      serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar serie...</option>';
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.text = doc.id;
+        serieSelect.appendChild(option);
+      });
+    }
+
+    async function cargarTemporadas() {
+      const serie = serieSelect.value;
+      if (!serie) return;
+      temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar temporada...</option>';
+      const snapshot = await db.collection("animes-series-portadas").doc(serie).collection("Temporadas").get();
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.text = doc.id;
+        temporadaSelect.appendChild(option);
+      });
+    }
+
+    async function cargarDatos() {
+      const serie = serieSelect.value;
+      const temporada = temporadaSelect.value;
+      if (!serie || !temporada) return;
+
+      const ref = db.collection("animes-series-portadas").doc(serie).collection("Temporadas").doc(temporada);
+      const doc = await ref.get();
+      if (doc.exists) {
+        const data = doc.data();
+        enlaceImagen.value = data.imagen || "";
+        enlaceSitio.value = data.sitio || "";
+        mostrarPreview(data.imagen);
+      } else {
+        enlaceImagen.value = "";
+        enlaceSitio.value = "";
+        previewImagen.innerHTML = "";
+      }
+    }
+
+    function mostrarPreview(url) {
+      previewImagen.innerHTML = url ? `<img src="${url}" alt="Vista previa">` : "";
+    }
+
+    function nuevaTemporada() {
+      creandoTemporada = true;
+      temporadaSelect.disabled = true;
+      document.getElementById("nuevaTemporadaInput").classList.remove("hidden");
+    }
+
+    function cancelarNuevaTemporada() {
+      creandoTemporada = false;
+      temporadaSelect.disabled = false;
+      document.getElementById("nuevaTemporadaInput").classList.add("hidden");
+      nuevaTemporadaInput.value = "";
+    }
+
+    async function guardarCambios() {
+      const serie = serieSelect.value;
+      const temporada = creandoTemporada ? nuevaTemporadaInput.value.trim() : temporadaSelect.value;
+      const imagen = enlaceImagen.value.trim();
+      const sitio = enlaceSitio.value.trim();
+
+      if (!serie || !temporada || !imagen || !sitio) {
+        alert("Completa todos los campos.");
+        return;
+      }
+
+      try {
+        await db.collection("animes-series-portadas")
+          .doc(serie)
+          .collection("Temporadas")
+          .doc(temporada)
+          .set({ imagen, sitio }, { merge: true });
+
+        alert("Datos actualizados correctamente.");
+        mostrarPreview(imagen);
+        if (creandoTemporada) {
+          cancelarNuevaTemporada();
+          await cargarTemporadas();
+          temporadaSelect.value = temporada;
+        }
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        alert("Hubo un error al guardar los datos.");
+      }
+    }
+
+    serieSelect.addEventListener("change", async () => {
+      await cargarTemporadas();
+      temporadaSelect.value = "";
+      enlaceImagen.value = "";
+      enlaceSitio.value = "";
+      previewImagen.innerHTML = "";
+    });
+
+    temporadaSelect.addEventListener("change", cargarDatos);
+
+    document.addEventListener("DOMContentLoaded", cargarSeries);
+  </script>
+</body>
+</html>
