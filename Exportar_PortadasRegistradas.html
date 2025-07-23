@@ -147,6 +147,7 @@
         <th>Temporada</th>
         <th>Enlace Imagen</th>
         <th>Enlace Sitio</th>
+        <th>Segundo Enlace Sitio</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -193,7 +194,8 @@
             nombreSerie,
             temporada,
             imagen: data.imagen || "",
-            sitio: data.sitio || ""
+            sitio: data.sitio || "",
+            sitio02: data.sitio02 || ""
           });
         }
       }
@@ -253,6 +255,7 @@
           <td>${d.temporada}</td>
           <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.imagen)}</td>
           <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.sitio)}</td>
+          <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.sitio02)}</td>
         `;
         tbody.appendChild(fila);
       });

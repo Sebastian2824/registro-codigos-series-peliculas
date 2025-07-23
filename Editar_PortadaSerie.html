@@ -104,6 +104,9 @@
     <label for="enlaceSitio">Enlace del Sitio</label>
     <input type="text" id="enlaceSitio" placeholder="https://sitio.com/serie/episodios" />
 
+    <label for="enlaceSitio02">Segundo Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio02" placeholder="https://sitio.com/serie/episodios" />
+
     <button onclick="guardarCambios()">Guardar Cambios</button>
 
     <div class="preview" id="previewImagen"></div>
@@ -130,6 +133,7 @@
     const temporadaSelect = document.getElementById("temporadaSelect");
     const enlaceImagen = document.getElementById("enlaceImagen");
     const enlaceSitio = document.getElementById("enlaceSitio");
+    const enlaceSitio02 = document.getElementById("enlaceSitio02");
     const previewImagen = document.getElementById("previewImagen");
     const nuevaTemporadaInput = document.getElementById("nuevaTemporada");
 
@@ -170,10 +174,12 @@
         const data = doc.data();
         enlaceImagen.value = data.imagen || "";
         enlaceSitio.value = data.sitio || "";
+        enlaceSitio02.value = data.sitio02 || "";
         mostrarPreview(data.imagen);
       } else {
         enlaceImagen.value = "";
         enlaceSitio.value = "";
+        enlaceSitio02.value = "";
         previewImagen.innerHTML = "";
       }
     }
@@ -200,8 +206,9 @@
       const temporada = creandoTemporada ? nuevaTemporadaInput.value.trim() : temporadaSelect.value;
       const imagen = enlaceImagen.value.trim();
       const sitio = enlaceSitio.value.trim();
+      const sitio02 = enlaceSitio02.value.trim();
 
-      if (!serie || !temporada || !imagen || !sitio) {
+      if (!serie || !temporada || !imagen || !sitio || !sitio02) {
         alert("Completa todos los campos.");
         return;
       }
@@ -211,7 +218,7 @@
           .doc(serie)
           .collection("Temporadas")
           .doc(temporada)
-          .set({ imagen, sitio }, { merge: true });
+          .set({ imagen, sitio, sitio02 }, { merge: true });
 
         alert("Datos actualizados correctamente.");
         mostrarPreview(imagen);
@@ -231,6 +238,7 @@
       temporadaSelect.value = "";
       enlaceImagen.value = "";
       enlaceSitio.value = "";
+      enlaceSitio02.value = "";
       previewImagen.innerHTML = "";
     });
 
