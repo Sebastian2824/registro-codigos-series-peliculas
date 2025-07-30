@@ -255,35 +255,48 @@
     }
 
     function mostrarDetallesTemporada(serieId, temporadaId) {
-      const resultadoDiv = document.getElementById('resultado');
-      resultadoDiv.innerHTML = "";
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = "";
 
-      firebase.firestore()
-        .collection("animes-series-portadas")
-        .doc(serieId)
-        .collection("Temporadas")
-        .doc(temporadaId)
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            const img = document.createElement("img");
-            img.src = data.imagen;
-            img.className = "series-image";
+  firebase.firestore()
+    .collection("animes-series-portadas")
+    .doc(serieId)
+    .collection("Temporadas")
+    .doc(temporadaId)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
 
-            const enlace = document.createElement("a");
-            enlace.href = data.enlace;
-            enlace.textContent = "Ver ahora";
-            enlace.className = "link-button";
-            enlace.target = "_blank";
+        const img = document.createElement("img");
+        img.src = data.imagen;
+        img.className = "series-image";
+        resultadoDiv.appendChild(img);
 
-            resultadoDiv.appendChild(img);
-            resultadoDiv.appendChild(enlace);
-          } else {
-            resultadoDiv.innerHTML = "<p>Temporada no encontrada.</p>";
-          }
-        });
-    }
+        if (data.sitio) {
+  const enlace = document.createElement("a");
+  enlace.href = data.sitio;
+  enlace.textContent = "Ver ahora";
+  enlace.className = "link-button";
+  enlace.target = "_blank";
+
+  // Al hacer clic, limpia el buscador y los resultados
+  enlace.addEventListener("click", () => {
+    document.getElementById("search-input").value = "";
+    setTimeout(() => {
+      document.getElementById("resultado").innerHTML = "";
+    }, 500); // Da un pequeño tiempo antes de borrar, por si el usuario quiere volver
+  });
+
+  resultadoDiv.appendChild(enlace);
+}
+
+      } else {
+        resultadoDiv.innerHTML = "<p>Temporada no encontrada.</p>";
+      }
+    });
+}
+
   </script>
 </body>
 </html>
