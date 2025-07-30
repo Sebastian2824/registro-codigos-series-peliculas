@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabla de Series desde Firebase</title>
+  
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+
+    h2 {
+        color: #1a73e8;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: 600;
+        border-bottom: 2px solid #e0e9ff;
+        padding-bottom: 8px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    table th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+        padding: 12px 15px;
+        text-align: left;
+    }
+
+    table td {
+        border: 1px solid #e0e9ff;
+        padding: 10px 15px;
+        vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+
+    select {
+        padding: 10px 15px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: #f8fbff;
+        color: #333;
+        min-width: 180px;
+    }
+
+    select:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        outline: none;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    .filtros-container {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        align-items: center;
+        background-color: #f8fbff;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #e0e9ff;
+    }
+
+    @media (max-width: 768px) {
+        .filtros-container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        select, button {
+            width: 100%;
+        }
+    }
+
+    #paginacion {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    #paginacion span {
+        font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Lista de Series de Descargas Registradas</h2>
+
+  <h2>Filtro de Series</h2>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+    <select id="filtroSerie"><option value="">Todas las series</option></select>
+    <select id="filtroTemporada"><option value="">Todas las temporadas</option></select>
+    <select id="filtroIdioma"><option value="">Todos los idiomas</option></select>
+    <select id="filtroServidor"><option value="">Todos los servidores</option></select>
+    <button onclick="aplicarFiltros()">Aplicar Filtros</button>
+    <button onclick="resetearFiltros()">Resetear</button>
+    <button onclick="exportarTablaAExcel()">📥 Exportar a Excel</button>
+    <button onclick="copiarTodosIframe()">📋 Copiar Todos</button>
+  </div>
+
+  <table id="tablaSeries">
+    <thead>
+  <tr>
+    <th>Serie</th>
+    <th>Temporada</th>
+    <th>Idioma</th>
+    <th>Servidor</th>
+    <th>Episodio</th>
+    <th style="max-width: 300px; word-break: break-word;">Enlace de Descarga</th>
+    <th>Copiar</th>
+  </tr>
+</thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="paginacion"></div>
+
+  <br>
+  
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let datosCargados = [];
+    let datosFiltrados = [];
+    let paginaActual = 1;
+    const registrosPorPagina = 10;
+
+    async function cargarDatos() {
+      const tablaBody = document.querySelector("#tablaSeries tbody");
+      tablaBody.innerHTML = "";
+      datosCargados = [];
+
+      const seriesSnapshot = await db.collection("animes-series-descargas").get();
+
+      for (const serieDoc of seriesSnapshot.docs) {
+        const nombreSerie = serieDoc.id;
+
+        const temporadasSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").get();
+
+        for (const temporadaDoc of temporadasSnapshot.docs) {
+          const temporada = temporadaDoc.id;
+
+          const idiomasSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+
+          for (const idiomaDoc of idiomasSnapshot.docs) {
+            const idioma = idiomaDoc.id;
+
+            const servidoresSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+
+            for (const servidorDoc of servidoresSnapshot.docs) {
+              const servidor = servidorDoc.id;
+
+              const episodiosSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+
+              for (const episodioDoc of episodiosSnapshot.docs) {
+                const episodio = episodioDoc.id;
+                const data = episodioDoc.data();
+                const iframe = data.iframe || "";
+
+                datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, iframe });
+              }
+            }
+          }
+        }
+      }
+
+      poblarFiltros();
+      aplicarFiltros();
+    }
+
+    function poblarFiltros() {
+      const serieSet = new Set();
+      const temporadaSet = new Set();
+      const idiomaSet = new Set();
+      const servidorSet = new Set();
+
+      datosCargados.forEach(d => {
+        serieSet.add(d.nombreSerie);
+        temporadaSet.add(d.temporada);
+        idiomaSet.add(d.idioma);
+        servidorSet.add(d.servidor);
+      });
+
+      llenarSelect("filtroSerie", Array.from(serieSet));
+      llenarSelect("filtroTemporada", Array.from(temporadaSet));
+      llenarSelect("filtroIdioma", Array.from(idiomaSet));
+      llenarSelect("filtroServidor", Array.from(servidorSet));
+    }
+
+    function llenarSelect(id, opciones) {
+      const select = document.getElementById(id);
+      const valorAnterior = select.value;
+      select.innerHTML = `<option value="">Todos</option>`;
+      opciones.sort().forEach(op => {
+        select.innerHTML += `<option value="${op}">${op}</option>`;
+      });
+      select.value = valorAnterior;
+    }
+
+    function aplicarFiltros() {
+      const serie = document.getElementById("filtroSerie").value;
+      const temporada = document.getElementById("filtroTemporada").value;
+      const idioma = document.getElementById("filtroIdioma").value;
+      const servidor = document.getElementById("filtroServidor").value;
+
+      datosFiltrados = datosCargados.filter(d =>
+        (!serie || d.nombreSerie === serie) &&
+        (!temporada || d.temporada === temporada) &&
+        (!idioma || d.idioma === idioma) &&
+        (!servidor || d.servidor === servidor)
+      );
+
+      paginaActual = 1;
+      mostrarPagina();
+    }
+
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+}
+
+    function mostrarPagina() {
+      const tablaBody = document.querySelector("#tablaSeries tbody");
+      tablaBody.innerHTML = "";
+
+      const inicio = (paginaActual - 1) * registrosPorPagina;
+      const fin = inicio + registrosPorPagina;
+      const pagina = datosFiltrados.slice(inicio, fin);
+
+      pagina.forEach(d => {
+  const fila = document.createElement("tr");
+  fila.innerHTML = `
+    <td>${d.nombreSerie}</td>
+    <td>${d.temporada}</td>
+    <td>${d.idioma}</td>
+    <td>${d.servidor}</td>
+    <td>${d.episodio}</td>
+    <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.iframe || "")}</td>
+    <td><button onclick="copiarIframe('${encodeURIComponent(d.iframe || "")}')">📋</button></td>
+  `;
+  tablaBody.appendChild(fila);
+});
+
+      renderizarControlesDePaginacion();
+    }
+
+    function copiarIframe(iframeCodificado) {
+  const codigo = decodeURIComponent(iframeCodificado);
+  navigator.clipboard.writeText(codigo).then(() => {
+    alert("Código iframe copiado al portapapeles.");
+  }).catch(err => {
+    alert("Error al copiar: " + err);
+  });
+}
+
+function copiarTodosIframe() {
+  const iframes = datosFiltrados
+    .map(d => d.iframe)
+    .filter(codigo => codigo && codigo.trim() !== "")
+    .join("\n");
+
+  if (iframes) {
+    navigator.clipboard.writeText(iframes).then(() => {
+      alert("Todos los códigos iframe visibles han sido copiados.");
+    }).catch(err => {
+      alert("Error al copiar: " + err);
+    });
+  } else {
+    alert("No hay códigos iframe para copiar.");
+  }
+}
+
+
+    function renderizarControlesDePaginacion() {
+      const contenedor = document.getElementById("paginacion");
+      contenedor.innerHTML = "";
+
+      const totalPaginas = Math.ceil(datosFiltrados.length / registrosPorPagina);
+
+      const btnAnterior = document.createElement("button");
+      btnAnterior.textContent = "⬅ Anterior";
+      btnAnterior.disabled = paginaActual === 1;
+      btnAnterior.onclick = () => {
+        paginaActual--;
+        mostrarPagina();
+      };
+
+      const btnSiguiente = document.createElement("button");
+      btnSiguiente.textContent = "Siguiente ➡";
+      btnSiguiente.disabled = paginaActual === totalPaginas;
+      btnSiguiente.onclick = () => {
+        paginaActual++;
+        mostrarPagina();
+      };
+
+      const info = document.createElement("span");
+      info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+      contenedor.appendChild(btnAnterior);
+      contenedor.appendChild(info);
+      contenedor.appendChild(btnSiguiente);
+    }
+
+    function resetearFiltros() {
+      document.getElementById("filtroSerie").value = "";
+      document.getElementById("filtroTemporada").value = "";
+      document.getElementById("filtroIdioma").value = "";
+      document.getElementById("filtroServidor").value = "";
+      paginaActual = 1;
+      aplicarFiltros();
+    }
+
+    function exportarTablaAExcel() {
+      const tabla = document.getElementById("tablaSeries");
+      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Series filtradas" });
+      XLSX.writeFile(wb, "series_descargas_filtradas.xlsx");
+    }
+
+    window.onload = cargarDatos;
+  </script>
+</body>
+</html>
