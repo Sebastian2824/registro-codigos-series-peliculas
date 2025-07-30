@@ -5,176 +5,274 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Buscador</title>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
       margin: 0;
-      min-height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
-    .search-container {
-      background-color: white;
-      padding: 40px;
-      border-radius: 0 0 20px 0;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      text-align: center;
-      width: fit-content;
+
+    body {
+      background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+      height: 100vh;
+    }
+
+    .contenedor-buscador {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      max-width: 440px;
+      margin-top: 40px;
+      background-color: #fff;
+      border-radius: 0 0 20px 0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      z-index: 100;
     }
-    h1 {
-      color: #0077b6;
-      margin-bottom: 25px;
-      font-size: 28px;
-      font-weight: 700;
+
+    .titulo-buscador {
       text-align: center;
+      margin-bottom: 15px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0077b6;
+      line-height: 1.2;
     }
-    #search-input {
-      width: 80%;
-      padding: 12px 15px;
-      margin: 10px 0;
+
+    .buscador {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      width: 100%;
       border: 2px solid #0096c7;
       border-radius: 10px;
-      font-size: 16px;
-      transition: all 0.3s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
+      background-color: #f0f8ff;
+      padding: 5px 10px;
     }
-    #search-input:focus {
+
+    .search input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      padding: 10px;
       outline: none;
-      border-color: #0077b6;
-      box-shadow: 0 0 0 3px rgba(0, 150, 199, 0.2);
+      color: #0077b6;
     }
-    #search-btn {
-      padding: 12px 25px;
-      margin: 15px auto;
-      background: linear-gradient(to right, #0096c7, #0077b6);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
+
+    .search ion-icon {
+      font-size: 20px;
+      color: #0077b6;
+      margin-right: 5px;
+    }
+
+    .resultados {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .resultado {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .resultado h3 {
       font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0, 118, 182, 0.2);
-      display: block;
+      color: #0077b6;
+      margin-bottom: 5px;
     }
-    #search-btn:hover {
-      background: linear-gradient(to right, #0077b6, #005f8a);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 118, 182, 0.3);
-    }
-    .season-button {
-      padding: 12px 25px;
-      margin: 10px 5px;
-      background: linear-gradient(to right, #0096c7, #0077b6);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0, 118, 182, 0.2);
-    }
-    .season-button:hover {
-      background: linear-gradient(to right, #0077b6, #005f8a);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 118, 182, 0.3);
-    }
-    .link-button {
-      padding: 12px 25px;
-      background: linear-gradient(to right, #00b4d8, #0096c7);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 15px;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
-    }
-    .link-button:hover {
-      background: linear-gradient(to right, #0096c7, #0077b6);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
-    }
-    .series-image {
+
+    .resultado img {
       max-width: 250px;
-      height: auto;
-      margin: 15px auto;
       border-radius: 10px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      display: block;
-    }
-    .hidden {
-      display: none;
-    }
-    #resultado {
-      margin-top: 20px;
-      text-align: center;
-    }
-    #resultado p {
-      color: #333;
-      margin-bottom: 15px;
-      font-size: 16px;
-      text-align: center;
-    }
-    #resultado button {
-      display: block;
-      width: 100%;
-      max-width: 300px;
       margin: 10px auto;
-      padding: 12px 15px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: linear-gradient(to right, #48cae4, #00b4d8);
-      color: white;
-      border-radius: 10px;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(72, 202, 228, 0.2);
+      display: block;
     }
-    #resultado button:hover {
-      background: linear-gradient(to right, #00b4d8, #0096c7);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(72, 202, 228, 0.3);
+
+    .no-resultados {
+      text-align: center;
+      color: #d32f2f;
+      font-size: 14px;
+      margin-top: 10px;
     }
-    #resultado a {
-      display: inline-block;
-      margin: 20px auto 0;
-      padding: 12px 25px;
-      background: linear-gradient(to right, #00b4d8, #0096c7);
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+
+    .resultados::-webkit-scrollbar {
+      width: 6px;
     }
-    #resultado a:hover {
-      background: linear-gradient(to right, #0096c7, #0077b6);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
+
+    .resultados::-webkit-scrollbar-thumb {
+      background-color: #0096c7;
+      border-radius: 4px;
     }
+    .button {
+  background: linear-gradient(to right, #00b4d8, #0096c7);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  margin: 8px auto;
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+}
+
+.button:hover {
+  background: linear-gradient(to right, #0096c7, #0077b6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
+}
+
+.resultado-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f1f1f1;
+  padding: 12px 15px;
+  margin: 8px 0;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.resultado-item:hover {
+  background-color: #e0e0e0;
+  transform: translateX(4px);
+}
+
+.resultado-item ion-icon {
+  font-size: 20px;
+  color: #0077b6;
+}
+/* Botón para volver a temporadas */
+.back-btn {
+  background-color: #29cc00;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: #20a000;
+}
+
+/* Botón para volver a resultados */
+.back-btn-resultados {
+  background-color: #29cc00;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-top: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-btn-resultados:hover {
+  background-color: #20a000;
+}
+
+/* Botones de temporadas normales */
+.temporada-btn {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  margin: 5px 5px 5px 0;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.temporada-btn:hover {
+  background-color: #666;
+}
+
+.temporada-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f1f1f1;
+  padding: 12px 15px;
+  margin: 8px 0;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.temporada-link:hover {
+   background-color: #e0e0e0;
+  transform: translateX(4px);
+}
+
+.ver-ahora-link {
+  display: flex;
+  justify-content: center;     /* Centra horizontalmente el contenido */
+  align-items: center;         /* Centra verticalmente el contenido */
+  gap: 10px;
+  padding: 12px 20px;
+  margin: 20px auto;           /* Centra el enlace horizontalmente */
+  text-decoration: none;
+  color: white;
+  background: linear-gradient(to right, #06d6a0, #118ab2);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(6, 214, 160, 0.2);
+  max-width: 300px;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.ver-ahora-link:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(6, 214, 160, 0.4);
+}
   </style>
 </head>
 <body>
-  <div class="search-container">
-    <h1>Buscador</h1>
-    <input type="text" id="search-input" placeholder="Escribe el nombre de la serie">
-    <button id="search-btn">Buscar</button>
-    <div id="resultado"></div>
+
+  <div class="contenedor-buscador">
+    <div class="titulo-buscador">
+      <div>Buscador de</div>
+      <div>Series y Películas Disponibles</div>
+    </div>
+
+    <div class="buscador">
+      <div class="search">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="text" id="search-input" placeholder="Escribe el nombre de la serie">
+      </div>
+    </div>
+
+    <div class="resultados" id="resultado"></div>
+    <div class="footer">
+            <span>Search by</span>
+           <ion-icon name="play-circle-outline"></ion-icon>
+            <span>Animes Plus</span>
+        </div>
   </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -190,76 +288,109 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    document.getElementById('search-btn').addEventListener('click', function () {
-      const input = document.getElementById('search-input').value.trim().toLowerCase();
-      const resultadoDiv = document.getElementById('resultado');
-      resultadoDiv.innerHTML = "";
+   let ultimaSerieBuscada = null; // Guardamos cuál serie se seleccionó
 
-      if (!input) {
-        resultadoDiv.innerHTML = "<p style='color:#d32f2f;'>Escribe el nombre o parte del nombre de la serie.</p>";
-        return;
+document.getElementById('search-input').addEventListener('keyup', function () {
+  const input = this.value.trim().toLowerCase();
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = "";
+
+  if (!input) {
+    return; // no hace nada si está vacío
+  }
+
+  const coincidenciasUnicas = new Set();
+
+  db.collection("animes-series-portadas")
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const idSerie = doc.id.toLowerCase();
+        if (idSerie.includes(input)) {
+          coincidenciasUnicas.add(doc.id);
+        }
+      });
+
+      if (coincidenciasUnicas.size === 0) {
+        resultadoDiv.innerHTML = "<div class='no-resultados'>No se encontró ninguna serie con ese nombre.</div>";
+      } else {
+        const title = document.createElement("h3");
+        title.textContent = "Selecciona la serie:";
+        resultadoDiv.appendChild(title);
+
+        coincidenciasUnicas.forEach(serieId => {
+          const enlace = document.createElement("a");
+          enlace.href = "#";
+          enlace.classList.add("resultado-item");
+
+          enlace.innerHTML = `
+            <ion-icon name="film-outline"></ion-icon>
+            <span>${serieId}</span>
+          `;
+
+          enlace.addEventListener("click", (e) => {
+            e.preventDefault();
+            ultimaSerieBuscada = serieId; // guardamos serie seleccionada
+            mostrarTemporadas(serieId);
+          });
+
+          resultadoDiv.appendChild(enlace);
+        });
       }
-
-      firebase.firestore().collection("animes-series-portadas")
-        .get()
-        .then(snapshot => {
-          const coincidencias = [];
-
-          snapshot.forEach(doc => {
-            const idSerie = doc.id.toLowerCase();
-            if (idSerie.includes(input)) {
-              coincidencias.push(doc.id);
-            }
-          });
-
-          if (coincidencias.length === 0) {
-            resultadoDiv.innerHTML = "<p>No se encontró ninguna serie con ese nombre.</p>";
-          } else if (coincidencias.length === 1) {
-            mostrarTemporadas(coincidencias[0]);
-          } else {
-            resultadoDiv.innerHTML = "<p>Se encontraron varias series.</p>";
-            resultadoDiv.innerHTML += "<p>Selecciona la correcta:</p>";
-            coincidencias.forEach(serieId => {
-              const btn = document.createElement("button");
-              btn.textContent = serieId;
-              btn.onclick = () => mostrarTemporadas(serieId);
-              resultadoDiv.appendChild(btn);
-            });
-          }
-        })
-        .catch(error => {
-          console.error("Error en la búsqueda:", error);
-          resultadoDiv.innerHTML = "<p style='color:#d32f2f;'>Ocurrió un error al buscar. Intenta nuevamente.</p>";
-        });
+    })
+    .catch(error => {
+      console.error("Error en la búsqueda:", error);
+      resultadoDiv.innerHTML = "<div class='no-resultados'>Ocurrió un error al buscar. Intenta nuevamente.</div>";
     });
+});
 
-    function mostrarTemporadas(serieId) {
-      const resultadoDiv = document.getElementById('resultado');
-      resultadoDiv.innerHTML = `<p>Excelente, existe la serie</p>`;
-      resultadoDiv.innerHTML += `<p><strong>${serieId}</strong></p>`;
-      resultadoDiv.innerHTML += `<p>¿Qué temporada deseas ver?</p>`;
+function mostrarTemporadas(serieId) {
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
 
-      firebase.firestore()
-        .collection("animes-series-portadas")
-        .doc(serieId)
-        .collection("Temporadas")
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(doc => {
-            const btn = document.createElement("button");
-            btn.textContent = doc.id;
-            btn.onclick = () => mostrarDetallesTemporada(serieId, doc.id);
-            resultadoDiv.appendChild(btn);
-          });
+  db.collection("animes-series-portadas")
+    .doc(serieId)
+    .collection("Temporadas")
+    .get()
+    .then(snapshot => {
+      const container = document.createElement("div");
+      container.className = "resultado";
+
+      snapshot.forEach(doc => {
+        const link = document.createElement("a");
+        link.href = "#";
+        link.className = "temporada-link"; // Usa esta clase para dar estilo
+        link.innerHTML = `
+          <ion-icon name="videocam-outline"></ion-icon>
+          <span>${doc.id}</span>
+        `;
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          mostrarDetallesTemporada(serieId, doc.id);
         });
-    }
+        container.appendChild(link);
+      });
+
+      // Botón para regresar a resultados
+      const backBtn = document.createElement("button");
+      backBtn.textContent = "← Volver a resultados";
+      backBtn.className = "back-btn-resultados";
+      backBtn.onclick = () => {
+        document.getElementById('search-input').dispatchEvent(new Event('keyup'));
+      };
+      container.appendChild(backBtn);
+
+      resultadoDiv.appendChild(container);
+    });
+}
+
+
 
     function mostrarDetallesTemporada(serieId, temporadaId) {
   const resultadoDiv = document.getElementById('resultado');
   resultadoDiv.innerHTML = "";
 
-  firebase.firestore()
-    .collection("animes-series-portadas")
+  db.collection("animes-series-portadas")
     .doc(serieId)
     .collection("Temporadas")
     .doc(temporadaId)
@@ -267,34 +398,55 @@
     .then(doc => {
       if (doc.exists) {
         const data = doc.data();
+        const resultadoHTML = document.createElement("div");
+        resultadoHTML.className = "resultado";
 
-        const img = document.createElement("img");
-        img.src = data.imagen;
-        img.className = "series-image";
-        resultadoDiv.appendChild(img);
+        // Título con serie y temporada
+        const titulo = document.createElement("h3");
+        titulo.textContent = `Excelente que lo Disfrutes`;
+        resultadoHTML.appendChild(titulo);
 
+        // Imagen si existe
+        if (data.imagen) {
+          const img = document.createElement("img");
+          img.src = data.imagen;
+          img.alt = `${serieId} Temporada ${temporadaId}`;
+          resultadoHTML.appendChild(img);
+        }
+
+        // Botón "Ver ahora"
         if (data.sitio) {
-  const enlace = document.createElement("a");
-  enlace.href = data.sitio;
-  enlace.textContent = "Ver ahora";
-  enlace.className = "link-button";
-  enlace.target = "_blank";
+          const link = document.createElement("a");
+          link.href = data.sitio;
+          link.target = "_blank";
+          link.textContent = "Ver Ahora";
+          link.className = "ver-ahora-link"; // usa mismo estilo de botón
+          link.addEventListener("click", () => {
+            document.getElementById("search-input").value = "";
+            setTimeout(() => {
+              resultadoDiv.innerHTML = "";
+            }, 500);
+          });
+          resultadoHTML.appendChild(link);
+        }
 
-  // Al hacer clic, limpia el buscador y los resultados
-  enlace.addEventListener("click", () => {
-    document.getElementById("search-input").value = "";
-    setTimeout(() => {
-      document.getElementById("resultado").innerHTML = "";
-    }, 500); // Da un pequeño tiempo antes de borrar, por si el usuario quiere volver
-  });
-
-  resultadoDiv.appendChild(enlace);
-}
-
+        // Botón para regresar a las temporadas
+        const backBtn = document.createElement("button");
+        backBtn.textContent = "← Volver a temporadas";
+        backBtn.className = "back-btn";
+        backBtn.addEventListener("click", () => mostrarTemporadas(serieId));
+        resultadoHTML.appendChild(backBtn);
+        
+        resultadoDiv.appendChild(resultadoHTML);
       } else {
-        resultadoDiv.innerHTML = "<p>Temporada no encontrada.</p>";
+        resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
       }
     });
+}
+
+// Regresa a los resultados de búsqueda
+function volverABusqueda() {
+  document.getElementById('search-input').dispatchEvent(new KeyboardEvent('keyup'));
 }
 
   </script>
