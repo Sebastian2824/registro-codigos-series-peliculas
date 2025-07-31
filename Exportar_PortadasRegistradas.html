@@ -178,31 +178,58 @@
     let paginaActual = 1;
     const registrosPorPagina = 10;
 
+    //Función original de cargarDatos
+    
+    //async function cargarDatos() {
+      //datosCargados = [];
+      //const seriesSnapshot = await db.collection("animes-series-portadas").get();
+
+      //for (const serieDoc of seriesSnapshot.docs) {
+        //const nombreSerie = serieDoc.id;
+        //const temporadasSnapshot = await db.collection("animes-series-portadas").doc(nombreSerie).collection("Temporadas").get();
+
+        //for (const temporadaDoc of temporadasSnapshot.docs) {
+          //const temporada = temporadaDoc.id;
+          //const data = temporadaDoc.data();
+
+          //datosCargados.push({
+            //nombreSerie,
+            //temporada,
+            //imagen: data.imagen || "",
+            //sitio: data.sitio || "",
+            //sitio02: data.sitio02 || ""
+          //});
+        //}
+      //}
+
+      //poblarFiltros();
+      //aplicarFiltros();
+    //}
+
     async function cargarDatos() {
-      datosCargados = [];
-      const seriesSnapshot = await db.collection("animes-series-portadas").get();
+  datosCargados = [];
+  const resumenSnapshot = await db.collection("animes-series-portadas-resumen").get();
 
-      for (const serieDoc of seriesSnapshot.docs) {
-        const nombreSerie = serieDoc.id;
-        const temporadasSnapshot = await db.collection("animes-series-portadas").doc(nombreSerie).collection("Temporadas").get();
+  for (const doc of resumenSnapshot.docs) {
+    const nombreSerie = doc.id;
+    const data = doc.data();
 
-        for (const temporadaDoc of temporadasSnapshot.docs) {
-          const temporada = temporadaDoc.id;
-          const data = temporadaDoc.data();
-
-          datosCargados.push({
-            nombreSerie,
-            temporada,
-            imagen: data.imagen || "",
-            sitio: data.sitio || "",
-            sitio02: data.sitio02 || ""
-          });
-        }
+    if (data.temporadas && Array.isArray(data.temporadas)) {
+      for (const temporadaObj of data.temporadas) {
+        datosCargados.push({
+          nombreSerie,
+          temporada: temporadaObj.nombre || "Desconocida",
+          imagen: temporadaObj.imagen || "",
+          sitio: temporadaObj.sitio || "",
+          sitio02: temporadaObj.sitio02 || ""
+        });
       }
-
-      poblarFiltros();
-      aplicarFiltros();
     }
+  }
+
+  poblarFiltros();
+  aplicarFiltros();
+}
 
     function poblarFiltros() {
       const serieSet = new Set();
@@ -300,11 +327,27 @@
       aplicarFiltros();
     }
 
-    function exportarTablaAExcel() {
-      const tabla = document.getElementById("tablaSeries");
-      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Portadas" });
-      XLSX.writeFile(wb, "portadas_series.xlsx");
-    }
+     function exportarTablaAExcel() {
+  if (datosFiltrados.length === 0) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  // Convertir datos filtrados a formato de hoja de cálculo con los campos correctos
+  const datosParaExportar = datosFiltrados.map(d => ({
+    Serie: d.nombreSerie,
+    Temporada: d.temporada,
+    "Enlace Imagen": d.imagen,
+    "Enlace Sitio": d.sitio,
+    "Segundo Enlace Sitio": d.sitio02
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(datosParaExportar);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Portadas Series");
+
+  XLSX.writeFile(wb, "series_portadas_filtradas.xlsx");
+}
 
     function escapeHTML(str) {
       return str.replace(/&/g, "&amp;")

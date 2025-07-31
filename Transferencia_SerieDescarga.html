@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Transferencia de Series</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0e1a2b;
+      color: #ffffff;
+    }
+
+    header {
+      background-color: #182c4e;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #8cc8ff;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .panel {
+      background-color: #1f2f48;
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    .panel h2 {
+      color: #ffffff;
+      margin-bottom: 30px;
+    }
+
+    #btnGenerarResumen {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #btnGenerarResumen:hover {
+      background: linear-gradient(90deg, #0072ff, #005bbb);
+    }
+
+    #estado {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #a8d3ff;
+    }
+
+    .transfer-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  margin: 30px 0;
+}
+
+.icon-block {
+  text-align: center;
+}
+
+.icon {
+  font-size: 60px;
+  background-color: #0056b3;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 114, 255, 0.6);
+  color: #fff;
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #a8d3ff;
+}
+
+.arrow {
+  font-size: 40px;
+  color: #00c6ff;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #999;
+    }
+    header {
+  background-color: #182c4e;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn-secundario {
+  background-color: #00c6ff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-secundario:hover {
+  background-color: #0072ff;
+}
+
+.indicacion {
+  color: #d0e7ff;
+  font-size: 14px;
+  margin-top: -20px;
+  margin-bottom: 30px;
+}
+  </style>
+</head>
+<body>
+  <header>
+  <h1>Transferencia de Series Firebase</h1>
+  <button class="btn-secundario" onclick="location.href='Exportar_SerieDescarga.html'">Exportar los Datos</button>
+</header>
+
+
+  <div class="container">
+    <div class="panel">
+      <h2>De Colección a Colección</h2>
+      <p class="indicacion">Antes de Exportar Transfiere solo las series que aún no se encuentran transferidas en la colección <code>animes-series-descargas</code>.</p>
+      <div class="transfer-illustration">
+  <div class="icon-block">
+    <div class="icon">📂</div>
+    <div class="label">Colección</div>
+    <div class="label">animes-series-descargas</div>
+  </div>
+
+  <div class="arrow">➡️</div>
+
+  <div class="icon-block">
+    <div class="icon">📂</div>
+    <div class="label">Colección</div>
+    <div class="label">animes-series-descargas-resumen</div>
+  </div>
+</div>
+
+      <button id="btnGenerarResumen">Iniciar Transferencia</button>
+      <p id="estado"></p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Transferencia de Datos - Sistema Firebase
+  </footer>
+
+  <!-- Scripts conservados exactamente -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, doc, getDocs, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const estado = document.getElementById("estado");
+
+    async function generarResumenDescargas() {
+  try {
+    estado.textContent = "⏳ Generando resumen de descargas...";
+
+    const seriesSnapshot = await getDocs(collection(db, "animes-series-descargas"));
+    const resumenSnapshot = await getDocs(collection(db, "animes-series-descargas-resumen"));
+    const resumenMap = new Map(resumenSnapshot.docs.map(doc => [doc.id, doc.data()]));
+
+    let seriesActualizadas = 0;
+
+    for (const serieDoc of seriesSnapshot.docs) {
+      const nombreSerie = serieDoc.id;
+
+      const temporadasSnapshot = await getDocs(collection(db, "animes-series-descargas", nombreSerie, "Temporadas"));
+      const temporadas = [];
+
+      for (const temporadaDoc of temporadasSnapshot.docs) {
+        const temporadaId = temporadaDoc.id;
+        const idiomasSnapshot = await getDocs(collection(db, "animes-series-descargas", nombreSerie, "Temporadas", temporadaId, "Idiomas"));
+
+        const idiomas = [];
+
+        for (const idiomaDoc of idiomasSnapshot.docs) {
+          const idiomaId = idiomaDoc.id;
+          const servidoresSnapshot = await getDocs(collection(db, "animes-series-descargas", nombreSerie, "Temporadas", temporadaId, "Idiomas", idiomaId, "Servidores"));
+
+          const servidores = [];
+
+          for (const servidorDoc of servidoresSnapshot.docs) {
+            const servidorId = servidorDoc.id;
+            const episodiosSnapshot = await getDocs(collection(db, "animes-series-descargas", nombreSerie, "Temporadas", temporadaId, "Idiomas", idiomaId, "Servidores", servidorId, "Episodios"));
+
+            const episodios = episodiosSnapshot.docs.map(doc => {
+              const datos = doc.data();
+              return {
+                episodio: doc.id,
+                iframe: datos.iframe || ""
+              };
+            });
+
+            servidores.push({ nombre: servidorId, episodios });
+          }
+
+          idiomas.push({ nombre: idiomaId, servidores });
+        }
+
+        temporadas.push({ nombre: temporadaId, idiomas });
+      }
+
+      const resumenNuevo = { nombre: nombreSerie, temporadas };
+      const resumenActual = resumenMap.get(nombreSerie);
+
+      // Compara el resumen actual con el nuevo
+      const esDiferente = JSON.stringify(resumenNuevo) !== JSON.stringify(resumenActual);
+
+      if (esDiferente) {
+        await setDoc(doc(db, "animes-series-descargas-resumen", nombreSerie), resumenNuevo);
+        seriesActualizadas++;
+      }
+    }
+
+    if (seriesActualizadas > 0) {
+      estado.textContent = `✅ Se actualizaron ${seriesActualizadas} series en 'animes-series-descargas-resumen'.`;
+    } else {
+      estado.textContent = "ℹ️ Todos los resúmenes ya están actualizados.";
+    }
+
+  } catch (error) {
+    console.error("❌ Error generando resumen de descargas:", error);
+    estado.textContent = "❌ Ocurrió un error al generar el resumen.";
+  }
+}
+
+  document.getElementById("btnGenerarResumen")
+    .addEventListener("click", generarResumenDescargas);
+  </script>
+</body>
+</html>

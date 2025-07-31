@@ -189,48 +189,96 @@
     let paginaActual = 1;
     const registrosPorPagina = 10;
 
+//Función original de cargarDatos
+
+    //async function cargarDatos() {
+      //const tablaBody = document.querySelector("#tablaSeries tbody");
+      //tablaBody.innerHTML = "";
+      //datosCargados = [];
+
+      //const seriesSnapshot = await db.collection("animes-series").get();
+
+      //for (const serieDoc of seriesSnapshot.docs) {
+        //const nombreSerie = serieDoc.id;
+
+        //const temporadasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").get();
+
+        //for (const temporadaDoc of temporadasSnapshot.docs) {
+          //const temporada = temporadaDoc.id;
+
+          //const idiomasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+
+          //for (const idiomaDoc of idiomasSnapshot.docs) {
+            //const idioma = idiomaDoc.id;
+
+            //const servidoresSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+
+            //for (const servidorDoc of servidoresSnapshot.docs) {
+              //const servidor = servidorDoc.id;
+
+              //const episodiosSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+
+              //for (const episodioDoc of episodiosSnapshot.docs) {
+                //const episodio = episodioDoc.id;
+                //const data = episodioDoc.data();
+                //const iframe = data.iframe || "";
+
+                //datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, iframe });
+              //}
+            //}
+          //}
+        //}
+      //}
+
+      //poblarFiltros();
+      //aplicarFiltros();
+    //}
+
     async function cargarDatos() {
-      const tablaBody = document.querySelector("#tablaSeries tbody");
-      tablaBody.innerHTML = "";
-      datosCargados = [];
+  const tablaBody = document.querySelector("#tablaSeries tbody");
+  tablaBody.innerHTML = "";
+  datosCargados = [];
 
-      const seriesSnapshot = await db.collection("animes-series").get();
+  // 🔄 Leer desde la colección resumen optimizada
+  const seriesSnapshot = await db.collection("animes-series-resumen").get();
 
-      for (const serieDoc of seriesSnapshot.docs) {
-        const nombreSerie = serieDoc.id;
+  for (const serieDoc of seriesSnapshot.docs) {
+    const serieData = serieDoc.data();
+    const nombreSerie = serieData.nombre || serieDoc.id;
 
-        const temporadasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").get();
+    if (!serieData.temporadas) continue;
 
-        for (const temporadaDoc of temporadasSnapshot.docs) {
-          const temporada = temporadaDoc.id;
+    serieData.temporadas.forEach(temp => {
+      const temporada = temp.nombre;
 
-          const idiomasSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+      temp.idiomas?.forEach(idiomaObj => {
+        const idioma = idiomaObj.nombre;
 
-          for (const idiomaDoc of idiomasSnapshot.docs) {
-            const idioma = idiomaDoc.id;
+        idiomaObj.servidores?.forEach(servidorObj => {
+          const servidor = servidorObj.nombre;
 
-            const servidoresSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+          servidorObj.episodios?.forEach(ep => {
+            const episodio = ep.nombre;
+            const iframe = ep.iframe || "";
 
-            for (const servidorDoc of servidoresSnapshot.docs) {
-              const servidor = servidorDoc.id;
+            datosCargados.push({
+              nombreSerie,
+              temporada,
+              idioma,
+              servidor,
+              episodio,
+              iframe
+            });
+          });
+        });
+      });
+    });
+  }
 
-              const episodiosSnapshot = await db.collection("animes-series").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+  poblarFiltros();
+  aplicarFiltros();
+}
 
-              for (const episodioDoc of episodiosSnapshot.docs) {
-                const episodio = episodioDoc.id;
-                const data = episodioDoc.data();
-                const iframe = data.iframe || "";
-
-                datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, iframe });
-              }
-            }
-          }
-        }
-      }
-
-      poblarFiltros();
-      aplicarFiltros();
-    }
 
     function poblarFiltros() {
       const serieSet = new Set();
@@ -376,10 +424,28 @@ function copiarTodosIframe() {
     }
 
     function exportarTablaAExcel() {
-      const tabla = document.getElementById("tablaSeries");
-      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Series filtradas" });
-      XLSX.writeFile(wb, "series_filtradas.xlsx");
-    }
+      if (datosFiltrados.length === 0) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  // Convertir datos filtrados a formato de hoja de cálculo
+  const datosParaExportar = datosFiltrados.map(d => ({
+    Serie: d.nombreSerie,
+    Temporada: d.temporada,
+    Idioma: d.idioma,
+    Servidor: d.servidor,
+    Episodio: d.episodio,
+    "Código iframe": d.iframe
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(datosParaExportar);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Series filtradas");
+
+  // Descargar archivo
+  XLSX.writeFile(wb, "series_filtradas.xlsx");
+}
 
     window.onload = cargarDatos;
   </script>

@@ -189,48 +189,88 @@
     let paginaActual = 1;
     const registrosPorPagina = 10;
 
-    async function cargarDatos() {
-      const tablaBody = document.querySelector("#tablaSeries tbody");
-      tablaBody.innerHTML = "";
-      datosCargados = [];
+//Función original de cargarDatos
 
-      const seriesSnapshot = await db.collection("animes-series-enlaces").get();
+//async function cargarDatos() {
+      //const tablaBody = document.querySelector("#tablaSeries tbody");
+      //tablaBody.innerHTML = "";
+      //datosCargados = [];
 
-      for (const serieDoc of seriesSnapshot.docs) {
-        const nombreSerie = serieDoc.id;
+      //const seriesSnapshot = await db.collection("animes-series-enlaces").get();
 
-        const temporadasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").get();
+      //for (const serieDoc of seriesSnapshot.docs) {
+        //const nombreSerie = serieDoc.id;
 
-        for (const temporadaDoc of temporadasSnapshot.docs) {
-          const temporada = temporadaDoc.id;
+        //const temporadasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").get();
 
-          const idiomasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+        //for (const temporadaDoc of temporadasSnapshot.docs) {
+          //const temporada = temporadaDoc.id;
 
-          for (const idiomaDoc of idiomasSnapshot.docs) {
-            const idioma = idiomaDoc.id;
+          //const idiomasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
 
-            const servidoresSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+          //for (const idiomaDoc of idiomasSnapshot.docs) {
+            //const idioma = idiomaDoc.id;
 
-            for (const servidorDoc of servidoresSnapshot.docs) {
-              const servidor = servidorDoc.id;
+            //const servidoresSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
 
-              const episodiosSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+            //for (const servidorDoc of servidoresSnapshot.docs) {
+              //const servidor = servidorDoc.id;
 
-              for (const episodioDoc of episodiosSnapshot.docs) {
-                const episodio = episodioDoc.id;
-                const data = episodioDoc.data();
-                const url = data.url || "";
+              //const episodiosSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
 
-                datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
-              }
-            }
+              //for (const episodioDoc of episodiosSnapshot.docs) {
+                //const episodio = episodioDoc.id;
+                //const data = episodioDoc.data();
+                //const url = data.url || "";
+
+                //datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
+              //}
+            //}
+          //}
+        //}
+      //}
+
+      //poblarFiltros();
+      //aplicarFiltros();
+    //}
+
+  async function cargarDatos() {
+  const tablaBody = document.querySelector("#tablaSeries tbody");
+  tablaBody.innerHTML = "";
+  datosCargados = [];
+
+  const resumenSnapshot = await db.collection("animes-series-enlaces-resumen").get();
+
+  for (const serieDoc of resumenSnapshot.docs) {
+    const nombreSerie = serieDoc.id;
+    const resumenData = serieDoc.data();
+
+    if (!resumenData.temporadas) continue;
+
+    for (const temporadaObj of resumenData.temporadas) {
+      const temporada = temporadaObj.nombre;
+
+      for (const idiomaObj of temporadaObj.idiomas || []) {
+        const idioma = idiomaObj.nombre;
+
+        for (const servidorObj of idiomaObj.servidores || []) {
+          const servidor = servidorObj.nombre;
+
+          for (const episodioObj of servidorObj.episodios || []) {
+            const episodio = episodioObj.id || "Desconocido";
+            const url = episodioObj.url || "";
+
+            datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
           }
         }
       }
-
-      poblarFiltros();
-      aplicarFiltros();
     }
+  }
+
+  poblarFiltros();
+  aplicarFiltros();
+}
+
 
     function poblarFiltros() {
       const serieSet = new Set();
@@ -369,11 +409,28 @@ function copiarTodosIframe() {
       aplicarFiltros();
     }
 
-    function exportarTablaAExcel() {
-      const tabla = document.getElementById("tablaSeries");
-      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Series filtradas" });
-      XLSX.writeFile(wb, "series_filtradas_url.xlsx");
-    }
+   function exportarTablaAExcel() {
+  if (datosFiltrados.length === 0) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const datosParaExportar = datosFiltrados.map(d => ({
+    Serie: d.nombreSerie,
+    Temporada: d.temporada,
+    Idioma: d.idioma,
+    Servidor: d.servidor,
+    Episodio: d.episodio,
+    "Enlace URL": d.url  // ← CAMBIADO de d.iframe a d.url
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(datosParaExportar);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Series filtradas");
+
+  XLSX.writeFile(wb, "series_enlaces_filtradas.xlsx");
+}
+
 
     window.onload = cargarDatos;
   </script>

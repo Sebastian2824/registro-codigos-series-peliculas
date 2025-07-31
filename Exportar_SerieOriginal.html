@@ -131,7 +131,7 @@
 </head>
 <body>
 
-  <h2>Lista de Series de Descargas Registradas</h2>
+  <h2>Lista de Series Originales Registradas - URLs</h2>
 
   <h2>Filtro de Series</h2>
   <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
@@ -153,7 +153,7 @@
     <th>Idioma</th>
     <th>Servidor</th>
     <th>Episodio</th>
-    <th style="max-width: 300px; word-break: break-word;">Enlace de Descarga</th>
+    <th style="max-width: 300px; word-break: break-word;">Enlaces - URLs</th>
     <th>Copiar</th>
   </tr>
 </thead>
@@ -189,41 +189,41 @@
     let paginaActual = 1;
     const registrosPorPagina = 10;
 
-    //Función original de cargarDatos
+//Función original de cargarDatos
 
-    //async function cargarDatos() {
+//async function cargarDatos() {
       //const tablaBody = document.querySelector("#tablaSeries tbody");
       //tablaBody.innerHTML = "";
       //datosCargados = [];
 
-      //const seriesSnapshot = await db.collection("animes-series-descargas").get();
+      //const seriesSnapshot = await db.collection("animes-series-original").get();
 
       //for (const serieDoc of seriesSnapshot.docs) {
         //const nombreSerie = serieDoc.id;
 
-        //const temporadasSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").get();
+        //const temporadasSnapshot = await db.collection("animes-series-original").doc(nombreSerie).collection("Temporadas").get();
 
         //for (const temporadaDoc of temporadasSnapshot.docs) {
           //const temporada = temporadaDoc.id;
 
-          //const idiomasSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
+          //const idiomasSnapshot = await db.collection("animes-series-original").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").get();
 
           //for (const idiomaDoc of idiomasSnapshot.docs) {
             //const idioma = idiomaDoc.id;
 
-            //const servidoresSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
+            //const servidoresSnapshot = await db.collection("animes-series-original").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").get();
 
             //for (const servidorDoc of servidoresSnapshot.docs) {
               //const servidor = servidorDoc.id;
 
-              //const episodiosSnapshot = await db.collection("animes-series-descargas").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
+              //const episodiosSnapshot = await db.collection("animes-series-original").doc(nombreSerie).collection("Temporadas").doc(temporada).collection("Idiomas").doc(idioma).collection("Servidores").doc(servidor).collection("Episodios").get();
 
               //for (const episodioDoc of episodiosSnapshot.docs) {
                 //const episodio = episodioDoc.id;
                 //const data = episodioDoc.data();
-                //const iframe = data.iframe || "";
+                //const url = data.url || "";
 
-                //datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, iframe });
+                //datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
               //}
             //}
           //}
@@ -239,32 +239,28 @@
   tablaBody.innerHTML = "";
   datosCargados = [];
 
-  const resumenSnapshot = await db.collection("animes-series-descargas-resumen").get();
+  const resumenSnapshot = await db.collection("animes-series-original-resumen").get();
 
-  for (const doc of resumenSnapshot.docs) {
-    const { nombre, temporadas } = doc.data();
+  for (const serieDoc of resumenSnapshot.docs) {
+    const nombreSerie = serieDoc.id;
+    const resumenData = serieDoc.data();
 
-    for (const temporada of temporadas) {
-      const temporadaNombre = temporada.nombre;
+    if (!resumenData.temporadas) continue;
 
-      for (const idioma of temporada.idiomas) {
-        const idiomaNombre = idioma.nombre;
+    for (const temporadaObj of resumenData.temporadas) {
+      const temporada = temporadaObj.nombre;
 
-        for (const servidor of idioma.servidores) {
-          const servidorNombre = servidor.nombre;
+      for (const idiomaObj of temporadaObj.idiomas || []) {
+        const idioma = idiomaObj.nombre;
 
-          for (const episodio of servidor.episodios) {
-            const episodioNombre = episodio.episodio;
-            const iframe = episodio.iframe || "";
+        for (const servidorObj of idiomaObj.servidores || []) {
+          const servidor = servidorObj.nombre;
 
-            datosCargados.push({
-              nombreSerie: nombre,
-              temporada: temporadaNombre,
-              idioma: idiomaNombre,
-              servidor: servidorNombre,
-              episodio: episodioNombre,
-              iframe
-            });
+          for (const episodioObj of servidorObj.episodios || []) {
+            const episodio = episodioObj.id || "Desconocido";
+            const url = episodioObj.url || "";
+
+            datosCargados.push({ nombreSerie, temporada, idioma, servidor, episodio, url });
           }
         }
       }
@@ -274,6 +270,7 @@
   poblarFiltros();
   aplicarFiltros();
 }
+
 
     function poblarFiltros() {
       const serieSet = new Set();
@@ -321,12 +318,6 @@
       mostrarPagina();
     }
 
-function escapeHTML(str) {
-  return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-}
-
     function mostrarPagina() {
       const tablaBody = document.querySelector("#tablaSeries tbody");
       tablaBody.innerHTML = "";
@@ -343,8 +334,8 @@ function escapeHTML(str) {
     <td>${d.idioma}</td>
     <td>${d.servidor}</td>
     <td>${d.episodio}</td>
-    <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.iframe || "")}</td>
-    <td><button onclick="copiarIframe('${encodeURIComponent(d.iframe || "")}')">📋</button></td>
+    <td style="max-width: 300px; word-break: break-word;">${d.url || ""}</td>
+    <td><button onclick="copiarIframe('${encodeURIComponent(d.url || "")}')">📋</button></td>
   `;
   tablaBody.appendChild(fila);
 });
@@ -355,7 +346,7 @@ function escapeHTML(str) {
     function copiarIframe(iframeCodificado) {
   const codigo = decodeURIComponent(iframeCodificado);
   navigator.clipboard.writeText(codigo).then(() => {
-    alert("Código iframe copiado al portapapeles.");
+    alert("Enlace copiado al portapapeles.");
   }).catch(err => {
     alert("Error al copiar: " + err);
   });
@@ -363,18 +354,18 @@ function escapeHTML(str) {
 
 function copiarTodosIframe() {
   const iframes = datosFiltrados
-    .map(d => d.iframe)
+    .map(d => d.url)
     .filter(codigo => codigo && codigo.trim() !== "")
     .join("\n");
 
   if (iframes) {
     navigator.clipboard.writeText(iframes).then(() => {
-      alert("Todos los códigos iframe visibles han sido copiados.");
+      alert("Todos los enlaces visibles han sido copiados.");
     }).catch(err => {
       alert("Error al copiar: " + err);
     });
   } else {
-    alert("No hay códigos iframe para copiar.");
+    alert("No hay enlaces para copiar.");
   }
 }
 
@@ -418,29 +409,28 @@ function copiarTodosIframe() {
       aplicarFiltros();
     }
 
-    function exportarTablaAExcel() {
-      if (datosFiltrados.length === 0) {
+   function exportarTablaAExcel() {
+  if (datosFiltrados.length === 0) {
     alert("No hay datos para exportar.");
     return;
   }
 
-  // Convertir datos filtrados a formato de hoja de cálculo
   const datosParaExportar = datosFiltrados.map(d => ({
     Serie: d.nombreSerie,
     Temporada: d.temporada,
     Idioma: d.idioma,
     Servidor: d.servidor,
     Episodio: d.episodio,
-    "Código iframe": d.iframe
+    "Enlace URL": d.url  // ← CAMBIADO de d.iframe a d.url
   }));
 
   const ws = XLSX.utils.json_to_sheet(datosParaExportar);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Series filtradas");
 
-  // Descargar archivo
-  XLSX.writeFile(wb, "series_portadas_filtradas.xlsx");
+  XLSX.writeFile(wb, "series_originales_filtradas.xlsx");
 }
+
 
     window.onload = cargarDatos;
   </script>
