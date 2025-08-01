@@ -343,7 +343,13 @@ function escapeHTML(str) {
     <td>${d.idioma}</td>
     <td>${d.servidor}</td>
     <td>${d.episodio}</td>
-    <td style="max-width: 300px; word-break: break-word;">${escapeHTML(d.iframe || "")}</td>
+    <td style="max-width: 300px; word-break: break-word;">
+  ${
+    d.iframe && /^https?:\/\/\S+$/i.test(d.iframe)
+      ? `<a href="${d.iframe}" target="_blank" style="color:#1a73e8; font-weight:500; text-decoration:underline;">Enlace</a>`
+      : escapeHTML(d.iframe || "")
+  }
+</td>
     <td><button onclick="copiarIframe('${encodeURIComponent(d.iframe || "")}')">📋</button></td>
   `;
   tablaBody.appendChild(fila);

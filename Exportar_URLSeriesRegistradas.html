@@ -334,7 +334,13 @@
     <td>${d.idioma}</td>
     <td>${d.servidor}</td>
     <td>${d.episodio}</td>
-    <td style="max-width: 300px; word-break: break-word;">${d.url || ""}</td>
+    <td style="max-width: 300px; word-break: break-word;">
+  ${
+    d.url && /^https?:\/\/\S+$/i.test(d.url)
+      ? `<a href="${d.url}" target="_blank" style="color:#1a73e8; font-weight:500; text-decoration:underline;">${d.url}</a>`
+      : (d.url || "")
+  }
+</td>
     <td><button onclick="copiarIframe('${encodeURIComponent(d.url || "")}')">📋</button></td>
   `;
   tablaBody.appendChild(fila);
