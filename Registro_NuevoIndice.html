@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Portada de la Serie</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    h2 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 28px;
+    }
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+    input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        outline: none;
+    }
+    button {
+        padding: 12px 20px;
+        margin-top: 15px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+    #btnGuardar {
+        background-color: #1a73e8;
+        padding: 12px 30px;
+    }
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Registrar Nuevo Indice de la Serie</h2>
+
+  <label>Nombre de la serie:</label>
+  <input type="text" id="serieNombre">
+
+  <label>Nombre en inglés:</label>
+  <input type="text" id="nombreIngles">
+
+  <label>Nombre en japonés:</label>
+  <input type="text" id="nombreJapones">
+
+  <label>Año de publicación:</label>
+  <input type="text" id="anioPublicacion">
+
+  <label>Categoría:</label>
+  <input type="text" id="categoria">
+
+  <label>Idioma:</label>
+  <input type="text" id="idioma">
+
+  <label>Enlace de imagen de portada:</label>
+  <input type="text" id="enlaceImagen">
+
+  <label>Enlace de redirección:</label>
+  <input type="text" id="enlaceSitio">
+
+  <div class="button-container">
+    <button id="btnGuardar">Guardar en Firebase</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById('btnGuardar').addEventListener('click', async function () {
+      const nombreSerie = document.getElementById("serieNombre").value.trim();
+      const nombreIngles = document.getElementById("nombreIngles").value.trim();
+      const nombreJapones = document.getElementById("nombreJapones").value.trim();
+      const anioPublicacion = document.getElementById("anioPublicacion").value.trim();
+      const categoria = document.getElementById("categoria").value.trim();
+      const idioma = document.getElementById("idioma").value.trim();
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+      const enlaceSitio = document.getElementById("enlaceSitio").value.trim();
+
+      if (!nombreSerie || !nombreIngles || !nombreJapones || !anioPublicacion || !categoria || !idioma || !enlaceImagen || !enlaceSitio) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+
+      try {
+        await db.collection("animes-series-indice")
+          .doc(nombreSerie)
+          .set({
+            nombresec: nombreIngles,
+            nombresec02: nombreJapones,
+            año: anioPublicacion,
+            categoria: categoria,
+            idioma: idioma,
+            imagen: enlaceImagen,
+            sitio: enlaceSitio
+          }, { merge: true });
+
+        alert("Portada registrada correctamente.");
+
+        // Limpiar campos
+        document.getElementById("serieNombre").value = "";
+        document.getElementById("nombreIngles").value = "";
+        document.getElementById("nombreJapones").value = "";
+        document.getElementById("anioPublicacion").value = "";
+        document.getElementById("categoria").value = "";
+        document.getElementById("idioma").value = "";
+        document.getElementById("enlaceImagen").value = "";
+        document.getElementById("enlaceSitio").value = "";
+
+      } catch (error) {
+        console.error("Error al guardar en Firebase:", error);
+        alert("Hubo un error al guardar los datos.");
+      }
+    });
+  </script>
+</body>
+</html>

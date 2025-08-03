@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Serie</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      text-align: center;
+      color: #1a73e8;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
+      color: #1a73e8;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #f8fbff;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background-color: white;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    .preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar el Indice de la Serie</h1>
+
+    <label for="serieSelect">Nombre de la Serie</label>
+    <select id="serieSelect">
+      <option value="" disabled selected>Seleccionar serie...</option>
+    </select>
+
+    <label for="nombreIngles">Nombre en Inglés</label>
+    <input type="text" id="nombreIngles" />
+
+    <label for="nombreJapones">Nombre en Japonés</label>
+    <input type="text" id="nombreJapones" />
+
+    <label for="anioPublicacion">Año de Publicación</label>
+    <input type="text" id="anioPublicacion" />
+
+    <label for="categoria">Categoría</label>
+    <input type="text" id="categoria" />
+
+    <label for="idioma">Idioma</label>
+    <input type="text" id="idioma" />
+
+    <label for="enlaceImagen">Enlace de la Imagen</label>
+    <input type="text" id="enlaceImagen" />
+
+    <label for="enlaceSitio">Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio" />
+
+    <button onclick="guardarCambios()">Guardar Cambios</button>
+
+    <div class="preview" id="previewImagen"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const serieSelect = document.getElementById("serieSelect");
+
+    async function cargarSeries() {
+      const snapshot = await db.collection("animes-series-indice").get();
+      serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar serie...</option>';
+      snapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.text = doc.id;
+        serieSelect.appendChild(option);
+      });
+    }
+
+    async function cargarDatos() {
+      const serie = serieSelect.value;
+      if (!serie) return;
+
+      const doc = await db.collection("animes-series-indice").doc(serie).get();
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById("nombreIngles").value = data.nombresec || "";
+        document.getElementById("nombreJapones").value = data.nombresec02 || "";
+        document.getElementById("anioPublicacion").value = data.año || "";
+        document.getElementById("categoria").value = data.categoria || "";
+        document.getElementById("idioma").value = data.idioma || "";
+        document.getElementById("enlaceImagen").value = data.imagen || "";
+        document.getElementById("enlaceSitio").value = data.sitio || "";
+        mostrarPreview(data.imagen);
+      } else {
+        limpiarCampos();
+      }
+    }
+
+    function limpiarCampos() {
+      document.getElementById("nombreIngles").value = "";
+      document.getElementById("nombreJapones").value = "";
+      document.getElementById("anioPublicacion").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("idioma").value = "";
+      document.getElementById("enlaceImagen").value = "";
+      document.getElementById("enlaceSitio").value = "";
+      document.getElementById("previewImagen").innerHTML = "";
+    }
+
+    function mostrarPreview(url) {
+      const contenedor = document.getElementById("previewImagen");
+      contenedor.innerHTML = url ? `<img src="${url}" alt="Vista previa">` : "";
+    }
+
+    async function guardarCambios() {
+      const serie = serieSelect.value;
+      const nombreIngles = document.getElementById("nombreIngles").value.trim();
+      const nombreJapones = document.getElementById("nombreJapones").value.trim();
+      const anioPublicacion = document.getElementById("anioPublicacion").value.trim();
+      const categoria = document.getElementById("categoria").value.trim();
+      const idioma = document.getElementById("idioma").value.trim();
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+      const enlaceSitio = document.getElementById("enlaceSitio").value.trim();
+
+      if (!serie || !nombreIngles || !nombreJapones || !anioPublicacion || !categoria || !idioma || !enlaceImagen || !enlaceSitio) {
+        alert("Completa todos los campos.");
+        return;
+      }
+
+      try {
+        await db.collection("animes-series-indice")
+          .doc(serie)
+          .set({
+            nombresec: nombreIngles,
+            nombresec02: nombreJapones,
+            año: anioPublicacion,
+            categoria: categoria,
+            idioma: idioma,
+            imagen: enlaceImagen,
+            sitio: enlaceSitio
+          }, { merge: true });
+
+        alert("Datos actualizados correctamente.");
+        mostrarPreview(enlaceImagen);
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        alert("Hubo un error al guardar los datos.");
+      }
+    }
+
+    serieSelect.addEventListener("change", cargarDatos);
+    document.addEventListener("DOMContentLoaded", cargarSeries);
+  </script>
+</body>
+</html>
