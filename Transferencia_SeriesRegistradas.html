@@ -237,7 +237,13 @@ footer {
             const servidorId = servidorDoc.id;
 
             const episodiosSnapshot = await getDocs(collection(db, "animes-series", nombreSerie, "Temporadas", temporadaId, "Idiomas", idiomaId, "Servidores", servidorId, "Episodios"));
-            const episodios = episodiosSnapshot.docs.map(doc => doc.id);
+            const episodios = episodiosSnapshot.docs.map(doc => {
+              const datos = doc.data();
+              return {
+                episodio: doc.id,
+                iframe: datos.iframe || ""
+              };
+            });
 
             servidores.push({ nombre: servidorId, episodios });
           }
