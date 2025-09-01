@@ -160,6 +160,16 @@
 
     let datosPreview = [];
 
+    function escapeHTML(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
     document.getElementById("inputExcel").addEventListener("change", async function (e) {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -188,9 +198,20 @@
       });
     });
 
-    const tablaHTML = `<table><thead><tr><th>Serie</th><th>Temporada</th><th>Idioma</th><th>Episodio</th><th>Servidor</th><th>Iframe</th></tr></thead><tbody>
-      ${datosPreview.map(d => `<tr><td>${d.nombreSerie}</td><td>${d.temporada}</td><td>${d.idioma}</td><td>${d.episodio}</td><td>${d.servidor}</td><td>${d.iframe}</td></tr>`).join('')}
-    </tbody></table>`;
+    const tablaHTML = `<table><thead><tr>
+  <th>Serie</th><th>Temporada</th><th>Idioma</th>
+  <th>Episodio</th><th>Servidor</th><th>Iframe</th>
+</tr></thead><tbody>
+  ${datosPreview.map(d => `
+    <tr>
+      <td>${escapeHTML(d.nombreSerie)}</td>
+      <td>${escapeHTML(d.temporada)}</td>
+      <td>${escapeHTML(d.idioma)}</td>
+      <td>${escapeHTML(d.episodio)}</td>
+      <td>${escapeHTML(d.servidor)}</td>
+      <td>${escapeHTML(d.iframe)}</td>
+    </tr>`).join('')}
+</tbody></table>`;
 
     document.getElementById("panelPreview").innerHTML = tablaHTML;
   };
