@@ -37,7 +37,6 @@
       font-weight: 600;
       padding: 12px 15px;
       text-align: left;
-      
     }
 
     table td {
@@ -117,6 +116,25 @@
       font-weight: 500;
     }
 
+    .url-link {
+      color: #1a73e8;
+      font-weight: 500;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+
+    .image-preview {
+      max-width: 100px;
+      max-height: 60px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .image-preview:hover {
+      transform: scale(1.5);
+    }
+
     @media (max-width: 768px) {
       .filtros-container {
         flex-direction: column;
@@ -133,6 +151,11 @@
 
   <h2>Listado de Portadas de Series</h2>
 
+  <button onclick="location.href='Interfaces_Cloudflare/Exportar_Indice.html'" 
+  style="background-color: #10b981; color: white;">
+  Exportar con Cloudflare
+</button>
+
   <div class="filtros-container">
     <select id="filtroSerie"><option value="">Todas las series</option></select>
     <select id="filtroCategoria"><option value="">Todas las categorías</option></select>
@@ -146,16 +169,15 @@
   <table id="tablaSeries">
     <thead>
       <tr>
-  <th>Serie</th>
-  <th>Nombre Inglés</th>
-  <th>Nombre Japonés</th>
-  <th>Año</th>
-  <th>Categoría</th>
-  <th>Idioma</th>
-  <th>Imagen</th>
-  <th>Sitio</th>
-</tr>
-
+        <th>Serie</th>
+        <th>Nombre Inglés</th>
+        <th>Nombre Japonés</th>
+        <th>Año</th>
+        <th>Categoría</th>
+        <th>Idioma</th>
+        <th>Imagen</th>
+        <th>Sitio</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -187,47 +209,46 @@
 
     
     async function cargarDatos() {
-  datosCargados = [];
-  const snapshot = await db.collection("animes-series-indice").get();
+      datosCargados = [];
+      const snapshot = await db.collection("animes-series-indice").get();
 
-  for (const doc of snapshot.docs) {
-    const data = doc.data();
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
 
-    datosCargados.push({
-      nombreSerie: doc.id,
-      nombresec: data.nombresec || "",
-      nombresec02: data.nombresec02 || "",
-      año: data.año || "",
-      categoria: data.categoria || "",
-      idioma: data.idioma || "",
-      imagen: data.imagen || "",
-      sitio: data.sitio || ""
-    });
-  }
+        datosCargados.push({
+          nombreSerie: doc.id,
+          nombresec: data.nombresec || "",
+          nombresec02: data.nombresec02 || "",
+          año: data.año || "",
+          categoria: data.categoria || "",
+          idioma: data.idioma || "",
+          imagen: data.imagen || "",
+          sitio: data.sitio || ""
+        });
+      }
 
-  poblarFiltros();
-  aplicarFiltros();
-}
+      poblarFiltros();
+      aplicarFiltros();
+    }
 
     function poblarFiltros() {
-  const series = new Set();
-  const categorias = new Set();
-  const idiomas = new Set();
-  const años = new Set();
+      const series = new Set();
+      const categorias = new Set();
+      const idiomas = new Set();
+      const años = new Set();
 
-  datosCargados.forEach(d => {
-    series.add(d.nombreSerie);
-    categorias.add(d.categoria);
-    idiomas.add(d.idioma);
-    años.add(d.año);
-  });
+      datosCargados.forEach(d => {
+        series.add(d.nombreSerie);
+        categorias.add(d.categoria);
+        idiomas.add(d.idioma);
+        años.add(d.año);
+      });
 
-  llenarSelect("filtroSerie", Array.from(series));
-  llenarSelect("filtroCategoria", Array.from(categorias));
-  llenarSelect("filtroIdioma", Array.from(idiomas));
-  llenarSelect("filtroAño", Array.from(años));
-}
-
+      llenarSelect("filtroSerie", Array.from(series));
+      llenarSelect("filtroCategoria", Array.from(categorias));
+      llenarSelect("filtroIdioma", Array.from(idiomas));
+      llenarSelect("filtroAño", Array.from(años));
+    }
 
     function llenarSelect(id, opciones) {
       const select = document.getElementById(id);
@@ -240,59 +261,87 @@
     }
 
     function aplicarFiltros() {
-  const serie = document.getElementById("filtroSerie").value;
-  const categoria = document.getElementById("filtroCategoria").value;
-  const idioma = document.getElementById("filtroIdioma").value;
-  const año = document.getElementById("filtroAño").value;
+      const serie = document.getElementById("filtroSerie").value;
+      const categoria = document.getElementById("filtroCategoria").value;
+      const idioma = document.getElementById("filtroIdioma").value;
+      const año = document.getElementById("filtroAño").value;
 
-  datosFiltrados = datosCargados.filter(d =>
-    (!serie || d.nombreSerie === serie) &&
-    (!categoria || d.categoria === categoria) &&
-    (!idioma || d.idioma === idioma) &&
-    (!año || d.año == año)
-  );
+      datosFiltrados = datosCargados.filter(d =>
+        (!serie || d.nombreSerie === serie) &&
+        (!categoria || d.categoria === categoria) &&
+        (!idioma || d.idioma === idioma) &&
+        (!año || d.año == año)
+      );
 
-  paginaActual = 1;
-  mostrarPagina();
-}
-
+      paginaActual = 1;
+      mostrarPagina();
+    }
 
     function mostrarPagina() {
-  const tbody = document.querySelector("#tablaSeries tbody");
-  tbody.innerHTML = "";
+      const tbody = document.querySelector("#tablaSeries tbody");
+      tbody.innerHTML = "";
 
-  const inicio = (paginaActual - 1) * registrosPorPagina;
-  const fin = inicio + registrosPorPagina;
-  const pagina = datosFiltrados.slice(inicio, fin);
+      if (datosFiltrados.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='8' style='text-align: center;'>No hay datos que coincidan con los filtros</td></tr>";
+        renderizarPaginacion();
+        return;
+      }
 
-  pagina.forEach(d => {
-    const fila = document.createElement("tr");
-    fila.innerHTML = `
-      <td>${d.nombreSerie}</td>
-      <td style="word-break: break-word;">${escapeHTML(d.nombresec)}</td>
-      <td style="word-break: break-word;">${escapeHTML(d.nombresec02)}</td>
-      <td>${escapeHTML(d.año)}</td>
-      <td>${escapeHTML(d.categoria)}</td>
-      <td>${escapeHTML(d.idioma)}</td>
-      <td style="max-width: 300px; word-break: break-word;">
-        ${d.imagen ? `<a href="${d.imagen}" target="_blank">${escapeHTML(d.imagen)}</a>` : ""}
-      </td>
-      <td style="max-width: 300px; word-break: break-word;">
-        ${d.sitio ? `<a href="${d.sitio}" target="_blank">${escapeHTML(d.sitio)}</a>` : ""}
-      </td>
-    `;
-    tbody.appendChild(fila);
-  });
+      const inicio = (paginaActual - 1) * registrosPorPagina;
+      const fin = inicio + registrosPorPagina;
+      const pagina = datosFiltrados.slice(inicio, fin);
 
-  renderizarPaginacion();
-}
+      pagina.forEach(d => {
+        const fila = document.createElement("tr");
+        
+        // Vista previa de imagen
+        const imagenPreview = d.imagen && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(d.imagen) 
+          ? `<img src="${d.imagen}" alt="Vista previa" class="image-preview" onclick="window.open('${d.imagen}', '_blank')" onerror="this.style.display='none'" />`
+          : "";
 
+        // Enlaces clickeables
+        const enlaceImagen = d.imagen 
+          ? `<a href="${d.imagen}" target="_blank" class="url-link">${acortarURL(d.imagen)}</a>`
+          : "";
+
+        const enlaceSitio = d.sitio && /^https?:\/\/\S+$/i.test(d.sitio)
+          ? `<a href="${d.sitio}" target="_blank" class="url-link">${acortarURL(d.sitio)}</a>`
+          : (d.sitio || "");
+
+        fila.innerHTML = `
+          <td>${escapeHTML(d.nombreSerie)}</td>
+          <td style="word-break: break-word;">${escapeHTML(d.nombresec)}</td>
+          <td style="word-break: break-word;">${escapeHTML(d.nombresec02)}</td>
+          <td>${escapeHTML(d.año)}</td>
+          <td>${escapeHTML(d.categoria)}</td>
+          <td>${escapeHTML(d.idioma)}</td>
+          <td style="text-align: center;">
+            ${imagenPreview}
+            <div style="margin-top: 5px; font-size: 12px;">${enlaceImagen}</div>
+          </td>
+          <td style="max-width: 200px; word-break: break-word;">${enlaceSitio}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+
+      renderizarPaginacion();
+    }
+
+    // Función para acortar URLs largas
+    function acortarURL(url) {
+      if (url.length > 50) {
+        return url.substring(0, 47) + '...';
+      }
+      return url;
+    }
 
     function renderizarPaginacion() {
       const contenedor = document.getElementById("paginacion");
       contenedor.innerHTML = "";
 
       const totalPaginas = Math.ceil(datosFiltrados.length / registrosPorPagina);
+
+      if (totalPaginas <= 1) return;
 
       const btnAnterior = document.createElement("button");
       btnAnterior.textContent = "⬅ Anterior";
@@ -304,14 +353,14 @@
 
       const btnSiguiente = document.createElement("button");
       btnSiguiente.textContent = "Siguiente ➡";
-      btnSiguiente.disabled = paginaActual === totalPaginas || totalPaginas === 0;
+      btnSiguiente.disabled = paginaActual === totalPaginas;
       btnSiguiente.onclick = () => {
         paginaActual++;
         mostrarPagina();
       };
 
       const info = document.createElement("span");
-      info.textContent = `Página ${paginaActual} de ${totalPaginas || 1}`;
+      info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
 
       contenedor.appendChild(btnAnterior);
       contenedor.appendChild(info);
@@ -327,36 +376,37 @@
       aplicarFiltros();
     }
 
-     function exportarTablaAExcel() {
-  if (datosFiltrados.length === 0) {
-    alert("No hay datos para exportar.");
-    return;
-  }
+    function exportarTablaAExcel() {
+      if (datosFiltrados.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
 
-  // Convertir datos filtrados a formato de hoja de cálculo con los campos correctos
-  const datosParaExportar = datosFiltrados.map(d => ({
-    Serie: d.nombreSerie,
-    "Nombre Inglés": d.nombresec,
-    "Nombre Japonés": d.nombresec02,
-    Año: d.año,
-    Categoría: d.categoria,
-    Idioma: d.idioma,
-    "Enlace Imagen": d.imagen,
-    "Enlace Sitio": d.sitio
-  }));
+      const datosParaExportar = datosFiltrados.map(d => ({
+        Serie: d.nombreSerie,
+        "Nombre Inglés": d.nombresec,
+        "Nombre Japonés": d.nombresec02,
+        Año: d.año,
+        Categoría: d.categoria,
+        Idioma: d.idioma,
+        "Enlace Imagen": d.imagen,
+        "Enlace Sitio": d.sitio
+      }));
 
-  const ws = XLSX.utils.json_to_sheet(datosParaExportar);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Series Índice");
+      const ws = XLSX.utils.json_to_sheet(datosParaExportar);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Series Índice");
 
-  XLSX.writeFile(wb, "series_indice_filtradas.xlsx");
-}
-
+      XLSX.writeFile(wb, "series_indice_filtradas.xlsx");
+    }
 
     function escapeHTML(str) {
+      if (!str) return "";
       return str.replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
     }
 
     window.onload = cargarDatos;

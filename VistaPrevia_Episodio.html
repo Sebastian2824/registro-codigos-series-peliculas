@@ -196,11 +196,80 @@
     #btnAgregarFila:hover {
         background-color: #2d9249;
     }
-</style>
+    
+    /* Estilos para el selector de servicio */
+    .servicio-selector {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+    
+    .servicio-btn {
+        padding: 10px 20px;
+        border: 2px solid #1a73e8;
+        background-color: white;
+        color: #1a73e8;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .servicio-btn.active {
+        background-color: #1a73e8;
+        color: white;
+    }
+    
+    .servicio-btn:hover {
+        background-color: #e8f1ff;
+    }
+    
+    .servicio-btn.active:hover {
+        background-color: #1557b0;
+    }
+    
+    .servicio-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .servicio-firebase {
+        background-color: #34a853;
+    }
+    
+    .servicio-cloudflare {
+        background-color: #fbbc05;
+    }
+    
+    .servicio-info {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
+    }
+  </style>
 </head>
 <body>
   <div class="main-container">
     <h2>Vista previa del Episodio</h2>
+    
+    <!-- Selector de servicio -->
+    <div class="servicio-selector">
+      <button id="btnFirebase" class="servicio-btn active">
+        <span class="servicio-indicator servicio-firebase"></span>Firebase
+      </button>
+      <button id="btnCloudflare" class="servicio-btn">
+        <span class="servicio-indicator servicio-cloudflare"></span>Cloudflare
+      </button>
+    </div>
+    
+    <div class="servicio-info" id="servicioInfo">
+      Usando: <strong>Firebase</strong>
+    </div>
 
     <label for="serie">Serie:</label>
     <select id="serie"></select>
@@ -239,14 +308,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // URLs base de Cloudflare (debes reemplazar con tu dominio real)
+    const CLOUDFLARE_BASE_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    // Variables globales
+    let servicioActual = 'firebase'; // 'firebase' o 'cloudflare'
+    
+    // Elementos DOM
     const selectSerie = document.getElementById('serie');
     const selectTemporada = document.getElementById('temporada');
     const selectIdioma = document.getElementById('idioma');
     const selectServidor = document.getElementById('servidor');
     const selectEpisodio = document.getElementById('episodio');
     const reproductor = document.getElementById('reproductor');
+    const btnFirebase = document.getElementById('btnFirebase');
+    const btnCloudflare = document.getElementById('btnCloudflare');
+    const servicioInfo = document.getElementById('servicioInfo');
 
-    async function cargarSeries() {
+    // Funciones para Firebase
+    async function cargarSeriesFirebase() {
       const seriesSnapshot = await getDocs(collection(db, 'animes-series'));
       selectSerie.innerHTML = '<option value="">Seleccione serie</option>';
       seriesSnapshot.forEach(doc => {
@@ -254,7 +334,7 @@
       });
     }
 
-    async function cargarTemporadas(serie) {
+    async function cargarTemporadasFirebase(serie) {
       const temporadasRef = collection(db, 'animes-series', serie, 'Temporadas');
       const snapshot = await getDocs(temporadasRef);
       selectTemporada.innerHTML = '<option value="">Seleccione temporada</option>';
@@ -263,7 +343,7 @@
       });
     }
 
-    async function cargarIdiomas(serie, temporada) {
+    async function cargarIdiomasFirebase(serie, temporada) {
       const idiomasRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas');
       const snapshot = await getDocs(idiomasRef);
       selectIdioma.innerHTML = '<option value="">Seleccione idioma</option>';
@@ -272,7 +352,7 @@
       });
     }
 
-    async function cargarServidores(serie, temporada, idioma) {
+    async function cargarServidoresFirebase(serie, temporada, idioma) {
       const servidoresRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores');
       const snapshot = await getDocs(servidoresRef);
       selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
@@ -281,7 +361,7 @@
       });
     }
 
-    async function cargarEpisodios(serie, temporada, idioma, servidor) {
+    async function cargarEpisodiosFirebase(serie, temporada, idioma, servidor) {
       const episodiosRef = collection(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios');
       const snapshot = await getDocs(episodiosRef);
       selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
@@ -290,30 +370,206 @@
       });
     }
 
-    async function mostrarVideo(serie, temporada, idioma, servidor, episodio) {
-  const docRef = doc(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios', episodio);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    console.log("Datos del episodio:", data); // Verificación en consola
-    if (data.iframe) {
-      reproductor.innerHTML = data.iframe;
-    } else {
-      reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
+    async function mostrarVideoFirebase(serie, temporada, idioma, servidor, episodio) {
+      const docRef = doc(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios', episodio);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        console.log("Datos del episodio:", data);
+        if (data.iframe) {
+          reproductor.innerHTML = data.iframe;
+        } else {
+          reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
+        }
+      } else {
+        reproductor.innerHTML = '⚠️ Episodio no encontrado en Firebase.';
+      }
     }
-  } else {
-    reproductor.innerHTML = '⚠️ Episodio no encontrado en Firebase.';
-  }
-}
 
+    // Funciones para Cloudflare
+    async function cargarSeriesCloudflare() {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/nombres-series`);
+        if (!response.ok) throw new Error('Error al cargar series');
+        
+        const series = await response.json();
+        selectSerie.innerHTML = '<option value="">Seleccione serie</option>';
+        series.forEach(serie => {
+          selectSerie.innerHTML += `<option value="${serie}">${serie}</option>`;
+        });
+      } catch (error) {
+        console.error('Error cargando series desde Cloudflare:', error);
+        selectSerie.innerHTML = '<option value="">Error al cargar series</option>';
+      }
+    }
 
+    async function cargarTemporadasCloudflare(serie) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/temporadas?serie=${encodeURIComponent(serie)}`);
+        if (!response.ok) throw new Error('Error al cargar temporadas');
+        
+        const temporadas = await response.json();
+        selectTemporada.innerHTML = '<option value="">Seleccione temporada</option>';
+        temporadas.forEach(temporada => {
+          selectTemporada.innerHTML += `<option value="${temporada}">${temporada}</option>`;
+        });
+      } catch (error) {
+        console.error('Error cargando temporadas desde Cloudflare:', error);
+        selectTemporada.innerHTML = '<option value="">Error al cargar temporadas</option>';
+      }
+    }
+
+    async function cargarIdiomasCloudflare(serie, temporada) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/idiomas?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
+        if (!response.ok) throw new Error('Error al cargar idiomas');
+        
+        const idiomas = await response.json();
+        selectIdioma.innerHTML = '<option value="">Seleccione idioma</option>';
+        idiomas.forEach(idioma => {
+          selectIdioma.innerHTML += `<option value="${idioma}">${idioma}</option>`;
+        });
+      } catch (error) {
+        console.error('Error cargando idiomas desde Cloudflare:', error);
+        selectIdioma.innerHTML = '<option value="">Error al cargar idiomas</option>';
+      }
+    }
+
+    async function cargarServidoresCloudflare(serie, temporada, idioma) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/servidores?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}`);
+        if (!response.ok) throw new Error('Error al cargar servidores');
+        
+        const servidores = await response.json();
+        selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
+        servidores.forEach(servidor => {
+          selectServidor.innerHTML += `<option value="${servidor}">${servidor}</option>`;
+        });
+      } catch (error) {
+        console.error('Error cargando servidores desde Cloudflare:', error);
+        selectServidor.innerHTML = '<option value="">Error al cargar servidores</option>';
+      }
+    }
+
+    async function cargarEpisodiosCloudflare(serie, temporada, idioma, servidor) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+        if (!response.ok) throw new Error('Error al cargar episodios');
+        
+        const episodios = await response.json();
+        selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
+        episodios.forEach(episodio => {
+          selectEpisodio.innerHTML += `<option value="${episodio.episodio}">${episodio.episodio}</option>`;
+        });
+      } catch (error) {
+        console.error('Error cargando episodios desde Cloudflare:', error);
+        selectEpisodio.innerHTML = '<option value="">Error al cargar episodios</option>';
+      }
+    }
+
+    async function mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+        if (!response.ok) throw new Error('Error al cargar datos del episodio');
+        
+        const episodios = await response.json();
+        const episodioData = episodios.find(e => e.episodio === episodio);
+        
+        if (episodioData && episodioData.iframe) {
+          reproductor.innerHTML = episodioData.iframe;
+        } else {
+          reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
+        }
+      } catch (error) {
+        console.error('Error cargando video desde Cloudflare:', error);
+        reproductor.innerHTML = '⚠️ Error al cargar el episodio desde Cloudflare.';
+      }
+    }
+
+    // Funciones de servicio unificadas
+    function cargarSeries() {
+      if (servicioActual === 'firebase') {
+        return cargarSeriesFirebase();
+      } else {
+        return cargarSeriesCloudflare();
+      }
+    }
+
+    function cargarTemporadas(serie) {
+      if (servicioActual === 'firebase') {
+        return cargarTemporadasFirebase(serie);
+      } else {
+        return cargarTemporadasCloudflare(serie);
+      }
+    }
+
+    function cargarIdiomas(serie, temporada) {
+      if (servicioActual === 'firebase') {
+        return cargarIdiomasFirebase(serie, temporada);
+      } else {
+        return cargarIdiomasCloudflare(serie, temporada);
+      }
+    }
+
+    function cargarServidores(serie, temporada, idioma) {
+      if (servicioActual === 'firebase') {
+        return cargarServidoresFirebase(serie, temporada, idioma);
+      } else {
+        return cargarServidoresCloudflare(serie, temporada, idioma);
+      }
+    }
+
+    function cargarEpisodios(serie, temporada, idioma, servidor) {
+      if (servicioActual === 'firebase') {
+        return cargarEpisodiosFirebase(serie, temporada, idioma, servidor);
+      } else {
+        return cargarEpisodiosCloudflare(serie, temporada, idioma, servidor);
+      }
+    }
+
+    function mostrarVideo(serie, temporada, idioma, servidor, episodio) {
+      if (servicioActual === 'firebase') {
+        return mostrarVideoFirebase(serie, temporada, idioma, servidor, episodio);
+      } else {
+        return mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio);
+      }
+    }
+
+    // Cambiar servicio
+    function cambiarServicio(nuevoServicio) {
+      servicioActual = nuevoServicio;
+      
+      // Actualizar botones
+      if (nuevoServicio === 'firebase') {
+        btnFirebase.classList.add('active');
+        btnCloudflare.classList.remove('active');
+        servicioInfo.innerHTML = 'Usando: <strong>Firebase</strong>';
+      } else {
+        btnFirebase.classList.remove('active');
+        btnCloudflare.classList.add('active');
+        servicioInfo.innerHTML = 'Usando: <strong>Cloudflare</strong>';
+      }
+      
+      // Limpiar selects y reproductor
+      selectSerie.innerHTML = '<option value="">Seleccione serie</option>';
+      selectTemporada.innerHTML = '<option value="">Seleccione temporada</option>';
+      selectIdioma.innerHTML = '<option value="">Seleccione idioma</option>';
+      selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
+      selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
+      reproductor.innerHTML = 'Selecciona un episodio para ver el video';
+      
+      // Recargar series
+      cargarSeries();
+    }
+
+    // Event Listeners
     selectSerie.addEventListener('change', async () => {
       const serie = selectSerie.value;
       if (serie) {
         await cargarTemporadas(serie);
-        selectIdioma.innerHTML = '';
-        selectServidor.innerHTML = '';
-        selectEpisodio.innerHTML = '';
+        selectIdioma.innerHTML = '<option value="">Seleccione idioma</option>';
+        selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
+        selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
         reproductor.innerHTML = '';
       }
     });
@@ -323,8 +579,8 @@
       const temporada = selectTemporada.value;
       if (temporada) {
         await cargarIdiomas(serie, temporada);
-        selectServidor.innerHTML = '';
-        selectEpisodio.innerHTML = '';
+        selectServidor.innerHTML = '<option value="">Seleccione servidor</option>';
+        selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
         reproductor.innerHTML = '';
       }
     });
@@ -335,7 +591,7 @@
       const idioma = selectIdioma.value;
       if (idioma) {
         await cargarServidores(serie, temporada, idioma);
-        selectEpisodio.innerHTML = '';
+        selectEpisodio.innerHTML = '<option value="">Seleccione episodio</option>';
         reproductor.innerHTML = '';
       }
     });
@@ -362,6 +618,10 @@
       }
     });
 
+    btnFirebase.addEventListener('click', () => cambiarServicio('firebase'));
+    btnCloudflare.addEventListener('click', () => cambiarServicio('cloudflare'));
+
+    // Inicializar
     cargarSeries();
   </script>
 </body>

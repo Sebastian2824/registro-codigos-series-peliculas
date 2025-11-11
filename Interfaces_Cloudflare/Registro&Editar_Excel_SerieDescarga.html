@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Excel a Cloudflare</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      padding: 30px;
+      background: #f8fafc;
+      color: #2d3748;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h2 {
+      color: #1e3a8a;
+      font-weight: 600;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 10px;
+    }
+    #inputExcel {
+      display: block;
+      margin: 20px 0;
+      padding: 12px;
+      border: 2px dashed #3b82f6;
+      border-radius: 8px;
+      background-color: #f0f7ff;
+      color: #1e40af;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #inputExcel:hover {
+      background-color: #e0f2fe;
+      border-color: #2563eb;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background-color: #1e40af;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    tr:nth-child(odd) {
+      background-color: #f1f5f9;
+    }
+    tr:hover {
+      background-color: #e0f2fe;
+    }
+    #progressContainer {
+      display: none;
+      margin: 25px 0;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    #progressBarWrapper {
+      width: 100%;
+      height: 20px;
+      background: #e0e7ff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    #progressText {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #1e40af;
+      text-align: center;
+    }
+    #saveButton {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+      display: block;
+      margin: 20px auto;
+      font-size: 16px;
+    }
+    #saveButton:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+    #saveButton:active {
+      transform: translateY(0);
+    }
+    #panelPreview {
+      margin-top: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h2>Registrar / Actualizar Series de Descarga en Firebase desde Excel</h2>
+  <input type="file" id="inputExcel" accept=".xlsx">
+
+  <button onclick="location.href='../Registro&Editar_Excel_SerieDescarga.html'" 
+  style="background-color: #10b981; color: white; 
+         border: none; padding: 12px 24px; 
+         border-radius: 8px; font-weight: 600; 
+         cursor: pointer; margin-bottom: 20px;">
+  Ir al registro con Firebase
+</button>
+  
+  <div id="progressContainer">
+    <div id="progressBarWrapper">
+      <div id="progressBar"></div>
+    </div>
+    <div id="progressText">0%</div>
+  </div>
+
+  <button id="saveButton">Guardar en Cloudflare</button>
+
+  <div id="panelPreview"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    
+    let datosPreview = [];
+
+    document.getElementById("inputExcel").addEventListener("change", async function (e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const hoja = workbook.Sheets[workbook.SheetNames[0]];
+        const datos = XLSX.utils.sheet_to_json(hoja);
+        datosPreview = [];
+        document.getElementById("panelPreview").innerHTML = "";
+
+        datos.forEach(row => {
+          const nombreSerie = row["Serie"]?.trim();
+          const temporada = row["Temporada"]?.trim();
+          const idioma = row["Idioma"]?.trim();
+          const episodio = row["Episodio"]?.trim();
+
+          Object.keys(row).forEach(col => {
+            if (!["Serie", "Temporada", "Idioma", "Episodio"].includes(col)) {
+              const servidor = col.trim();
+              const url = row[col]?.toString().trim();
+              if (url && url !== "-") {
+                datosPreview.push({ 
+                  nombreSerie, 
+                  temporada, 
+                  idioma, 
+                  episodio, 
+                  servidor, 
+                  url 
+                });
+              }
+            }
+          });
+        });
+
+        const tablaHTML = `<table>
+          <thead>
+            <tr>
+              <th>Serie</th>
+              <th>Temporada</th>
+              <th>Idioma</th>
+              <th>Episodio</th>
+              <th>Servidor</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${datosPreview.map(d => `
+              <tr>
+                <td>${d.nombreSerie}</td>
+                <td>${d.temporada}</td>
+                <td>${d.idioma}</td>
+                <td>${d.episodio}</td>
+                <td>${d.servidor}</td>
+                <td>${d.url}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+
+        document.getElementById("panelPreview").innerHTML = tablaHTML;
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    document.getElementById("saveButton").addEventListener("click", async function () {
+      const total = datosPreview.length;
+      if (total === 0) return alert("No hay datos para guardar.");
+
+      const chunkSize = 50; // número de registros por bloque
+      let processed = 0;
+
+      const progressContainer = document.getElementById("progressContainer");
+      const progressBar = document.getElementById("progressBar");
+      const progressText = document.getElementById("progressText");
+      progressContainer.style.display = "block";
+      progressBar.style.width = "0%";
+      progressText.innerText = "0%";
+
+      try {
+        for (let i = 0; i < total; i += chunkSize) {
+          const chunk = datosPreview.slice(i, i + chunkSize);
+
+          const response = await fetch(`${WORKER_URL}/registrar-descargas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ registros: chunk }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+          }
+
+          processed += chunk.length;
+          const percent = Math.round((processed / total) * 100);
+          progressBar.style.width = `${percent}%`;
+          progressText.innerText = `${percent}%`;
+        }
+
+        alert("✅ Datos registrados/actualizados exitosamente en Cloudflare.");
+
+        setTimeout(() => location.reload(), 1000);
+
+      } catch (error) {
+        console.error("Error al guardar en Cloudflare:", error);
+        alert(`Error al guardar en Cloudflare: ${error}`);
+      }
+    });
+  </script>
+</body>
+</html>

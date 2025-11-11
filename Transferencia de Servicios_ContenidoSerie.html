@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferir Datos Firebase a Cloudflare</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f9ff;
+      color: #333;
+    }
+    
+    h2 {
+      color: #1a73e8;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card h3 {
+      margin-top: 0;
+      color: #1a73e8;
+      border-bottom: 1px solid #e0e9ff;
+      padding-bottom: 10px;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:hover {
+      background-color: #1557b0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    #btnTransferir {
+      background-color: #34a853;
+    }
+    
+    #btnTransferir:hover {
+      background-color: #2d9249;
+    }
+    
+    #btnLimpiar {
+      background-color: #ea4335;
+    }
+    
+    #btnLimpiar:hover {
+      background-color: #d33426;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    th, td {
+      border: 1px solid #e0e9ff;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #1a73e8;
+      color: white;
+      font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+    
+    tr:hover {
+      background-color: #e8f1ff;
+    }
+    
+    .progress-container {
+      margin: 15px 0;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 20px;
+      background: #e0e7ff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .progress-text {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #1e40af;
+      text-align: center;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .stat-box {
+      background-color: #e8f1ff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      flex: 1;
+      margin: 0 10px;
+    }
+    
+    .stat-box h4 {
+      margin: 0 0 10px 0;
+      color: #1a73e8;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
+    
+    .filter-section {
+      margin-bottom: 20px;
+    }
+    
+    .filter-section label {
+      display: inline-block;
+      margin-right: 15px;
+      font-weight: 500;
+      color: #1a73e8;
+    }
+    
+    .filter-section input, .filter-section select {
+      padding: 8px 12px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-sizing: border-box;
+    }
+    
+    .filter-section input:focus, .filter-section select:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+      outline: none;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    
+    .pagination button {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    .pagination-info {
+      margin: 0 15px;
+      font-weight: 500;
+      color: #1a73e8;
+    }
+    
+    .loading-progress {
+      margin: 15px 0;
+    }
+    
+    .loading-progress .progress-bar-wrapper {
+      height: 10px;
+    }
+    
+    .loading-progress .progress-text {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    
+    .debug-info {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Transferir Datos de Firebase a Cloudflare</h2>
+    
+    <div class="card">
+      <h3>Configuración</h3>
+      <div class="controls">
+        <button id="btnCargarFirebase">Cargar Datos de Firebase</button>
+        <button id="btnTransferir" disabled>Transferir a Cloudflare</button>
+        <button id="btnLimpiar">Limpiar Tabla</button>
+      </div>
+      
+      <!-- Barra de progreso para carga de Firebase -->
+      <div id="loadingProgress" class="loading-progress" style="display: none;">
+        <div class="progress-bar-wrapper">
+          <div id="loadingProgressBar" class="progress-bar"></div>
+        </div>
+        <div id="loadingProgressText" class="progress-text">0%</div>
+      </div>
+      
+      <div class="filter-section">
+        <label for="filterSerie">Filtrar por Serie:</label>
+        <input type="text" id="filterSerie" placeholder="Nombre de la serie">
+        
+        <label for="filterTemporada">Filtrar por Temporada:</label>
+        <input type="text" id="filterTemporada" placeholder="Nombre de temporada">
+        
+        <button id="btnAplicarFiltro">Aplicar Filtros</button>
+        <button id="btnLimpiarFiltro">Limpiar Filtros</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>Datos de Firebase</h3>
+      <div class="table-container">
+        <div id="tablaDatos"></div>
+      </div>
+      
+      <!-- Paginación -->
+      <div id="pagination" class="pagination" style="display: none;">
+        <button id="btnFirstPage">Primera</button>
+        <button id="btnPrevPage">Anterior</button>
+        <span id="paginationInfo" class="pagination-info"></span>
+        <button id="btnNextPage">Siguiente</button>
+        <button id="btnLastPage">Última</button>
+      </div>
+    </div>
+    
+    <!-- Barra de progreso para transferencia a Cloudflare -->
+    <div id="transferProgress" class="progress-container" style="display: none;">
+      <div class="progress-bar-wrapper">
+        <div id="transferProgressBar" class="progress-bar"></div>
+      </div>
+      <div id="transferProgressText" class="progress-text">0%</div>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-box">
+        <h4>Series</h4>
+        <div class="stat-value" id="statSeries">0</div>
+      </div>
+      <div class="stat-box">
+        <h4>Temporadas</h4>
+        <div class="stat-value" id="statTemporadas">0</div>
+      </div>
+      <div class="stat-box">
+        <h4>Episodios</h4>
+        <div class="stat-value" id="statEpisodios">0</div>
+      </div>
+    </div>
+
+    <!-- Información de depuración -->
+    <div class="card">
+      <h3>Información de Depuración</h3>
+      <button id="btnToggleDebug">Mostrar/Ocultar Información de Depuración</button>
+      <div id="debugInfo" class="debug-info" style="display: none;">
+        <div id="debugContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
+      authDomain: "animes-plus-89b93.firebaseapp.com",
+      projectId: "animes-plus-89b93",
+      storageBucket: "animes-plus-89b93.appspot.com",
+      messagingSenderId: "402867181985",
+      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
+      measurementId: "G-DN632G7XJT"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Variables globales
+    let datosFirebase = [];
+    let datosFiltrados = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    // Cargar datos de Firebase
+    document.getElementById('btnCargarFirebase').addEventListener('click', cargarDatosFirebase);
+
+    async function cargarDatosFirebase() {
+      try {
+        const btnCargar = document.getElementById('btnCargarFirebase');
+        btnCargar.disabled = true;
+        btnCargar.textContent = 'Cargando...';
+        
+        // Mostrar barra de progreso de carga
+        const loadingProgress = document.getElementById('loadingProgress');
+        const loadingProgressBar = document.getElementById('loadingProgressBar');
+        const loadingProgressText = document.getElementById('loadingProgressText');
+        loadingProgress.style.display = 'block';
+        
+        datosFirebase = [];
+        
+        // Obtener todas las series
+        const seriesSnapshot = await db.collection("animes-series").get();
+        const totalSeries = seriesSnapshot.size;
+        let seriesProcesadas = 0;
+        
+        for (const serieDoc of seriesSnapshot.docs) {
+          const nombreSerie = serieDoc.id;
+          
+          // Obtener temporadas
+          const temporadasSnapshot = await db.collection("animes-series")
+            .doc(nombreSerie)
+            .collection("Temporadas")
+            .get();
+          
+          for (const temporadaDoc of temporadasSnapshot.docs) {
+            const nombreTemporada = temporadaDoc.id;
+            
+            // Obtener idiomas
+            const idiomasSnapshot = await db.collection("animes-series")
+              .doc(nombreSerie)
+              .collection("Temporadas")
+              .doc(nombreTemporada)
+              .collection("Idiomas")
+              .get();
+            
+            for (const idiomaDoc of idiomasSnapshot.docs) {
+              const nombreIdioma = idiomaDoc.id;
+              
+              // Obtener servidores
+              const servidoresSnapshot = await db.collection("animes-series")
+                .doc(nombreSerie)
+                .collection("Temporadas")
+                .doc(nombreTemporada)
+                .collection("Idiomas")
+                .doc(nombreIdioma)
+                .collection("Servidores")
+                .get();
+              
+              for (const servidorDoc of servidoresSnapshot.docs) {
+                const nombreServidor = servidorDoc.id;
+                
+                // Obtener episodios
+                const episodiosSnapshot = await db.collection("animes-series")
+                  .doc(nombreSerie)
+                  .collection("Temporadas")
+                  .doc(nombreTemporada)
+                  .collection("Idiomas")
+                  .doc(nombreIdioma)
+                  .collection("Servidores")
+                  .doc(nombreServidor)
+                  .collection("Episodios")
+                  .get();
+                
+                for (const episodioDoc of episodiosSnapshot.docs) {
+                  const nombreEpisodio = episodioDoc.id;
+                  const iframe = episodioDoc.data().iframe;
+                  
+                  datosFirebase.push({
+                    nombreSerie,
+                    temporada: nombreTemporada,
+                    idioma: nombreIdioma,
+                    servidor: nombreServidor,
+                    episodio: nombreEpisodio,
+                    iframe
+                  });
+                }
+              }
+            }
+          }
+          
+          // Actualizar progreso
+          seriesProcesadas++;
+          const progressPercent = Math.round((seriesProcesadas / totalSeries) * 100);
+          loadingProgressBar.style.width = `${progressPercent}%`;
+          loadingProgressText.textContent = `${progressPercent}% (${seriesProcesadas}/${totalSeries} series)`;
+        }
+        
+        datosFiltrados = [...datosFirebase];
+        currentPage = 1;
+        mostrarDatosEnTabla();
+        actualizarEstadisticas();
+        actualizarPaginacion();
+        
+        document.getElementById('btnTransferir').disabled = false;
+        btnCargar.disabled = false;
+        btnCargar.textContent = 'Cargar Datos de Firebase';
+        loadingProgress.style.display = 'none';
+        
+        alert(`Se cargaron ${datosFirebase.length} episodios de Firebase.`);
+        
+      } catch (error) {
+        console.error("Error al cargar datos de Firebase:", error);
+        alert("Error al cargar datos de Firebase: " + error.message);
+        
+        const btnCargar = document.getElementById('btnCargarFirebase');
+        btnCargar.disabled = false;
+        btnCargar.textContent = 'Cargar Datos de Firebase';
+        document.getElementById('loadingProgress').style.display = 'none';
+      }
+    }
+
+    // Mostrar datos en tabla con paginación
+    function mostrarDatosEnTabla() {
+      const tablaDatos = document.getElementById('tablaDatos');
+      
+      if (datosFiltrados.length === 0) {
+        tablaDatos.innerHTML = '<p>No hay datos para mostrar.</p>';
+        document.getElementById('pagination').style.display = 'none';
+        return;
+      }
+      
+      // Calcular índices para la página actual
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, datosFiltrados.length);
+      const datosPagina = datosFiltrados.slice(startIndex, endIndex);
+      
+      const tablaHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Serie</th>
+              <th>Temporada</th>
+              <th>Idioma</th>
+              <th>Servidor</th>
+              <th>Episodio</th>
+              <th>Iframe</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${datosPagina.map(d => `
+              <tr>
+                <td>${escapeHTML(d.nombreSerie)}</td>
+                <td>${escapeHTML(d.temporada)}</td>
+                <td>${escapeHTML(d.idioma)}</td>
+                <td>${escapeHTML(d.servidor)}</td>
+                <td>${escapeHTML(d.episodio)}</td>
+                <td class="iframe-cell">${truncateText(escapeHTML(d.iframe), 50)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      tablaDatos.innerHTML = tablaHTML;
+      document.getElementById('pagination').style.display = 'flex';
+    }
+
+    // Actualizar controles de paginación
+    function actualizarPaginacion() {
+      const totalPages = Math.ceil(datosFiltrados.length / itemsPerPage);
+      const paginationInfo = document.getElementById('paginationInfo');
+      
+      paginationInfo.textContent = `Página ${currentPage} de ${totalPages} (${datosFiltrados.length} registros)`;
+      
+      // Habilitar/deshabilitar botones
+      document.getElementById('btnFirstPage').disabled = currentPage === 1;
+      document.getElementById('btnPrevPage').disabled = currentPage === 1;
+      document.getElementById('btnNextPage').disabled = currentPage === totalPages;
+      document.getElementById('btnLastPage').disabled = currentPage === totalPages;
+    }
+
+    // Event listeners para paginación
+    document.getElementById('btnFirstPage').addEventListener('click', function() {
+      currentPage = 1;
+      mostrarDatosEnTabla();
+      actualizarPaginacion();
+    });
+
+    document.getElementById('btnPrevPage').addEventListener('click', function() {
+      if (currentPage > 1) {
+        currentPage--;
+        mostrarDatosEnTabla();
+        actualizarPaginacion();
+      }
+    });
+
+    document.getElementById('btnNextPage').addEventListener('click', function() {
+      const totalPages = Math.ceil(datosFiltrados.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        mostrarDatosEnTabla();
+        actualizarPaginacion();
+      }
+    });
+
+    document.getElementById('btnLastPage').addEventListener('click', function() {
+      const totalPages = Math.ceil(datosFiltrados.length / itemsPerPage);
+      currentPage = totalPages;
+      mostrarDatosEnTabla();
+      actualizarPaginacion();
+    });
+
+    // Función para escapar HTML
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Función para truncar texto
+    function truncateText(text, maxLength) {
+      if (!text) return '';
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '...';
+    }
+
+    // Actualizar estadísticas
+    function actualizarEstadisticas() {
+      const series = new Set(datosFiltrados.map(d => d.nombreSerie));
+      const temporadas = new Set(datosFiltrados.map(d => d.temporada));
+      
+      document.getElementById('statSeries').textContent = series.size;
+      document.getElementById('statTemporadas').textContent = temporadas.size;
+      document.getElementById('statEpisodios').textContent = datosFiltrados.length;
+    }
+
+    // Transferir datos a Cloudflare - CORREGIDO
+    document.getElementById('btnTransferir').addEventListener('click', transferirACloudflare);
+
+    async function transferirACloudflare() {
+      if (datosFiltrados.length === 0) {
+        alert("No hay datos para transferir.");
+        return;
+      }
+
+      const total = datosFiltrados.length;
+      const chunkSize = 50; // número de registros por bloque
+      let processed = 0;
+
+      const transferProgress = document.getElementById('transferProgress');
+      const transferProgressBar = document.getElementById('transferProgressBar');
+      const transferProgressText = document.getElementById('transferProgressText');
+      
+      transferProgress.style.display = "block";
+      transferProgressBar.style.width = "0%";
+      transferProgressText.innerText = "0%";
+
+      const btnTransferir = document.getElementById('btnTransferir');
+      btnTransferir.disabled = true;
+      btnTransferir.textContent = 'Transferiendo...';
+
+      try {
+        for (let i = 0; i < total; i += chunkSize) {
+          const chunk = datosFiltrados.slice(i, i + chunkSize);
+
+          // MOSTRAR INFORMACIÓN DE DEPURACIÓN
+          actualizarDebugInfo(`Enviando lote ${Math.floor(i/chunkSize) + 1}:`, chunk);
+
+          // INTENTO 1: Formato basado en tu código de Excel (con "registros")
+          let response;
+          try {
+            response = await fetch("https://proyect-cloud-flare.apiprueba2025.workers.dev/registrar", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ registros: chunk }),
+            });
+          } catch (error) {
+            // INTENTO 2: Formato alternativo (con "episodios")
+            response = await fetch("https://proyect-cloud-flare.apiprueba2025.workers.dev/registrar", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ episodios: chunk }),
+            });
+          }
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            actualizarDebugInfo(`Error en respuesta: ${errorText}`);
+            throw new Error(errorText);
+          }
+
+          const result = await response.json();
+          actualizarDebugInfo(`Lote ${Math.floor(i/chunkSize) + 1} procesado:`, result);
+
+          processed += chunk.length;
+          const percent = Math.round((processed / total) * 100);
+          transferProgressBar.style.width = `${percent}%`;
+          transferProgressText.innerText = `${percent}%`;
+        }
+
+        alert("✅ Datos transferidos exitosamente a Cloudflare.");
+        
+        // Limpiar después de la transferencia
+        setTimeout(() => {
+          transferProgress.style.display = "none";
+          btnTransferir.disabled = false;
+          btnTransferir.textContent = 'Transferir a Cloudflare';
+        }, 1000);
+
+      } catch (error) {
+        console.error("Error al transferir a Cloudflare:", error);
+        
+        // Mostrar información detallada del error
+        let errorMessage = error.message;
+        try {
+          const errorObj = JSON.parse(error.message);
+          errorMessage = errorObj.error || error.message;
+        } catch (e) {
+          // Si no es JSON, usar el mensaje original
+        }
+        
+        alert(`Error al transferir a Cloudflare: ${errorMessage}`);
+        
+        transferProgress.style.display = "none";
+        btnTransferir.disabled = false;
+        btnTransferir.textContent = 'Transferir a Cloudflare';
+      }
+    }
+
+    // Funciones para depuración
+    document.getElementById('btnToggleDebug').addEventListener('click', function() {
+      const debugInfo = document.getElementById('debugInfo');
+      debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+    });
+
+    function actualizarDebugInfo(title, data) {
+      const debugContent = document.getElementById('debugContent');
+      const timestamp = new Date().toLocaleTimeString();
+      debugContent.innerHTML += `<div><strong>${timestamp} - ${title}</strong><br>${JSON.stringify(data, null, 2)}</div><hr>`;
+      debugContent.scrollTop = debugContent.scrollHeight;
+    }
+
+    // Limpiar tabla
+    document.getElementById('btnLimpiar').addEventListener('click', function() {
+      datosFirebase = [];
+      datosFiltrados = [];
+      currentPage = 1;
+      mostrarDatosEnTabla();
+      actualizarEstadisticas();
+      document.getElementById('btnTransferir').disabled = true;
+      document.getElementById('pagination').style.display = 'none';
+      document.getElementById('debugContent').innerHTML = '';
+    });
+
+    // Aplicar filtros
+    document.getElementById('btnAplicarFiltro').addEventListener('click', aplicarFiltros);
+    
+    function aplicarFiltros() {
+      const filterSerie = document.getElementById('filterSerie').value.toLowerCase();
+      const filterTemporada = document.getElementById('filterTemporada').value.toLowerCase();
+      
+      datosFiltrados = datosFirebase.filter(item => {
+        const serieMatch = !filterSerie || item.nombreSerie.toLowerCase().includes(filterSerie);
+        const temporadaMatch = !filterTemporada || item.temporada.toLowerCase().includes(filterTemporada);
+        
+        return serieMatch && temporadaMatch;
+      });
+      
+      currentPage = 1;
+      mostrarDatosEnTabla();
+      actualizarEstadisticas();
+      actualizarPaginacion();
+    }
+
+    // Limpiar filtros
+    document.getElementById('btnLimpiarFiltro').addEventListener('click', function() {
+      document.getElementById('filterSerie').value = '';
+      document.getElementById('filterTemporada').value = '';
+      datosFiltrados = [...datosFirebase];
+      currentPage = 1;
+      mostrarDatosEnTabla();
+      actualizarEstadisticas();
+      actualizarPaginacion();
+    });
+  </script>
+</body>
+</html>

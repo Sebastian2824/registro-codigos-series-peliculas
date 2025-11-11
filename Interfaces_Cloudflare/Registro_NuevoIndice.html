@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Índice de la Serie</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    h2 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 28px;
+    }
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+    input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        outline: none;
+    }
+    button {
+        padding: 12px 20px;
+        margin-top: 15px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+    #btnGuardar {
+        background-color: #1a73e8;
+        padding: 12px 30px;
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .preview-container {
+        margin: 20px 0;
+        text-align: center;
+    }
+    .preview-image {
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .preview-placeholder {
+        width: 300px;
+        height: 200px;
+        background-color: #f0f0f0;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-style: italic;
+    }
+    .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: -15px;
+        margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Registrar Nuevo Índice de la Serie</h2>
+
+  <label>Nombre de la serie:</label>
+  <input type="text" id="serieNombre" placeholder="Ej: Nagi no Asukara">
+  <div id="serieError" class="error-message hidden"></div>
+
+  <label>Nombre en inglés:</label>
+  <input type="text" id="nombreIngles" placeholder="Ej: A Lull in the Sea">
+
+  <label>Nombre en japonés:</label>
+  <input type="text" id="nombreJapones" placeholder="Ej: 凪のあすから">
+
+  <label>Año de publicación:</label>
+  <input type="text" id="anioPublicacion" placeholder="Ej: 2013">
+
+  <label>Categoría:</label>
+  <input type="text" id="categoria" placeholder="Ej: Romance, Fantasía">
+
+  <label>Idioma:</label>
+  <input type="text" id="idioma" placeholder="Ej: Japonés">
+
+  <label>Enlace de imagen de portada:</label>
+  <input type="text" id="enlaceImagen" placeholder="https://ejemplo.com/imagen.jpg">
+  <div id="imagenError" class="error-message hidden"></div>
+
+  <label>Enlace de redirección:</label>
+  <input type="text" id="enlaceSitio" placeholder="https://ejemplo.com/serie">
+
+  <!-- Vista previa de la imagen -->
+  <div class="preview-container">
+    <h3>Vista Previa de la Portada</h3>
+    <div id="previewImage">
+      <div class="preview-placeholder">Vista previa de la imagen</div>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button onclick="location.href='../Registro_NuevoIndice.html'" 
+  style="background-color: #10b981; color: white;">
+  Registrar con Firebase
+</button>
+    <button id="btnGuardar">Guardar en Cloudflare</button>
+  </div>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    // Función para mostrar vista previa de la imagen
+    function actualizarVistaPrevia() {
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+      const previewContainer = document.getElementById("previewImage");
+      
+      if (enlaceImagen && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(enlaceImagen)) {
+        previewContainer.innerHTML = `<img src="${enlaceImagen}" alt="Vista previa" class="preview-image" onerror="mostrarErrorImagen('Error al cargar la imagen')" />`;
+        ocultarErrorImagen();
+      } else {
+        previewContainer.innerHTML = '<div class="preview-placeholder">Ingresa un enlace válido de imagen</div>';
+      }
+    }
+
+    // Función para mostrar error de imagen
+    function mostrarErrorImagen(mensaje) {
+      const imagenError = document.getElementById("imagenError");
+      imagenError.textContent = mensaje;
+      imagenError.classList.remove("hidden");
+      document.getElementById("previewImage").innerHTML = '<div class="preview-placeholder">Error al cargar imagen</div>';
+    }
+
+    // Función para ocultar error de imagen
+    function ocultarErrorImagen() {
+      const imagenError = document.getElementById("imagenError");
+      imagenError.classList.add("hidden");
+    }
+
+    // Función para mostrar error de serie
+    function mostrarErrorSerie(mensaje) {
+      const serieError = document.getElementById("serieError");
+      serieError.textContent = mensaje;
+      serieError.classList.remove("hidden");
+    }
+
+    // Función para ocultar error de serie
+    function ocultarErrorSerie() {
+      const serieError = document.getElementById("serieError");
+      serieError.classList.add("hidden");
+    }
+
+    // Función para limpiar campos
+    function limpiarCampos() {
+      document.getElementById("serieNombre").value = "";
+      document.getElementById("nombreIngles").value = "";
+      document.getElementById("nombreJapones").value = "";
+      document.getElementById("anioPublicacion").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("idioma").value = "";
+      document.getElementById("enlaceImagen").value = "";
+      document.getElementById("enlaceSitio").value = "";
+      document.getElementById("previewImage").innerHTML = '<div class="preview-placeholder">Vista previa de la imagen</div>';
+      ocultarErrorImagen();
+      ocultarErrorSerie();
+    }
+
+    // Función para validar campos
+    function validarCampos() {
+      const nombreSerie = document.getElementById("serieNombre").value.trim();
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+
+      let valido = true;
+
+      if (!nombreSerie) {
+        mostrarErrorSerie("El nombre de la serie es obligatorio");
+        valido = false;
+      } else {
+        ocultarErrorSerie();
+      }
+
+      if (!enlaceImagen) {
+        mostrarErrorImagen("El enlace de la imagen es obligatorio");
+        valido = false;
+      } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(enlaceImagen)) {
+        mostrarErrorImagen("Ingresa un enlace válido de imagen (jpg, jpeg, png, webp, gif)");
+        valido = false;
+      } else {
+        ocultarErrorImagen();
+      }
+
+      return valido;
+    }
+
+    // Función principal para guardar
+    async function guardarEnCloudflare() {
+      if (!validarCampos()) {
+        return;
+      }
+
+      const datosIndice = {
+        nombreSerie: document.getElementById("serieNombre").value.trim(),
+        nombresec: document.getElementById("nombreIngles").value.trim() || null,
+        nombresec02: document.getElementById("nombreJapones").value.trim() || null,
+        año: document.getElementById("anioPublicacion").value.trim() || null,
+        categoria: document.getElementById("categoria").value.trim() || null,
+        idioma: document.getElementById("idioma").value.trim() || null,
+        imagen: document.getElementById("enlaceImagen").value.trim(),
+        sitio: document.getElementById("enlaceSitio").value.trim() || null
+      };
+
+      try {
+        const res = await fetch(`${WORKER_URL}/registrar-indice`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosIndice)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Serie registrada correctamente en el índice de Cloudflare D1.");
+          limpiarCampos();
+        } else {
+          alert("Error al guardar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al guardar en Cloudflare:", error);
+        alert("Error al guardar los datos: " + error.message);
+      }
+    }
+
+    // Event listeners
+    document.getElementById('enlaceImagen').addEventListener('input', actualizarVistaPrevia);
+    document.getElementById('btnGuardar').addEventListener('click', guardarEnCloudflare);
+
+    // Soporte para tecla Enter
+    document.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        guardarEnCloudflare();
+      }
+    });
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function() {
+      // Añadir clase hidden a los mensajes de error
+      document.getElementById('serieError').classList.add('hidden');
+      document.getElementById('imagenError').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

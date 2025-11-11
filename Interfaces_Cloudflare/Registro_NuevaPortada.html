@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Portada de la Serie</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    
+    h2 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 28px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+    
+    input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        outline: none;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    th, td {
+        border: 1px solid #e0e9ff;
+        padding: 12px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+    
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+    
+    button {
+        padding: 12px 20px;
+        margin-top: 15px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    #btnAgregarFila {
+        background-color: #34a853;
+        margin-right: 10px;
+    }
+    
+    #btnAgregarFila:hover {
+        background-color: #2d9249;
+    }
+    
+    #btnGuardar {
+        background-color: #1a73e8;
+        padding: 12px 30px;
+    }
+    
+    h3 {
+        color: #1a73e8;
+        border-bottom: 2px solid #d3e3fd;
+        padding-bottom: 10px;
+        margin-top: 30px;
+    }
+    
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .preview-container {
+        margin: 20px 0;
+        text-align: center;
+    }
+
+    .preview-image {
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .preview-placeholder {
+        width: 300px;
+        height: 200px;
+        background-color: #f0f0f0;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-style: italic;
+    }
+</style>
+</head>
+<body>
+
+  <h2>Registrar Nueva Portada de la Serie</h2>
+
+  <label>Nombre de la serie:</label>
+  <input type="text" id="serieNombre" placeholder="Ej: Nagi no Asukara"><br><br>
+
+  <label>Temporada (ej: Temporada 1):</label>
+  <input type="text" id="temporada" placeholder="Ej: Temporada 01"><br><br>
+
+  <label>Enlace de imagen de portada:</label>
+  <input type="text" id="enlaceImagen" placeholder="https://ejemplo.com/imagen.jpg"><br><br>
+
+  <label>Enlace de redirección:</label>
+  <input type="text" id="enlaceSitio" placeholder="https://ejemplo.com/serie"><br><br>
+
+  <label>Segundo Enlace de redirección:</label>
+  <input type="text" id="enlaceSitio02" placeholder="https://ejemplo.com/alternativo"><br><br>
+
+  <!-- Vista previa de la imagen -->
+  <div class="preview-container">
+    <h3>Vista Previa de la Portada</h3>
+    <div id="previewImage">
+      <div class="preview-placeholder">Vista previa de la imagen</div>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button onclick="location.href='../Registro_NuevaPortada.html'" 
+  style="background-color: #10b981; color: white;">
+  Registrar con Firebase
+</button>
+    <button id="btnGuardar">Guardar en Cloudflare</button>
+  </div>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    // Función para mostrar vista previa de la imagen
+    function actualizarVistaPrevia() {
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+      const previewContainer = document.getElementById("previewImage");
+      
+      if (enlaceImagen && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(enlaceImagen)) {
+        previewContainer.innerHTML = `<img src="${enlaceImagen}" alt="Vista previa" class="preview-image" onerror="this.style.display='none'; document.getElementById('previewImage').innerHTML='<div class=\\'preview-placeholder\\'>Error al cargar imagen</div>';" />`;
+      } else {
+        previewContainer.innerHTML = '<div class="preview-placeholder">Ingresa un enlace válido de imagen</div>';
+      }
+    }
+
+    // Event listener para actualizar vista previa en tiempo real
+    document.getElementById('enlaceImagen').addEventListener('input', actualizarVistaPrevia);
+
+    async function guardarEnCloudflare() {
+      const nombreSerie = document.getElementById("serieNombre").value.trim();
+      const temporada = document.getElementById("temporada").value.trim();
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+      const enlaceSitio = document.getElementById("enlaceSitio").value.trim();
+      const enlaceSitio02 = document.getElementById("enlaceSitio02").value.trim();
+
+      if (!nombreSerie || !temporada || !enlaceImagen) {
+        alert("Por favor, completa los campos obligatorios: Nombre de la serie, Temporada y Enlace de imagen.");
+        return;
+      }
+
+      try {
+        const datosPortada = {
+          nombreSerie: nombreSerie,
+          temporada: temporada,
+          imagen: enlaceImagen,
+          sitio: enlaceSitio || null,
+          sitio02: enlaceSitio02 || null
+        };
+
+        const res = await fetch(`${WORKER_URL}/registrar-portada`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosPortada)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Portada registrada correctamente en Cloudflare D1.");
+          
+          // Limpiar campos después de guardar
+          document.getElementById("serieNombre").value = "";
+          document.getElementById("temporada").value = "";
+          document.getElementById("enlaceImagen").value = "";
+          document.getElementById("enlaceSitio").value = "";
+          document.getElementById("enlaceSitio02").value = "";
+          
+          // Limpiar vista previa
+          document.getElementById("previewImage").innerHTML = '<div class="preview-placeholder">Vista previa de la imagen</div>';
+        } else {
+          alert("Error al guardar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al guardar en Cloudflare:", error);
+        alert("Error al guardar los datos: " + error.message);
+      }
+    }
+
+    document.getElementById('btnGuardar').addEventListener('click', guardarEnCloudflare);
+
+    // Enter key support
+    document.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        guardarEnCloudflare();
+      }
+    });
+  </script>
+</body>
+</html>

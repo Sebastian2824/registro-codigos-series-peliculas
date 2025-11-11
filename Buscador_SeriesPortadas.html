@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Buscador</title>
+  <title>Buscador Multi-Servicio</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -40,6 +40,33 @@
       font-weight: 700;
       color: #0077b6;
       line-height: 1.2;
+    }
+
+    .servicio-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .servicio-btn {
+      background-color: #f0f8ff;
+      color: #0077b6;
+      border: 2px solid #0096c7;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .servicio-btn.active {
+      background-color: #0096c7;
+      color: white;
+    }
+
+    .servicio-btn:hover {
+      background-color: #e0f7ff;
     }
 
     .buscador {
@@ -114,135 +141,147 @@
       background-color: #0096c7;
       border-radius: 4px;
     }
+
     .button {
-  background: linear-gradient(to right, #00b4d8, #0096c7);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 25px;
-  margin: 8px auto;
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
-}
+      background: linear-gradient(to right, #00b4d8, #0096c7);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 25px;
+      margin: 8px auto;
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 180, 216, 0.2);
+    }
 
-.button:hover {
-  background: linear-gradient(to right, #0096c7, #0077b6);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
-}
+    .button:hover {
+      background: linear-gradient(to right, #0096c7, #0077b6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 180, 216, 0.3);
+    }
 
-.resultado-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background-color: #f1f1f1;
-  padding: 12px 15px;
-  margin: 8px 0;
-  border-radius: 8px;
-  color: #333;
-  text-decoration: none;
-  transition: background 0.3s ease;
-}
+    .resultado-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #f1f1f1;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
 
-.resultado-item:hover {
-  background-color: #e0e0e0;
-  transform: translateX(4px);
-}
+    .resultado-item:hover {
+      background-color: #e0e0e0;
+      transform: translateX(4px);
+    }
 
-.resultado-item ion-icon {
-  font-size: 20px;
-  color: #0077b6;
-}
-/* Botón para volver a temporadas */
-.back-btn {
-  background-color: #29cc00;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    .resultado-item ion-icon {
+      font-size: 20px;
+      color: #0077b6;
+    }
 
-.back-btn:hover {
-  background-color: #20a000;
-}
+    /* Botón para volver a temporadas */
+    .back-btn {
+      background-color: #29cc00;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-/* Botón para volver a resultados */
-.back-btn-resultados {
-  background-color: #29cc00;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  margin-top: 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    .back-btn:hover {
+      background-color: #20a000;
+    }
 
-.back-btn-resultados:hover {
-  background-color: #20a000;
-}
+    /* Botón para volver a resultados */
+    .back-btn-resultados {
+      background-color: #29cc00;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      margin-top: 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-/* Botones de temporadas normales */
-.temporada-btn {
-  background-color: #444;
-  color: #fff;
-  border: none;
-  margin: 5px 5px 5px 0;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    .back-btn-resultados:hover {
+      background-color: #20a000;
+    }
 
-.temporada-btn:hover {
-  background-color: #666;
-}
+    /* Botones de temporadas normales */
+    .temporada-btn {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      margin: 5px 5px 5px 0;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-.temporada-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background-color: #f1f1f1;
-  padding: 12px 15px;
-  margin: 8px 0;
-  border-radius: 8px;
-  color: #333;
-  text-decoration: none;
-  transition: background 0.3s ease;
-}
+    .temporada-btn:hover {
+      background-color: #666;
+    }
 
-.temporada-link:hover {
-   background-color: #e0e0e0;
-  transform: translateX(4px);
-}
+    .temporada-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #f1f1f1;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
 
-.ver-ahora-link {
-  display: flex;
-  justify-content: center;     /* Centra horizontalmente el contenido */
-  align-items: center;         /* Centra verticalmente el contenido */
-  gap: 10px;
-  padding: 12px 20px;
-  margin: 20px auto;           /* Centra el enlace horizontalmente */
-  text-decoration: none;
-  color: white;
-  background: linear-gradient(to right, #06d6a0, #118ab2);
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  box-shadow: 0 4px 8px rgba(6, 214, 160, 0.2);
-  max-width: 300px;
-  transition: all 0.3s;
-  text-align: center;
-}
+    .temporada-link:hover {
+      background-color: #e0e0e0;
+      transform: translateX(4px);
+    }
 
-.ver-ahora-link:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 12px rgba(6, 214, 160, 0.4);
-}
+    .ver-ahora-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      margin: 20px auto;
+      text-decoration: none;
+      color: white;
+      background: linear-gradient(to right, #06d6a0, #118ab2);
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(6, 214, 160, 0.2);
+      max-width: 300px;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .ver-ahora-link:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 12px rgba(6, 214, 160, 0.4);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 15px;
+      gap: 5px;
+      font-size: 14px;
+      color: #0077b6;
+    }
   </style>
 </head>
 <body>
@@ -251,6 +290,11 @@
     <div class="titulo-buscador">
       <div>Buscador de</div>
       <div>Series y Películas Disponibles</div>
+    </div>
+
+    <div class="servicio-selector">
+      <button class="servicio-btn active" id="firebase-btn">Firebase</button>
+      <button class="servicio-btn" id="cloudflare-btn">Cloudflare</button>
     </div>
 
     <div class="buscador">
@@ -262,10 +306,10 @@
 
     <div class="resultados" id="resultado"></div>
     <div class="footer">
-            <span>Search by</span>
-           <ion-icon name="play-circle-outline"></ion-icon>
-            <span>Animes Plus</span>
-        </div>
+      <span>Search by</span>
+      <ion-icon name="play-circle-outline"></ion-icon>
+      <span>Animes Plus</span>
+    </div>
   </div>
 
   <!-- Firebase SDKs -->
@@ -275,6 +319,7 @@
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
   <script>
+    // Configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
       authDomain: "animes-plus-89b93.firebaseapp.com",
@@ -285,32 +330,114 @@
       measurementId: "G-DN632G7XJT"
     };
 
+    // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-   let ultimaSerieBuscada = null; // Guardamos cuál serie se seleccionó
+    // Estado de la aplicación
+    let servicioActual = 'firebase'; // 'firebase' o 'cloudflare'
+    let ultimaSerieBuscada = null;
 
-document.getElementById('search-input').addEventListener('keyup', function () {
-  const input = this.value.trim().toLowerCase();
-  const resultadoDiv = document.getElementById('resultado');
-  resultadoDiv.innerHTML = "";
+    // URL base para Cloudflare (debes reemplazar con tu URL real)
+    const CLOUDFLARE_BASE_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
 
-  if (!input) {
-    return; // no hace nada si está vacío
-  }
+    // Elementos DOM
+    const firebaseBtn = document.getElementById('firebase-btn');
+    const cloudflareBtn = document.getElementById('cloudflare-btn');
+    const searchInput = document.getElementById('search-input');
+    const resultadoDiv = document.getElementById('resultado');
 
-  const coincidenciasUnicas = new Set();
+    // Configurar eventos para los botones de servicio
+    firebaseBtn.addEventListener('click', () => cambiarServicio('firebase'));
+    cloudflareBtn.addEventListener('click', () => cambiarServicio('cloudflare'));
 
-  db.collection("animes-series-portadas")
-    .get()
-    .then(snapshot => {
-      snapshot.forEach(doc => {
-        const idSerie = doc.id.toLowerCase();
-        if (idSerie.includes(input)) {
-          coincidenciasUnicas.add(doc.id);
+    // Configurar evento de búsqueda
+    searchInput.addEventListener('keyup', realizarBusqueda);
+
+    // Función para cambiar entre servicios
+    function cambiarServicio(servicio) {
+      servicioActual = servicio;
+      
+      // Actualizar botones
+      firebaseBtn.classList.toggle('active', servicio === 'firebase');
+      cloudflareBtn.classList.toggle('active', servicio === 'cloudflare');
+      
+      // Limpiar resultados
+      resultadoDiv.innerHTML = '';
+      
+      // Mostrar mensaje de servicio activo
+      const mensaje = document.createElement('div');
+      mensaje.className = 'no-resultados';
+      mensaje.textContent = `Servicio activo: ${servicio.toUpperCase()}. Escribe para buscar.`;
+      resultadoDiv.appendChild(mensaje);
+    }
+
+    // Función principal de búsqueda
+    function realizarBusqueda() {
+      const input = searchInput.value.trim().toLowerCase();
+      resultadoDiv.innerHTML = "";
+
+      if (!input) {
+        return;
+      }
+
+      if (servicioActual === 'firebase') {
+        buscarConFirebase(input);
+      } else {
+        buscarConCloudflare(input);
+      }
+    }
+
+    // Búsqueda con Firebase
+    function buscarConFirebase(input) {
+      const coincidenciasUnicas = new Set();
+
+      db.collection("animes-series-portadas")
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            const idSerie = doc.id.toLowerCase();
+            if (idSerie.includes(input)) {
+              coincidenciasUnicas.add(doc.id);
+            }
+          });
+
+          mostrarResultados(coincidenciasUnicas);
+        })
+        .catch(error => {
+          console.error("Error en la búsqueda Firebase:", error);
+          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al buscar con Firebase. Intenta nuevamente.</div>";
+        });
+    }
+
+    // Búsqueda con Cloudflare
+    async function buscarConCloudflare(input) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/portadas`);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
         }
-      });
+        
+        const portadas = await response.json();
+        const coincidenciasUnicas = new Set();
+        
+        portadas.forEach(portada => {
+          const nombreSerie = portada.nombreSerie.toLowerCase();
+          if (nombreSerie.includes(input)) {
+            coincidenciasUnicas.add(portada.nombreSerie);
+          }
+        });
+        
+        mostrarResultados(coincidenciasUnicas);
+      } catch (error) {
+        console.error("Error en la búsqueda Cloudflare:", error);
+        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al buscar con Cloudflare. Intenta nuevamente.</div>";
+      }
+    }
 
+    // Mostrar resultados de búsqueda
+    function mostrarResultados(coincidenciasUnicas) {
       if (coincidenciasUnicas.size === 0) {
         resultadoDiv.innerHTML = "<div class='no-resultados'>No se encontró ninguna serie con ese nombre.</div>";
       } else {
@@ -330,125 +457,213 @@ document.getElementById('search-input').addEventListener('keyup', function () {
 
           enlace.addEventListener("click", (e) => {
             e.preventDefault();
-            ultimaSerieBuscada = serieId; // guardamos serie seleccionada
+            ultimaSerieBuscada = serieId;
             mostrarTemporadas(serieId);
           });
 
           resultadoDiv.appendChild(enlace);
         });
       }
-    })
-    .catch(error => {
-      console.error("Error en la búsqueda:", error);
-      resultadoDiv.innerHTML = "<div class='no-resultados'>Ocurrió un error al buscar. Intenta nuevamente.</div>";
-    });
-});
+    }
 
-function mostrarTemporadas(serieId) {
-  const resultadoDiv = document.getElementById('resultado');
-  resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
+    // Mostrar temporadas de una serie
+    function mostrarTemporadas(serieId) {
+      resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
 
-  db.collection("animes-series-portadas")
-    .doc(serieId)
-    .collection("Temporadas")
-    .get()
-    .then(snapshot => {
-      const container = document.createElement("div");
-      container.className = "resultado";
-
-      snapshot.forEach(doc => {
-        const link = document.createElement("a");
-        link.href = "#";
-        link.className = "temporada-link"; // Usa esta clase para dar estilo
-        link.innerHTML = `
-          <ion-icon name="videocam-outline"></ion-icon>
-          <span>${doc.id}</span>
-        `;
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          mostrarDetallesTemporada(serieId, doc.id);
-        });
-        container.appendChild(link);
-      });
-
-      // Botón para regresar a resultados
-      const backBtn = document.createElement("button");
-      backBtn.textContent = "← Volver a resultados";
-      backBtn.className = "back-btn-resultados";
-      backBtn.onclick = () => {
-        document.getElementById('search-input').dispatchEvent(new Event('keyup'));
-      };
-      container.appendChild(backBtn);
-
-      resultadoDiv.appendChild(container);
-    });
-}
-
-
-
-    function mostrarDetallesTemporada(serieId, temporadaId) {
-  const resultadoDiv = document.getElementById('resultado');
-  resultadoDiv.innerHTML = "";
-
-  db.collection("animes-series-portadas")
-    .doc(serieId)
-    .collection("Temporadas")
-    .doc(temporadaId)
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        const data = doc.data();
-        const resultadoHTML = document.createElement("div");
-        resultadoHTML.className = "resultado";
-
-        // Título con serie y temporada
-        const titulo = document.createElement("h3");
-        titulo.textContent = `Excelente que lo Disfrutes`;
-        resultadoHTML.appendChild(titulo);
-
-        // Imagen si existe
-        if (data.imagen) {
-          const img = document.createElement("img");
-          img.src = data.imagen;
-          img.alt = `${serieId} Temporada ${temporadaId}`;
-          resultadoHTML.appendChild(img);
-        }
-
-        // Botón "Ver ahora"
-        if (data.sitio) {
-          const link = document.createElement("a");
-          link.href = data.sitio;
-          link.target = "_blank";
-          link.textContent = "Ver Ahora";
-          link.className = "ver-ahora-link"; // usa mismo estilo de botón
-          link.addEventListener("click", () => {
-            document.getElementById("search-input").value = "";
-            setTimeout(() => {
-              resultadoDiv.innerHTML = "";
-            }, 500);
-          });
-          resultadoHTML.appendChild(link);
-        }
-
-        // Botón para regresar a las temporadas
-        const backBtn = document.createElement("button");
-        backBtn.textContent = "← Volver a temporadas";
-        backBtn.className = "back-btn";
-        backBtn.addEventListener("click", () => mostrarTemporadas(serieId));
-        resultadoHTML.appendChild(backBtn);
-        
-        resultadoDiv.appendChild(resultadoHTML);
+      if (servicioActual === 'firebase') {
+        mostrarTemporadasFirebase(serieId);
       } else {
-        resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
+        mostrarTemporadasCloudflare(serieId);
       }
-    });
-}
+    }
 
-// Regresa a los resultados de búsqueda
-function volverABusqueda() {
-  document.getElementById('search-input').dispatchEvent(new KeyboardEvent('keyup'));
-}
+    // Mostrar temporadas con Firebase
+    function mostrarTemporadasFirebase(serieId) {
+      db.collection("animes-series-portadas")
+        .doc(serieId)
+        .collection("Temporadas")
+        .get()
+        .then(snapshot => {
+          const container = document.createElement("div");
+          container.className = "resultado";
 
+          snapshot.forEach(doc => {
+            const link = document.createElement("a");
+            link.href = "#";
+            link.className = "temporada-link";
+            link.innerHTML = `
+              <ion-icon name="videocam-outline"></ion-icon>
+              <span>${doc.id}</span>
+            `;
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              mostrarDetallesTemporada(serieId, doc.id);
+            });
+            container.appendChild(link);
+          });
+
+          // Botón para regresar a resultados
+          const backBtn = document.createElement("button");
+          backBtn.textContent = "← Volver a resultados";
+          backBtn.className = "back-btn-resultados";
+          backBtn.onclick = () => {
+            realizarBusqueda();
+          };
+          container.appendChild(backBtn);
+
+          resultadoDiv.appendChild(container);
+        })
+        .catch(error => {
+          console.error("Error al obtener temporadas Firebase:", error);
+          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar temporadas.</div>";
+        });
+    }
+
+    // Mostrar temporadas con Cloudflare
+    async function mostrarTemporadasCloudflare(serieId) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/temporadas-portadas?serie=${encodeURIComponent(serieId)}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const temporadas = await response.json();
+        const container = document.createElement("div");
+        container.className = "resultado";
+
+        temporadas.forEach(temporada => {
+          const link = document.createElement("a");
+          link.href = "#";
+          link.className = "temporada-link";
+          link.innerHTML = `
+            <ion-icon name="videocam-outline"></ion-icon>
+            <span>${temporada}</span>
+          `;
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            mostrarDetallesTemporada(serieId, temporada);
+          });
+          container.appendChild(link);
+        });
+
+        // Botón para regresar a resultados
+        const backBtn = document.createElement("button");
+        backBtn.textContent = "← Volver a resultados";
+        backBtn.className = "back-btn-resultados";
+        backBtn.onclick = () => {
+          realizarBusqueda();
+        };
+        container.appendChild(backBtn);
+
+        resultadoDiv.appendChild(container);
+      } catch (error) {
+        console.error("Error al obtener temporadas Cloudflare:", error);
+        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar temporadas.</div>";
+      }
+    }
+
+    // Mostrar detalles de una temporada específica
+    function mostrarDetallesTemporada(serieId, temporadaId) {
+      resultadoDiv.innerHTML = "";
+
+      if (servicioActual === 'firebase') {
+        mostrarDetallesTemporadaFirebase(serieId, temporadaId);
+      } else {
+        mostrarDetallesTemporadaCloudflare(serieId, temporadaId);
+      }
+    }
+
+    // Mostrar detalles de temporada con Firebase
+    function mostrarDetallesTemporadaFirebase(serieId, temporadaId) {
+      db.collection("animes-series-portadas")
+        .doc(serieId)
+        .collection("Temporadas")
+        .doc(temporadaId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            mostrarDetallesTemporadaUI(serieId, temporadaId, data);
+          } else {
+            resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
+          }
+        })
+        .catch(error => {
+          console.error("Error al obtener detalles Firebase:", error);
+          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar detalles.</div>";
+        });
+    }
+
+    // Mostrar detalles de temporada con Cloudflare
+    async function mostrarDetallesTemporadaCloudflare(serieId, temporadaId) {
+      try {
+        const response = await fetch(`${CLOUDFLARE_BASE_URL}/portada?serie=${encodeURIComponent(serieId)}&temporada=${encodeURIComponent(temporadaId)}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
+        } else {
+          mostrarDetallesTemporadaUI(serieId, temporadaId, data);
+        }
+      } catch (error) {
+        console.error("Error al obtener detalles Cloudflare:", error);
+        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar detalles.</div>";
+      }
+    }
+
+    // Mostrar UI de detalles de temporada
+    function mostrarDetallesTemporadaUI(serieId, temporadaId, data) {
+      const resultadoHTML = document.createElement("div");
+      resultadoHTML.className = "resultado";
+
+      // Título con serie y temporada
+      const titulo = document.createElement("h3");
+      titulo.textContent = `Excelente que lo Disfrutes`;
+      resultadoHTML.appendChild(titulo);
+
+      // Imagen si existe
+      if (data.imagen) {
+        const img = document.createElement("img");
+        img.src = data.imagen;
+        img.alt = `${serieId} Temporada ${temporadaId}`;
+        resultadoHTML.appendChild(img);
+      }
+
+      // Botón "Ver ahora"
+      if (data.sitio) {
+        const link = document.createElement("a");
+        link.href = data.sitio;
+        link.target = "_blank";
+        link.textContent = "Ver Ahora";
+        link.className = "ver-ahora-link";
+        link.innerHTML = `<ion-icon name="play-outline"></ion-icon> Ver Ahora`;
+        link.addEventListener("click", () => {
+          searchInput.value = "";
+          setTimeout(() => {
+            resultadoDiv.innerHTML = "";
+          }, 500);
+        });
+        resultadoHTML.appendChild(link);
+      }
+
+      // Botón para regresar a las temporadas
+      const backBtn = document.createElement("button");
+      backBtn.textContent = "← Volver a temporadas";
+      backBtn.className = "back-btn";
+      backBtn.addEventListener("click", () => mostrarTemporadas(serieId));
+      resultadoHTML.appendChild(backBtn);
+      
+      resultadoDiv.appendChild(resultadoHTML);
+    }
+
+    // Inicializar con Firebase como servicio predeterminado
+    cambiarServicio('firebase');
   </script>
 </body>
 </html>

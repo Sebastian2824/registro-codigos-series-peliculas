@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Imagen y Sitio de Serie</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      text-align: center;
+      color: #1a73e8;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
+      color: #1a73e8;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #f8fbff;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background-color: white;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    .hidden {
+      display: none;
+    }
+    .preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .preview-placeholder {
+      width: 100%;
+      height: 200px;
+      background-color: #f0f0f0;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-style: italic;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .success-message {
+      color: #28a745;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar Imagen y Sitio de Serie</h1>
+
+    <label for="serieSelect">Nombre de la Serie</label>
+    <select id="serieSelect">
+      <option value="" disabled selected>Seleccionar serie...</option>
+    </select>
+
+    <label for="temporadaSelect">Temporada</label>
+    <div class="acciones">
+      <select id="temporadaSelect">
+        <option value="" disabled selected>Seleccionar temporada...</option>
+      </select>
+      <button onclick="nuevaTemporada()">+</button>
+    </div>
+
+    <div id="nuevaTemporadaInput" class="hidden">
+      <input type="text" id="nuevaTemporada" placeholder="Ej: Temporada 2" />
+      <button onclick="cancelarNuevaTemporada()">Cancelar</button>
+    </div>
+
+    <label for="enlaceImagen">Enlace de la Imagen</label>
+    <input type="text" id="enlaceImagen" placeholder="https://ejemplo.com/imagen.jpg" />
+    <div id="imagenError" class="error-message hidden"></div>
+
+    <label for="enlaceSitio">Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio" placeholder="https://sitio.com/serie/episodios" />
+
+    <label for="enlaceSitio02">Segundo Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio02" placeholder="https://sitio.com/serie/episodios" />
+
+    <div class="acciones">
+      <button onclick="location.href='../Editar_PortadaSerie.html'" 
+  style="background-color: #10b981; color: white;">
+  Editar con Firebase
+</button>
+      <button onclick="guardarCambios()">Guardar Cambios</button>
+      <button onclick="eliminarPortada()" style="background-color: #dc3545;">Eliminar Portada</button>
+    </div>
+
+    <div class="preview" id="previewImagen">
+      <div class="preview-placeholder">Vista previa de la imagen</div>
+    </div>
+  </div>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    const serieSelect = document.getElementById("serieSelect");
+    const temporadaSelect = document.getElementById("temporadaSelect");
+    const enlaceImagen = document.getElementById("enlaceImagen");
+    const enlaceSitio = document.getElementById("enlaceSitio");
+    const enlaceSitio02 = document.getElementById("enlaceSitio02");
+    const previewImagen = document.getElementById("previewImagen");
+    const nuevaTemporadaInput = document.getElementById("nuevaTemporada");
+    const imagenError = document.getElementById("imagenError");
+
+    let creandoTemporada = false;
+    let portadaActual = null;
+
+    // Función para cargar series disponibles
+    async function cargarSeries() {
+      try {
+        const res = await fetch(`${WORKER_URL}/portadas`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const portadas = await res.json();
+        
+        // Obtener series únicas
+        const seriesUnicas = [...new Set(portadas.map(p => p.nombreSerie))].sort();
+        
+        serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar serie...</option>';
+        seriesUnicas.forEach(serie => {
+          const option = document.createElement("option");
+          option.value = serie;
+          option.text = serie;
+          serieSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando series:", error);
+        serieSelect.innerHTML = '<option value="" disabled selected>Error al cargar series</option>';
+      }
+    }
+
+    // Función para cargar temporadas de una serie
+    async function cargarTemporadas() {
+      const serie = serieSelect.value;
+      if (!serie) return;
+      
+      try {
+        const res = await fetch(`${WORKER_URL}/temporadas-portadas?serie=${encodeURIComponent(serie)}`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const temporadas = await res.json();
+        
+        temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar temporada...</option>';
+        temporadas.forEach(temp => {
+          const option = document.createElement("option");
+          option.value = temp;
+          option.text = temp;
+          temporadaSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando temporadas:", error);
+        temporadaSelect.innerHTML = '<option value="" disabled selected>Error al cargar temporadas</option>';
+      }
+    }
+
+    // Función para cargar datos de una portada específica
+    async function cargarDatos() {
+      const serie = serieSelect.value;
+      const temporada = temporadaSelect.value;
+      if (!serie || !temporada) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/portada?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            // Portada no encontrada, limpiar campos
+            limpiarCampos();
+            return;
+          }
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const portada = await res.json();
+        portadaActual = portada;
+        
+        enlaceImagen.value = portada.imagen || "";
+        enlaceSitio.value = portada.sitio || "";
+        enlaceSitio02.value = portada.sitio02 || "";
+        
+        mostrarPreview(portada.imagen);
+        ocultarErrorImagen();
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        limpiarCampos();
+      }
+    }
+
+    // Función para mostrar vista previa de la imagen
+    function mostrarPreview(url) {
+      if (url && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(url)) {
+        previewImagen.innerHTML = `<img src="${url}" alt="Vista previa" onerror="mostrarErrorImagen('Error al cargar la imagen')" />`;
+      } else {
+        previewImagen.innerHTML = '<div class="preview-placeholder">Ingresa un enlace válido de imagen</div>';
+      }
+    }
+
+    // Función para mostrar error de imagen
+    function mostrarErrorImagen(mensaje) {
+      imagenError.textContent = mensaje;
+      imagenError.classList.remove("hidden");
+      previewImagen.innerHTML = '<div class="preview-placeholder">Error al cargar imagen</div>';
+    }
+
+    // Función para ocultar error de imagen
+    function ocultarErrorImagen() {
+      imagenError.classList.add("hidden");
+    }
+
+    // Función para limpiar campos
+    function limpiarCampos() {
+      enlaceImagen.value = "";
+      enlaceSitio.value = "";
+      enlaceSitio02.value = "";
+      previewImagen.innerHTML = '<div class="preview-placeholder">Vista previa de la imagen</div>';
+      portadaActual = null;
+    }
+
+    // Función para nueva temporada
+    function nuevaTemporada() {
+      creandoTemporada = true;
+      temporadaSelect.disabled = true;
+      document.getElementById("nuevaTemporadaInput").classList.remove("hidden");
+      limpiarCampos();
+    }
+
+    // Función para cancelar nueva temporada
+    function cancelarNuevaTemporada() {
+      creandoTemporada = false;
+      temporadaSelect.disabled = false;
+      document.getElementById("nuevaTemporadaInput").classList.add("hidden");
+      nuevaTemporadaInput.value = "";
+    }
+
+    // Función para guardar cambios
+    async function guardarCambios() {
+      const serie = serieSelect.value;
+      const temporada = creandoTemporada ? nuevaTemporadaInput.value.trim() : temporadaSelect.value;
+      const imagen = enlaceImagen.value.trim();
+      const sitio = enlaceSitio.value.trim();
+      const sitio02 = enlaceSitio02.value.trim();
+
+      if (!serie || !temporada) {
+        alert("Selecciona una serie y temporada.");
+        return;
+      }
+
+      if (!imagen) {
+        mostrarErrorImagen("El enlace de la imagen es obligatorio.");
+        return;
+      }
+
+      try {
+        const datosPortada = {
+          nombreSerie: serie,
+          temporada: temporada,
+          imagen: imagen,
+          sitio: sitio || null,
+          sitio02: sitio02 || null
+        };
+
+        const res = await fetch(`${WORKER_URL}/registrar-portada`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosPortada)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Portada guardada correctamente.");
+          mostrarPreview(imagen);
+          ocultarErrorImagen();
+          
+          if (creandoTemporada) {
+            cancelarNuevaTemporada();
+            await cargarTemporadas();
+            temporadaSelect.value = temporada;
+            creandoTemporada = false;
+          }
+        } else {
+          alert("Error al guardar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        alert("Error al guardar los datos: " + error.message);
+      }
+    }
+
+    // Función para eliminar portada
+    async function eliminarPortada() {
+      const serie = serieSelect.value;
+      const temporada = temporadaSelect.value;
+      
+      if (!serie || !temporada || !portadaActual) {
+        alert("No hay portada seleccionada para eliminar.");
+        return;
+      }
+
+      if (!confirm(`¿Estás seguro de eliminar la portada de "${serie} - ${temporada}"?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/eliminar-portada`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombreSerie: serie,
+            temporada: temporada
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Portada eliminada correctamente.");
+          limpiarCampos();
+          await cargarTemporadas(); // Recargar lista de temporadas
+        } else {
+          alert("Error al eliminar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("Error al eliminar la portada: " + error.message);
+      }
+    }
+
+    // Event listeners
+    serieSelect.addEventListener("change", async () => {
+      await cargarTemporadas();
+      temporadaSelect.value = "";
+      limpiarCampos();
+    });
+
+    temporadaSelect.addEventListener("change", cargarDatos);
+
+    // Actualizar vista previa en tiempo real
+    enlaceImagen.addEventListener("input", () => {
+      mostrarPreview(enlaceImagen.value.trim());
+      ocultarErrorImagen();
+    });
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", cargarSeries);
+  </script>
+</body>
+</html>

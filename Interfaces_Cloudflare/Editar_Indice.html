@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Serie</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      text-align: center;
+      color: #1a73e8;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
+      color: #1a73e8;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #f8fbff;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background-color: white;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    .preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .preview-placeholder {
+      width: 100%;
+      height: 200px;
+      background-color: #f0f0f0;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-style: italic;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .btn-eliminar {
+      background-color: #dc3545;
+    }
+    .btn-eliminar:hover {
+      background-color: #bb2d3b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar el Índice de la Serie</h1>
+
+    <label for="serieSelect">Nombre de la Serie</label>
+    <select id="serieSelect">
+      <option value="" disabled selected>Seleccionar serie...</option>
+    </select>
+
+    <label for="nombreIngles">Nombre en Inglés</label>
+    <input type="text" id="nombreIngles" placeholder="Ej: A Lull in the Sea" />
+
+    <label for="nombreJapones">Nombre en Japonés</label>
+    <input type="text" id="nombreJapones" placeholder="Ej: 凪のあすから" />
+
+    <label for="anioPublicacion">Año de Publicación</label>
+    <input type="text" id="anioPublicacion" placeholder="Ej: 2013" />
+
+    <label for="categoria">Categoría</label>
+    <input type="text" id="categoria" placeholder="Ej: Romance, Fantasía" />
+
+    <label for="idioma">Idioma</label>
+    <input type="text" id="idioma" placeholder="Ej: Japonés" />
+
+    <label for="enlaceImagen">Enlace de la Imagen</label>
+    <input type="text" id="enlaceImagen" placeholder="https://ejemplo.com/imagen.jpg" />
+    <div id="imagenError" class="error-message hidden"></div>
+
+    <label for="enlaceSitio">Enlace del Sitio</label>
+    <input type="text" id="enlaceSitio" placeholder="https://ejemplo.com/serie" />
+
+    <div class="acciones">
+      <button onclick="location.href='../Editar_Indice.html'" 
+  style="background-color: #10b981; color: white;">
+  Editar con Firebase
+</button>
+      <button onclick="guardarCambios()">Guardar Cambios</button>
+      <button onclick="eliminarSerie()" class="btn-eliminar">Eliminar Serie</button>
+    </div>
+
+    <div class="preview" id="previewImagen">
+      <div class="preview-placeholder">Vista previa de la imagen</div>
+    </div>
+  </div>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    const serieSelect = document.getElementById("serieSelect");
+    let serieActual = null;
+
+    // Función para cargar series disponibles
+    async function cargarSeries() {
+      try {
+        const res = await fetch(`${WORKER_URL}/indice-series`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const series = await res.json();
+
+        if (!Array.isArray(series)) {
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar serie...</option>';
+        series.forEach(serie => {
+          const option = document.createElement("option");
+          option.value = serie.nombreSerie;
+          option.text = serie.nombreSerie;
+          serieSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando series:", error);
+        serieSelect.innerHTML = '<option value="" disabled selected>Error al cargar series</option>';
+      }
+    }
+
+    // Función para cargar datos de una serie específica
+    async function cargarDatos() {
+      const serie = serieSelect.value;
+      if (!serie) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/indice-serie?serie=${encodeURIComponent(serie)}`);
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            alert("Serie no encontrada en el índice");
+            limpiarCampos();
+            return;
+          }
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const serieData = await res.json();
+        serieActual = serieData;
+        
+        // Llenar campos con los datos de la serie
+        document.getElementById("nombreIngles").value = serieData.nombresec || "";
+        document.getElementById("nombreJapones").value = serieData.nombresec02 || "";
+        document.getElementById("anioPublicacion").value = serieData.año || "";
+        document.getElementById("categoria").value = serieData.categoria || "";
+        document.getElementById("idioma").value = serieData.idioma || "";
+        document.getElementById("enlaceImagen").value = serieData.imagen || "";
+        document.getElementById("enlaceSitio").value = serieData.sitio || "";
+        
+        mostrarPreview(serieData.imagen);
+        ocultarErrorImagen();
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        alert("Error al cargar los datos de la serie: " + error.message);
+        limpiarCampos();
+      }
+    }
+
+    // Función para mostrar vista previa de la imagen
+    function mostrarPreview(url) {
+      const previewContainer = document.getElementById("previewImagen");
+      
+      if (url && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(url)) {
+        previewContainer.innerHTML = `<img src="${url}" alt="Vista previa" onerror="mostrarErrorImagen('Error al cargar la imagen')" />`;
+      } else {
+        previewContainer.innerHTML = '<div class="preview-placeholder">Ingresa un enlace válido de imagen</div>';
+      }
+    }
+
+    // Función para mostrar error de imagen
+    function mostrarErrorImagen(mensaje) {
+      const imagenError = document.getElementById("imagenError");
+      imagenError.textContent = mensaje;
+      imagenError.classList.remove("hidden");
+      document.getElementById("previewImagen").innerHTML = '<div class="preview-placeholder">Error al cargar imagen</div>';
+    }
+
+    // Función para ocultar error de imagen
+    function ocultarErrorImagen() {
+      const imagenError = document.getElementById("imagenError");
+      imagenError.classList.add("hidden");
+    }
+
+    // Función para limpiar campos
+    function limpiarCampos() {
+      document.getElementById("nombreIngles").value = "";
+      document.getElementById("nombreJapones").value = "";
+      document.getElementById("anioPublicacion").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("idioma").value = "";
+      document.getElementById("enlaceImagen").value = "";
+      document.getElementById("enlaceSitio").value = "";
+      document.getElementById("previewImagen").innerHTML = '<div class="preview-placeholder">Vista previa de la imagen</div>';
+      ocultarErrorImagen();
+      serieActual = null;
+    }
+
+    // Función para validar campos
+    function validarCampos() {
+      const serie = serieSelect.value;
+      const enlaceImagen = document.getElementById("enlaceImagen").value.trim();
+
+      if (!serie) {
+        alert("Selecciona una serie para editar.");
+        return false;
+      }
+
+      if (!enlaceImagen) {
+        mostrarErrorImagen("El enlace de la imagen es obligatorio");
+        return false;
+      } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(enlaceImagen)) {
+        mostrarErrorImagen("Ingresa un enlace válido de imagen (jpg, jpeg, png, webp, gif)");
+        return false;
+      } else {
+        ocultarErrorImagen();
+      }
+
+      return true;
+    }
+
+    // Función para guardar cambios
+    async function guardarCambios() {
+      if (!validarCampos()) {
+        return;
+      }
+
+      const datosActualizados = {
+        nombreSerie: serieSelect.value,
+        nombresec: document.getElementById("nombreIngles").value.trim() || null,
+        nombresec02: document.getElementById("nombreJapones").value.trim() || null,
+        año: document.getElementById("anioPublicacion").value.trim() || null,
+        categoria: document.getElementById("categoria").value.trim() || null,
+        idioma: document.getElementById("idioma").value.trim() || null,
+        imagen: document.getElementById("enlaceImagen").value.trim(),
+        sitio: document.getElementById("enlaceSitio").value.trim() || null
+      };
+
+      try {
+        const res = await fetch(`${WORKER_URL}/actualizar-indice`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosActualizados)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Serie actualizada correctamente en el índice.");
+          mostrarPreview(datosActualizados.imagen);
+        } else {
+          alert("Error al actualizar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        alert("Error al guardar los datos: " + error.message);
+      }
+    }
+
+    // Función para eliminar serie
+    async function eliminarSerie() {
+      const serie = serieSelect.value;
+      
+      if (!serie || !serieActual) {
+        alert("No hay serie seleccionada para eliminar.");
+        return;
+      }
+
+      if (!confirm(`¿Estás seguro de eliminar la serie "${serie}" del índice? Esta acción no se puede deshacer.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/eliminar-indice`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombreSerie: serie })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "✅ Serie eliminada correctamente del índice.");
+          limpiarCampos();
+          await cargarSeries(); // Recargar lista de series
+        } else {
+          alert("Error al eliminar: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("Error al eliminar la serie: " + error.message);
+      }
+    }
+
+    // Event listeners
+    serieSelect.addEventListener("change", cargarDatos);
+
+    // Actualizar vista previa en tiempo real
+    document.getElementById("enlaceImagen").addEventListener("input", () => {
+      mostrarPreview(document.getElementById("enlaceImagen").value.trim());
+    });
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarSeries();
+      // Añadir clase hidden al mensaje de error
+      document.getElementById('imagenError').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

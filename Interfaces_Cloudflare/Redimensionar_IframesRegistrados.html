@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar dimensiones de iframe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f9ff;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      color: #1a73e8;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #1a73e8;
+    }
+
+    select, input[type="text"], textarea {
+      width: 100%;
+      padding: 12px 15px;
+      margin-top: 5px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background-color: #f8fbff;
+    }
+
+    select:focus, input[type="text"]:focus, textarea:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+      outline: none;
+      background-color: white;
+    }
+
+    textarea {
+      height: 120px;
+    }
+
+    .iframe-container {
+      background: #f8fbff;
+      padding: 15px;
+      border: 1px solid #e0e9ff;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    #formDimension {
+      display: none;
+      background: #e3f3ff;
+      padding: 20px;
+      border: 1px solid #d3e3fd;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-top: 10px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+
+    button:hover {
+      background-color: #1557b0;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      border: 1px solid #e0e9ff;
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #1a73e8;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    tr:hover {
+      background-color: #e8f1ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar dimensiones de iframe</h1>
+
+    <div class="form-group">
+      <label>Serie</label>
+      <select id="serieSelect">
+        <option value="">Selecciona una serie</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Temporada</label>
+      <select id="temporadaSelect">
+        <option value="">Selecciona una temporada</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Idioma</label>
+      <select id="idiomaSelect">
+        <option value="">Selecciona un idioma</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Servidor</label>
+      <select id="servidorSelect">
+        <option value="">Selecciona un servidor</option>
+      </select>
+    </div>
+
+    <div id="episodiosContainer"></div>
+
+    <button onclick="mostrarFormulario()" id="btnModificar" style="display:none;">Modificar dimensión del video</button>
+
+    <div id="formDimension">
+      <label>Nuevo width:</label>
+      <input type="text" id="nuevoWidth" placeholder='Ej: 100%' />
+      <label>Nuevo height:</label>
+      <input type="text" id="nuevoHeight" placeholder='Ej: 500' />
+      <button onclick="aplicarCambiosDimension()">Realizar cambios</button>
+    </div>
+
+    <div style="margin-top: 30px; text-align: right;">
+      <button onclick="guardarCambios()">Guardar cambios</button>
+      <button onclick="location.href='../Redimensionar_IframesRegistrados.html'" 
+  style="background-color: #10b981; color: white; 
+         border: none; padding: 12px 24px; 
+         border-radius: 8px; font-weight: 600; 
+         cursor: pointer; margin-bottom: 20px;">
+  Redimensionar con Firebase
+</button>
+    </div>
+  </div>
+  
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    
+    // Variables globales para mantener los valores actuales
+    let serieActual = "";
+    let temporadaActual = "";
+    let idiomaActual = "";
+    let servidorActual = "";
+
+    window.onload = () => {
+      cargarSeries();
+    };
+
+    async function cargarSeries() {
+      try {
+        const res = await fetch(`${WORKER_URL}/nombres-series`);
+        const series = await res.json();
+        
+        const select = document.getElementById("serieSelect");
+        select.innerHTML = `<option value="">Selecciona una serie</option>`;
+        
+        series.forEach(serie => {
+          const option = document.createElement("option");
+          option.value = serie;
+          option.textContent = serie;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando series:", error);
+        alert("Error al cargar las series");
+      }
+    }
+
+    async function cargarTemporadas() {
+      const serie = document.getElementById("serieSelect").value;
+      serieActual = serie;
+      
+      const select = document.getElementById("temporadaSelect");
+      select.innerHTML = `<option value="">Selecciona una temporada</option>`;
+      limpiarSelects("idiomaSelect", "servidorSelect");
+      limpiarContenedores();
+
+      if (!serie) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/temporadas?serie=${encodeURIComponent(serie)}`);
+        const temporadas = await res.json();
+        
+        temporadas.forEach(temp => {
+          const option = document.createElement("option");
+          option.value = temp;
+          option.textContent = temp;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando temporadas:", error);
+      }
+    }
+
+    async function cargarIdiomas() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      temporadaActual = temporada;
+      
+      const select = document.getElementById("idiomaSelect");
+      select.innerHTML = `<option value="">Selecciona un idioma</option>`;
+      limpiarSelects("servidorSelect");
+      limpiarContenedores();
+
+      if (!temporada) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/idiomas?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
+        const idiomas = await res.json();
+        
+        idiomas.forEach(idioma => {
+          const option = document.createElement("option");
+          option.value = idioma;
+          option.textContent = idioma;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando idiomas:", error);
+      }
+    }
+
+    async function cargarServidores() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      const idioma = document.getElementById("idiomaSelect").value;
+      idiomaActual = idioma;
+      
+      const select = document.getElementById("servidorSelect");
+      select.innerHTML = `<option value="">Selecciona un servidor</option>`;
+      limpiarContenedores();
+
+      if (!idioma) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/servidores?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}`);
+        const servidores = await res.json();
+        
+        servidores.forEach(servidor => {
+          const option = document.createElement("option");
+          option.value = servidor;
+          option.textContent = servidor;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando servidores:", error);
+      }
+    }
+
+    async function cargarEpisodios() {
+      const serie = document.getElementById("serieSelect").value;
+      const temporada = document.getElementById("temporadaSelect").value;
+      const idioma = document.getElementById("idiomaSelect").value;
+      const servidor = document.getElementById("servidorSelect").value;
+      servidorActual = servidor;
+      
+      const contenedor = document.getElementById("episodiosContainer");
+      contenedor.innerHTML = "";
+      document.getElementById("formDimension").style.display = "none";
+      document.getElementById("btnModificar").style.display = "none";
+
+      if (!servidor) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+        const episodios = await res.json();
+
+        if (episodios.length === 0) return;
+
+        let tablaHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Episodio</th>
+                <th>Código iframe</th>
+                <th>Width</th>
+                <th>Height</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        episodios.forEach(ep => {
+          const episodio = ep.episodio;
+          const iframe = ep.iframe || "";
+
+          // Buscar width y height en el iframe
+          const widthMatch = iframe.match(/(?:\s|^)width\s*=\s*(?:"([^"]+)"|(\d+))/i);
+          const heightMatch = iframe.match(/(?:\s|^)height\s*=\s*(?:"([^"]+)"|(\d+))/i);
+
+          const width = widthMatch ? (widthMatch[1] || widthMatch[2]) : '';
+          const height = heightMatch ? (heightMatch[1] || heightMatch[2]) : '';
+
+          tablaHTML += `
+            <tr>
+              <td>${episodio}</td>
+              <td>
+                <textarea data-episodio="${episodio}" style="width: 100%; height: 100px;">${iframe}</textarea>
+              </td>
+              <td>${width}</td>
+              <td>${height}</td>
+            </tr>
+          `;
+        });
+
+        tablaHTML += `
+            </tbody>
+          </table>
+        `;
+
+        contenedor.innerHTML = tablaHTML;
+        document.getElementById("btnModificar").style.display = "block";
+
+      } catch (error) {
+        console.error("Error cargando episodios:", error);
+        alert("Error al cargar los episodios");
+      }
+    }
+
+    function mostrarFormulario() {
+      document.getElementById("formDimension").style.display = "block";
+    }
+
+    function aplicarCambiosDimension() {
+      const nuevoWidth = document.getElementById("nuevoWidth").value.trim();
+      const nuevoHeight = document.getElementById("nuevoHeight").value.trim();
+
+      if (!nuevoWidth || !nuevoHeight) {
+        alert("Debes ingresar valores para width y height.");
+        return;
+      }
+
+      const textareas = document.querySelectorAll("#episodiosContainer textarea");
+
+      textareas.forEach(textarea => {
+        let iframe = textarea.value;
+
+        // Detectar y reemplazar width según su estilo original
+        const widthMatch = iframe.match(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/);
+        if (widthMatch) {
+          const atributo = widthMatch[1]; // 'width' o 'WIDTH'
+          iframe = iframe.replace(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoWidth}"`);
+        } else {
+          iframe = iframe.replace(/<iframe/i, `<iframe width="${nuevoWidth}"`);
+        }
+
+        // Detectar y reemplazar height según su estilo original
+        const heightMatch = iframe.match(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/);
+        if (heightMatch) {
+          const atributo = heightMatch[1]; // 'height' o 'HEIGHT'
+          iframe = iframe.replace(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoHeight}"`);
+        } else {
+          iframe = iframe.replace(/<iframe/i, `<iframe height="${nuevoHeight}"`);
+        }
+
+        // Actualizar el contenido del textarea
+        textarea.value = iframe;
+
+        // Actualizar la tabla: buscar la fila y cambiar columnas de width y height
+        const fila = textarea.closest("tr");
+        if (fila) {
+          fila.children[2].textContent = nuevoWidth;  // Columna width
+          fila.children[3].textContent = nuevoHeight; // Columna height
+        }
+      });
+
+      alert("Las dimensiones han sido actualizadas en los campos mostrados. Pulsa 'Guardar cambios' para guardar en la base de datos.");
+    }
+
+    async function guardarCambios() {
+      const serie = serieActual;
+      const temporada = temporadaActual;
+      const idioma = idiomaActual;
+      const servidor = servidorActual;
+
+      if (!serie || !temporada || !idioma || !servidor) {
+        alert("Por favor, selecciona serie, temporada, idioma y servidor.");
+        return;
+      }
+
+      const textareas = document.querySelectorAll("#episodiosContainer textarea");
+      const registros = [];
+
+      for (let textarea of textareas) {
+        const episodio = textarea.dataset.episodio;
+        const nuevoCodigo = textarea.value.trim();
+
+        if (episodio && nuevoCodigo) {
+          registros.push({
+            nombreSerie: serie,
+            temporada: temporada,
+            idioma: idioma,
+            servidor: servidor,
+            episodio: episodio,
+            iframe: nuevoCodigo
+          });
+        }
+      }
+
+      if (registros.length === 0) {
+        alert("No hay cambios para guardar.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/registrar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registros })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Cambios guardados correctamente en Cloudflare D1.");
+        } else {
+          alert("Error al guardar los cambios: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error al guardar los cambios: " + error.message);
+      }
+    }
+
+    function limpiarSelects(...ids) {
+      ids.forEach(id => {
+        const s = document.getElementById(id);
+        if (s) s.innerHTML = `<option value="">Selecciona una opción</option>`;
+      });
+    }
+
+    function limpiarContenedores() {
+      document.getElementById("episodiosContainer").innerHTML = "";
+      document.getElementById("formDimension").style.display = "none";
+      document.getElementById("btnModificar").style.display = "none";
+    }
+
+    // Event listeners para los selects
+    document.getElementById("serieSelect").addEventListener("change", cargarTemporadas);
+    document.getElementById("temporadaSelect").addEventListener("change", cargarIdiomas);
+    document.getElementById("idiomaSelect").addEventListener("change", cargarServidores);
+    document.getElementById("servidorSelect").addEventListener("change", cargarEpisodios);
+  </script>
+</body>
+</html>

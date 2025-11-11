@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Índice de Series</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f9ff;
+      color: #333;
+    }
+
+    h2 {
+      color: #1a73e8;
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+      border-bottom: 2px solid #e0e9ff;
+      padding-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    table th {
+      background-color: #1a73e8;
+      color: white;
+      font-weight: 600;
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    table td {
+      border: 1px solid #e0e9ff;
+      padding: 10px 15px;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    tr:hover {
+      background-color: #e8f1ff;
+    }
+
+    select, input[type="text"] {
+      padding: 10px 15px;
+      border: 2px solid #d3e3fd;
+      border-radius: 8px;
+      font-size: 14px;
+      background-color: #f8fbff;
+      color: #333;
+      min-width: 180px;
+    }
+
+    select:focus, input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+      outline: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+
+    button:hover {
+      background-color: #1557b0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .filtros-container {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      align-items: center;
+      background-color: #f8fbff;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #e0e9ff;
+    }
+
+    #paginacion {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    #paginacion span {
+      font-weight: 500;
+    }
+
+    .url-link {
+      color: #1a73e8;
+      font-weight: 500;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+
+    .image-preview {
+      max-width: 100px;
+      max-height: 60px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .image-preview:hover {
+      transform: scale(1.5);
+    }
+
+    .search-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .filtros-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      select, input, button {
+        width: 100%;
+      }
+
+      .search-container {
+        flex-direction: column;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Índice de Series</h2>
+
+  <button onclick="location.href='../Exportar_Indice.html'" 
+  style="background-color: #10b981; color: white;">
+  Exportar con Firebase
+</button>
+
+  <div class="filtros-container">
+    <select id="filtroSerie"><option value="">Todas las series</option></select>
+    <select id="filtroCategoria"><option value="">Todas las categorías</option></select>
+    <select id="filtroIdioma"><option value="">Todos los idiomas</option></select>
+    <select id="filtroAño"><option value="">Todos los años</option></select>
+    
+    <div class="search-container">
+      <input type="text" id="buscarInput" placeholder="Buscar series..." />
+      <button onclick="buscarSeries()">🔍 Buscar</button>
+    </div>
+    
+    <button onclick="aplicarFiltros()">Aplicar Filtros</button>
+    <button onclick="resetearFiltros()">Resetear</button>
+    <button onclick="exportarTablaAExcel()">📥 Exportar a Excel</button>
+  </div>
+
+  <table id="tablaSeries">
+    <thead>
+      <tr>
+        <th>Serie</th>
+        <th>Nombre Inglés</th>
+        <th>Nombre Japonés</th>
+        <th>Año</th>
+        <th>Categoría</th>
+        <th>Idioma</th>
+        <th>Imagen</th>
+        <th>Sitio</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="paginacion"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    let datosCargados = [];
+    let datosFiltrados = [];
+    let paginaActual = 1;
+    const registrosPorPagina = 10;
+
+    // Función para cargar todos los datos desde Cloudflare D1
+    async function cargarDatos() {
+      const tbody = document.querySelector("#tablaSeries tbody");
+      tbody.innerHTML = "<tr><td colspan='8' style='text-align: center;'>Cargando datos...</td></tr>";
+      datosCargados = [];
+
+      try {
+        const res = await fetch(`${WORKER_URL}/indice-series`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const series = await res.json();
+
+        if (!Array.isArray(series)) {
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        datosCargados = series.map(s => ({
+          nombreSerie: s.nombreSerie,
+          nombresec: s.nombresec || "",
+          nombresec02: s.nombresec02 || "",
+          año: s.año || "",
+          categoria: s.categoria || "",
+          idioma: s.idioma || "",
+          imagen: s.imagen || "",
+          sitio: s.sitio || ""
+        }));
+
+        poblarFiltros();
+        aplicarFiltros();
+        
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        tbody.innerHTML = "<tr><td colspan='8' style='text-align: center; color: red;'>Error al cargar los datos</td></tr>";
+      }
+    }
+
+    // Función para buscar series
+    async function buscarSeries() {
+      const query = document.getElementById("buscarInput").value.trim();
+      
+      if (!query) {
+        // Si la búsqueda está vacía, cargar todos los datos
+        await cargarDatos();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/buscar-indice?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const series = await res.json();
+
+        if (!Array.isArray(series)) {
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        datosCargados = series.map(s => ({
+          nombreSerie: s.nombreSerie,
+          nombresec: s.nombresec || "",
+          nombresec02: s.nombresec02 || "",
+          año: s.año || "",
+          categoria: s.categoria || "",
+          idioma: s.idioma || "",
+          imagen: s.imagen || "",
+          sitio: s.sitio || ""
+        }));
+
+        // Limpiar filtros cuando se realiza una búsqueda
+        document.getElementById("filtroSerie").value = "";
+        document.getElementById("filtroCategoria").value = "";
+        document.getElementById("filtroIdioma").value = "";
+        document.getElementById("filtroAño").value = "";
+        
+        poblarFiltros();
+        aplicarFiltros();
+        
+      } catch (error) {
+        console.error("Error buscando series:", error);
+        alert("Error al buscar series: " + error.message);
+      }
+    }
+
+    function poblarFiltros() {
+      const series = new Set();
+      const categorias = new Set();
+      const idiomas = new Set();
+      const años = new Set();
+
+      datosCargados.forEach(d => {
+        series.add(d.nombreSerie);
+        if (d.categoria) categorias.add(d.categoria);
+        if (d.idioma) idiomas.add(d.idioma);
+        if (d.año) años.add(d.año);
+      });
+
+      llenarSelect("filtroSerie", Array.from(series));
+      llenarSelect("filtroCategoria", Array.from(categorias));
+      llenarSelect("filtroIdioma", Array.from(idiomas));
+      llenarSelect("filtroAño", Array.from(años));
+    }
+
+    function llenarSelect(id, opciones) {
+      const select = document.getElementById(id);
+      const valorAnterior = select.value;
+      select.innerHTML = `<option value="">Todos</option>`;
+      opciones.sort().forEach(op => {
+        if (op) { // Solo agregar valores no vacíos
+          select.innerHTML += `<option value="${op}">${op}</option>`;
+        }
+      });
+      select.value = valorAnterior;
+    }
+
+    function aplicarFiltros() {
+      const serie = document.getElementById("filtroSerie").value;
+      const categoria = document.getElementById("filtroCategoria").value;
+      const idioma = document.getElementById("filtroIdioma").value;
+      const año = document.getElementById("filtroAño").value;
+
+      datosFiltrados = datosCargados.filter(d =>
+        (!serie || d.nombreSerie === serie) &&
+        (!categoria || d.categoria === categoria) &&
+        (!idioma || d.idioma === idioma) &&
+        (!año || d.año == año)
+      );
+
+      paginaActual = 1;
+      mostrarPagina();
+    }
+
+    function mostrarPagina() {
+      const tbody = document.querySelector("#tablaSeries tbody");
+      tbody.innerHTML = "";
+
+      if (datosFiltrados.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='8' style='text-align: center;'>No hay datos que coincidan con los filtros</td></tr>";
+        renderizarPaginacion();
+        return;
+      }
+
+      const inicio = (paginaActual - 1) * registrosPorPagina;
+      const fin = inicio + registrosPorPagina;
+      const pagina = datosFiltrados.slice(inicio, fin);
+
+      pagina.forEach(d => {
+        const fila = document.createElement("tr");
+        
+        // Vista previa de imagen
+        const imagenPreview = d.imagen && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(d.imagen) 
+          ? `<img src="${d.imagen}" alt="Vista previa" class="image-preview" onclick="window.open('${d.imagen}', '_blank')" onerror="this.style.display='none'" />`
+          : "";
+
+        // Enlaces clickeables
+        const enlaceImagen = d.imagen 
+          ? `<a href="${d.imagen}" target="_blank" class="url-link">${acortarURL(d.imagen)}</a>`
+          : "";
+
+        const enlaceSitio = d.sitio && /^https?:\/\/\S+$/i.test(d.sitio)
+          ? `<a href="${d.sitio}" target="_blank" class="url-link">${acortarURL(d.sitio)}</a>`
+          : (d.sitio || "");
+
+        fila.innerHTML = `
+          <td>${escapeHTML(d.nombreSerie)}</td>
+          <td style="word-break: break-word;">${escapeHTML(d.nombresec)}</td>
+          <td style="word-break: break-word;">${escapeHTML(d.nombresec02)}</td>
+          <td>${escapeHTML(d.año)}</td>
+          <td>${escapeHTML(d.categoria)}</td>
+          <td>${escapeHTML(d.idioma)}</td>
+          <td style="text-align: center;">
+            ${imagenPreview}
+            <div style="margin-top: 5px; font-size: 12px;">${enlaceImagen}</div>
+          </td>
+          <td style="max-width: 200px; word-break: break-word;">${enlaceSitio}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+
+      renderizarPaginacion();
+    }
+
+    // Función para acortar URLs largas
+    function acortarURL(url) {
+      if (url.length > 50) {
+        return url.substring(0, 47) + '...';
+      }
+      return url;
+    }
+
+    function renderizarPaginacion() {
+      const contenedor = document.getElementById("paginacion");
+      contenedor.innerHTML = "";
+
+      const totalPaginas = Math.ceil(datosFiltrados.length / registrosPorPagina);
+
+      if (totalPaginas <= 1) return;
+
+      const btnAnterior = document.createElement("button");
+      btnAnterior.textContent = "⬅ Anterior";
+      btnAnterior.disabled = paginaActual === 1;
+      btnAnterior.onclick = () => {
+        paginaActual--;
+        mostrarPagina();
+      };
+
+      const btnSiguiente = document.createElement("button");
+      btnSiguiente.textContent = "Siguiente ➡";
+      btnSiguiente.disabled = paginaActual === totalPaginas;
+      btnSiguiente.onclick = () => {
+        paginaActual++;
+        mostrarPagina();
+      };
+
+      const info = document.createElement("span");
+      info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+      contenedor.appendChild(btnAnterior);
+      contenedor.appendChild(info);
+      contenedor.appendChild(btnSiguiente);
+    }
+
+    function resetearFiltros() {
+      document.getElementById("filtroSerie").value = "";
+      document.getElementById("filtroCategoria").value = "";
+      document.getElementById("filtroIdioma").value = "";
+      document.getElementById("filtroAño").value = "";
+      document.getElementById("buscarInput").value = "";
+      paginaActual = 1;
+      cargarDatos(); // Recargar todos los datos
+    }
+
+    function exportarTablaAExcel() {
+      if (datosFiltrados.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const datosParaExportar = datosFiltrados.map(d => ({
+        Serie: d.nombreSerie,
+        "Nombre Inglés": d.nombresec,
+        "Nombre Japonés": d.nombresec02,
+        Año: d.año,
+        Categoría: d.categoria,
+        Idioma: d.idioma,
+        "Enlace Imagen": d.imagen,
+        "Enlace Sitio": d.sitio
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(datosParaExportar);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Series Índice");
+
+      XLSX.writeFile(wb, "series_indice_filtradas.xlsx");
+    }
+
+    function escapeHTML(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
+
+    // Soporte para buscar con Enter
+    document.getElementById("buscarInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        buscarSeries();
+      }
+    });
+
+    window.onload = cargarDatos;
+  </script>
+</body>
+</html>

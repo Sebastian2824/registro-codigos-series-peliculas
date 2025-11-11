@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar URL de la Serie Registrada</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f9ff;
+        color: #333;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    h1 {
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 32px;
+        font-weight: 600;
+    }
+    
+    h2 {
+        color: #1a73e8;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 24px;
+        border-bottom: 2px solid #e0e9ff;
+        padding-bottom: 8px;
+    }
+    
+    label {
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #1a73e8;
+    }
+    
+    select, input[type="text"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin-top: 5px;
+        border: 2px solid #d3e3fd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+        background-color: #f8fbff;
+    }
+    
+    select:focus, input[type="text"]:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        outline: none;
+        background-color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    th, td {
+        border: 1px solid #e0e9ff;
+        padding: 12px 15px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #1a73e8;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8fbff;
+    }
+    
+    tr:hover {
+        background-color: #e8f1ff;
+    }
+    
+    button {
+        padding: 12px 20px;
+        margin-top: 10px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(26, 115, 232, 0.2);
+    }
+    
+    button:hover {
+        background-color: #1557b0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    button.cancelar {
+        background-color: #dc3545;
+        margin-left: 10px;
+    }
+    
+    button.cancelar:hover {
+        background-color: #bb2d3b;
+    }
+    
+    .row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .row select, .row input {
+        flex: 1;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        padding: 20px;
+        background-color: #f8fbff;
+        border-radius: 10px;
+        border: 1px solid #e0e9ff;
+    }
+    
+    .acciones {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    /* Estilo para los botones dentro de las celdas de la tabla */
+    td button {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* Estilo para los inputs dentro de la tabla */
+    td input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d3e3fd;
+        border-radius: 6px;
+        background-color: white;
+    }
+    
+    /* Estilo para el botón de agregar fila */
+    #btnAgregarFila {
+        background-color: #34a853;
+        margin-top: 15px;
+    }
+    
+    #btnAgregarFila:hover {
+        background-color: #2d9249;
+    }
+
+    /* Nuevos estilos para diferenciar filas */
+    .fila-existente {
+        background-color: #f0f8ff !important;
+    }
+    
+    .fila-nueva {
+        background-color: #f9fff0 !important;
+    }
+    
+    .btn-actualizar {
+        background-color: #1a73e8;
+    }
+    
+    .btn-registrar {
+        background-color: #34a853;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Editar Series de Descargas</h1>
+
+    <div class="form-group">
+      <label>Nombre de la Serie</label>
+      <select id="serieSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Temporada</label>
+      <select id="temporadaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button onclick="nuevaEntrada('temporada')">Nueva Temporada</button>
+      <div id="nuevaTemporadaInput" class="hidden">
+        <input type="text" id="nuevaTemporada" placeholder="Ej: Temporada 02" />
+        <button onclick="cancelarEntrada('temporada')">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Idioma</label>
+      <select id="idiomaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button type="button" onclick="nuevaEntrada('idioma')">Nuevo idioma</button>
+      <div id="nuevoIdiomaInput" class="hidden">
+        <input type="text" id="nuevoIdioma" placeholder="Ej: Español" />
+        <button type="button" onclick="cancelarEntrada('idioma')">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Servidor</label>
+      <select id="servidorSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <button type="button" onclick="nuevaEntrada('servidor')">Nuevo servidor</button>
+      <div id="nuevoServidorInput" class="hidden">
+        <input type="text" id="nuevoServidor" placeholder="Ej: Servidor 01" />
+        <button type="button" onclick="cancelarEntrada('servidor')">Cancelar</button>
+      </div>
+    </div>
+
+    <h2>Episodios y Enlaces URL</h2>
+    <div>
+      <button onclick="document.getElementById('importarTxt').click()">📂 Importar TXT</button>
+      <button onclick="document.getElementById('importarExcel').click()">📥 Importar Excel</button>
+      <input type="file" id="importarTxt" accept=".txt" style="display: none;" />
+      <input type="file" id="importarExcel" accept=".xlsx, .xls" style="display: none;" />
+    </div>
+    <table id="tabla-episodios">
+      <thead>
+        <tr>
+          <th>Episodio</th>
+          <th>Enlace URL</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody"></tbody>
+    </table>
+    <button onclick="agregarFila()">Agregar Fila</button>
+
+    <div class="acciones">
+      <button onclick="location.href='../Editar_SerieDescarga.html'" 
+  style="background-color: #10b981; color: white;">
+  Editar con Firebase
+</button>
+      <button onclick="guardarCambios()">Actualizar</button>
+    </div>
+  </div>
+
+  <script>
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    
+    const serieSelect = document.getElementById("serieSelect");
+    const temporadaSelect = document.getElementById("temporadaSelect");
+    const idiomaSelect = document.getElementById("idiomaSelect");
+    const servidorSelect = document.getElementById("servidorSelect");
+
+    const nuevaTemporadaInput = document.getElementById("nuevaTemporadaInput");
+    const nuevoIdiomaInput = document.getElementById("nuevoIdiomaInput");
+    const nuevoServidorInput = document.getElementById("nuevoServidorInput");
+
+    let serieActual = "";
+    let temporadaActual = "";
+    let idiomaActual = "";
+    let servidorActual = "";
+
+    async function cargarSeries() {
+  try {
+    const res = await fetch(`${WORKER_URL}/nombres-series-descargas`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    }
+
+    const series = await res.json();
+
+    if (!Array.isArray(series)) {
+      console.error('La respuesta de series no es un array:', series);
+      throw new Error('Formato de respuesta inválido');
+    }
+
+    serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+    series.forEach(nombre => {
+      const option = document.createElement("option");
+      option.value = option.text = nombre;
+      serieSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error cargando series:", error);
+    serieSelect.innerHTML = '<option value="" disabled selected>Error al cargar series</option>';
+  }
+}
+
+async function cargarTemporadas() {
+  if (!serieActual) return;
+
+  try {
+    const res = await fetch(`${WORKER_URL}/temporadas-descargas?serie=${encodeURIComponent(serieActual)}`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    }
+
+    const temporadas = await res.json();
+
+    if (!Array.isArray(temporadas)) {
+      console.error('La respuesta de temporadas no es un array:', temporadas);
+      throw new Error('Formato de respuesta inválido');
+    }
+
+    temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+    temporadas.forEach(temp => {
+      const option = document.createElement("option");
+      option.value = option.text = temp;
+      temporadaSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error cargando temporadas:", error);
+    temporadaSelect.innerHTML = '<option value="" disabled selected>Error al cargar temporadas</option>';
+  }
+}
+
+async function cargarIdiomas() {
+  if (!serieActual || !temporadaActual) return;
+
+  try {
+    const res = await fetch(`${WORKER_URL}/idiomas-descargas?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    }
+
+    const idiomas = await res.json();
+
+    if (!Array.isArray(idiomas)) {
+      console.error('La respuesta de idiomas no es un array:', idiomas);
+      throw new Error('Formato de respuesta inválido');
+    }
+
+    idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+    idiomas.forEach(idioma => {
+      const option = document.createElement("option");
+      option.value = option.text = idioma;
+      idiomaSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error cargando idiomas:", error);
+    idiomaSelect.innerHTML = '<option value="" disabled selected>Error al cargar idiomas</option>';
+  }
+}
+
+async function cargarServidores() {
+  if (!serieActual || !temporadaActual || !idiomaActual) return;
+
+  try {
+    const res = await fetch(`${WORKER_URL}/servidores-descargas?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    }
+
+    const servidores = await res.json();
+
+    if (!Array.isArray(servidores)) {
+      console.error('La respuesta de servidores no es un array:', servidores);
+      throw new Error('Formato de respuesta inválido');
+    }
+
+    servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+    servidores.forEach(servidor => {
+      const option = document.createElement("option");
+      option.value = option.text = servidor;
+      servidorSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error cargando servidores:", error);
+    servidorSelect.innerHTML = '<option value="" disabled selected>Error al cargar servidores</option>';
+  }
+}
+
+   async function cargarEpisodios() {
+  if (!serieActual || !temporadaActual || !idiomaActual || !servidorActual) return;
+
+  try {
+    const res = await fetch(`${WORKER_URL}/episodios-descargas?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
+    
+    // Verificar si la respuesta es exitosa
+    if (!res.ok) {
+      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    }
+
+    const episodios = await res.json();
+
+    // Verificar que episodios sea un array
+    if (!Array.isArray(episodios)) {
+      console.error('La respuesta no es un array:', episodios);
+      throw new Error('Formato de respuesta inválido');
+    }
+
+    const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+    tabla.innerHTML = "";
+
+    if (episodios.length === 0) {
+      tabla.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay episodios registrados</td></tr>';
+      return;
+    }
+
+    episodios.forEach(ep => {
+      const fila = tabla.insertRow();
+      fila.classList.add("fila-existente");
+      fila.setAttribute("data-episodio-original", ep.episodio);
+
+      const celEpisodio = fila.insertCell();
+      const inputEpisodio = document.createElement("input");
+      inputEpisodio.type = "text";
+      inputEpisodio.value = ep.episodio;
+      celEpisodio.appendChild(inputEpisodio);
+
+      const celUrl = fila.insertCell();
+      const inputUrl = document.createElement("input");
+      inputUrl.type = "text";
+      inputUrl.value = ep.url || "";
+      celUrl.appendChild(inputUrl);
+
+      const celAcciones = fila.insertCell();
+      
+      const btnActualizar = document.createElement("button");
+      btnActualizar.textContent = "Actualizar";
+      btnActualizar.classList.add("btn-actualizar");
+      celAcciones.appendChild(btnActualizar);
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "Eliminar";
+      btnEliminar.classList.add("btn-eliminar");
+      celAcciones.appendChild(btnEliminar);
+    });
+  } catch (error) {
+    console.error("Error cargando episodios:", error);
+    const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+    tabla.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Error al cargar episodios: ${error.message}</td></tr>`;
+  }
+}
+
+    // Función para agregar nueva fila (episodio nuevo)
+    function agregarFila() {
+      const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+      const newRow = tabla.insertRow();
+      newRow.classList.add("fila-nueva");
+
+      newRow.innerHTML = `
+        <td><input type="text" placeholder="Ej: Episodio X"></td>
+        <td><input type="text" placeholder="https://..."></td>
+        <td>
+          <button class="btn-registrar">Registrar</button>
+          <button class="btn-eliminar-fila">Eliminar</button>
+        </td>
+      `;
+    }
+
+    // Función para actualizar un episodio existente
+    async function actualizarEpisodio(fila) {
+      const episodioOriginal = fila.getAttribute("data-episodio-original");
+      const inputs = fila.getElementsByTagName("input");
+      const episodioNombre = inputs[0].value.trim();
+      const url = inputs[1].value.trim();
+
+      if (!episodioNombre || !url) {
+        alert("Completa todos los campos antes de actualizar.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/actualizar-episodio-descargas`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            serie: serieActual,
+            temporada: temporadaActual,
+            idioma: idiomaActual,
+            servidor: servidorActual,
+            episodio: episodioOriginal,
+            url: url
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Episodio actualizado correctamente");
+          // Actualizar el episodio original en caso de que haya cambiado
+          fila.setAttribute("data-episodio-original", episodioNombre);
+        } else {
+          alert("Error al actualizar episodio: " + (data.error || res.status));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error interno: " + err.message);
+      }
+    }
+
+    // Función para registrar un nuevo episodio
+    async function registrarNuevoEpisodio(fila) {
+      const inputs = fila.getElementsByTagName("input");
+      const episodioNombre = inputs[0].value.trim();
+      const url = inputs[1].value.trim();
+
+      if (!serieActual || !temporadaActual || !idiomaActual || !servidorActual || !episodioNombre || !url) {
+        alert("Completa todos los campos antes de registrar.");
+        return;
+      }
+
+      const registros = [{
+        nombreSerie: serieActual,
+        temporada: temporadaActual,
+        idioma: idiomaActual,
+        servidor: servidorActual,
+        episodio: episodioNombre,
+        url: url
+      }];
+
+      try {
+        const res = await fetch(`${WORKER_URL}/registrar-descargas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registros })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || "Episodio registrado correctamente");
+          // Convertir la fila nueva en existente
+          fila.classList.remove("fila-nueva");
+          fila.classList.add("fila-existente");
+          fila.setAttribute("data-episodio-original", episodioNombre);
+          
+          // Cambiar el botón de Registrar a Actualizar
+          const btnRegistrar = fila.querySelector('.btn-registrar');
+          if (btnRegistrar) {
+            btnRegistrar.textContent = "Actualizar";
+            btnRegistrar.classList.remove("btn-registrar");
+            btnRegistrar.classList.add("btn-actualizar");
+          }
+        } else {
+          alert("Error al registrar episodio: " + (data.error || res.statusText));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error interno: " + err.message);
+      }
+    }
+
+    // Función para eliminar un episodio existente
+    async function eliminarEpisodio(fila) {
+      const episodioNombre = fila.getAttribute("data-episodio-original");
+
+      if (!confirm(`¿Eliminar episodio "${episodioNombre}"?`)) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/eliminar-episodio-descargas`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serie: serieActual,
+            temporada: temporadaActual,
+            idioma: idiomaActual,
+            servidor: servidorActual,
+            episodio: episodioNombre
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Episodio eliminado correctamente");
+          fila.remove();
+        } else {
+          alert("Error al eliminar episodio: " + (data.error || res.status));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error interno: " + err.message);
+      }
+    }
+
+    // Función para eliminar una fila nueva (sin guardar en BD)
+    function eliminarFilaNueva(fila) {
+      if (confirm("¿Eliminar esta fila?")) {
+        fila.remove();
+      }
+    }
+
+    // FUNCIONES DE IMPORTACIÓN TXT Y EXCEL
+    function configurarImportacionTxt() {
+      document.getElementById('importarTxt').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const contenido = e.target.result;
+          const lineas = contenido.split('\n');
+          const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+
+          lineas.forEach(linea => {
+            if (linea.trim() === '') return;
+            const partes = linea.split(';');
+            if (partes.length !== 2) return;
+
+            const episodio = partes[0].trim();
+            const url = partes[1].trim();
+
+            const newRow = tabla.insertRow();
+            newRow.classList.add("fila-nueva");
+            newRow.innerHTML = `
+              <td><input type="text" value="${episodio}"></td>
+              <td><input type="text" value="${url}"></td>
+              <td>
+                <button class="btn-registrar">Registrar</button>
+                <button class="btn-eliminar-fila">Eliminar</button>
+              </td>
+            `;
+          });
+
+          alert(`Importación completada. Se agregaron ${lineas.length} episodios.`);
+          event.target.value = '';
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function configurarImportacionExcel() {
+      document.getElementById('importarExcel').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+          let contador = 0;
+
+          rows.forEach(row => {
+            if (row.length < 2) return;
+            const episodio = String(row[0]).trim();
+            const url = String(row[1]).trim();
+
+            if (episodio && url && episodio !== 'Episodio' && url !== 'URL') {
+              const nuevaFila = tabla.insertRow();
+              nuevaFila.classList.add("fila-nueva");
+              nuevaFila.innerHTML = `
+                <td><input type="text" value="${episodio}"></td>
+                <td><input type="text" value="${url}"></td>
+                <td>
+                  <button class="btn-registrar">Registrar</button>
+                  <button class="btn-eliminar-fila">Eliminar</button>
+                </td>
+              `;
+              contador++;
+            }
+          });
+
+          alert(`Importación desde Excel completada. Se agregaron ${contador} episodios.`);
+          event.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // FUNCIÓN GUARDAR CAMBIOS MEJORADA
+    async function guardarCambios() {
+      const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
+      const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
+      const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
+
+      // Actualizar los valores actuales si se agregaron nuevos
+      temporadaActual = nuevaTemporada || temporadaActual;
+      idiomaActual = nuevoIdioma || idiomaActual;
+      servidorActual = nuevoServidor || servidorActual;
+
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      const filas = tabla.getElementsByTagName("tr");
+
+      const registrosNuevos = [];
+      const registrosActualizados = [];
+
+      // Procesar todas las filas
+      for (const fila of filas) {
+        const inputs = fila.getElementsByTagName("input");
+        if (!inputs[0] || !inputs[1]) continue;
+
+        const episodioNombre = inputs[0].value.trim();
+        const url = inputs[1].value.trim();
+
+        if (episodioNombre && url) {
+          const registro = {
+            nombreSerie: serieActual,
+            temporada: temporadaActual,
+            idioma: idiomaActual,
+            servidor: servidorActual,
+            episodio: episodioNombre,
+            url: url
+          };
+
+          if (fila.classList.contains("fila-nueva")) {
+            registrosNuevos.push(registro);
+          } else {
+            registrosActualizados.push(registro);
+          }
+        }
+      }
+
+      if (registrosNuevos.length === 0 && registrosActualizados.length === 0) {
+        alert("No hay episodios para guardar.");
+        return;
+      }
+
+      try {
+        const todosRegistros = [...registrosNuevos, ...registrosActualizados];
+
+        const res = await fetch(`${WORKER_URL}/registrar-descargas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registros: todosRegistros })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          let mensaje = "Cambios guardados correctamente.";
+          if (registrosNuevos.length > 0) {
+            mensaje += ` ${registrosNuevos.length} nuevos episodios registrados.`;
+          }
+          if (registrosActualizados.length > 0) {
+            mensaje += ` ${registrosActualizados.length} episodios actualizados.`;
+          }
+          
+          alert(mensaje);
+          resetearInterfaz();
+        } else {
+          alert("Error al guardar los cambios: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error al guardar los cambios: " + error.message);
+      }
+    }
+
+    // FUNCIÓN PARA RESETEAR LA INTERFAZ COMPLETAMENTE
+    function resetearInterfaz() {
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      tabla.innerHTML = "";
+      
+      document.getElementById("nuevaTemporada").value = "";
+      document.getElementById("nuevoIdioma").value = "";
+      document.getElementById("nuevoServidor").value = "";
+      
+      nuevaTemporadaInput.classList.add("hidden");
+      nuevoIdiomaInput.classList.add("hidden");
+      nuevoServidorInput.classList.add("hidden");
+      
+      temporadaSelect.disabled = false;
+      idiomaSelect.disabled = false;
+      servidorSelect.disabled = false;
+      
+      serieSelect.value = "";
+      temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      
+      serieActual = "";
+      temporadaActual = "";
+      idiomaActual = "";
+      servidorActual = "";
+    }
+
+    // Event delegation para manejar los botones de la tabla
+    document.getElementById('tablaBody').addEventListener('click', async (event) => {
+      const target = event.target;
+      const fila = target.closest('tr');
+      if (!fila) return;
+
+      if (target.classList.contains('btn-actualizar')) {
+        await actualizarEpisodio(fila);
+      }
+
+      if (target.classList.contains('btn-registrar')) {
+        await registrarNuevoEpisodio(fila);
+      }
+
+      if (target.classList.contains('btn-eliminar')) {
+        await eliminarEpisodio(fila);
+      }
+
+      if (target.classList.contains('btn-eliminar-fila')) {
+        eliminarFilaNueva(fila);
+      }
+    });
+
+    // Las demás funciones se mantienen igual
+    function nuevaEntrada(tipo) {
+      if (tipo === "temporada") {
+        temporadaSelect.disabled = true;
+        nuevaTemporadaInput.classList.remove("hidden");
+      } else if (tipo === "idioma") {
+        idiomaSelect.disabled = true;
+        nuevoIdiomaInput.classList.remove("hidden");
+      } else if (tipo === "servidor") {
+        servidorSelect.disabled = true;
+        nuevoServidorInput.classList.remove("hidden");
+      }
+    }
+
+    function cancelarEntrada(tipo) {
+      if (tipo === "temporada") {
+        temporadaSelect.disabled = false;
+        nuevaTemporadaInput.classList.add("hidden");
+      } else if (tipo === "idioma") {
+        idiomaSelect.disabled = false;
+        nuevoIdiomaInput.classList.add("hidden");
+      } else if (tipo === "servidor") {
+        servidorSelect.disabled = false;
+        nuevoServidorInput.classList.add("hidden");
+      }
+    }
+
+    // Event listeners para los selects
+    serieSelect.addEventListener("change", () => {
+      serieActual = serieSelect.value;
+      cargarTemporadas();
+    });
+
+    temporadaSelect.addEventListener("change", () => {
+      temporadaActual = temporadaSelect.value;
+      cargarIdiomas();
+    });
+
+    idiomaSelect.addEventListener("change", () => {
+      idiomaActual = idiomaSelect.value;
+      cargarServidores();
+    });
+
+    servidorSelect.addEventListener("change", () => {
+      servidorActual = servidorSelect.value;
+      cargarEpisodios();
+    });
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarSeries();
+      configurarImportacionTxt();
+      configurarImportacionExcel();
+    });
+  </script>
+</body>
+</html>
