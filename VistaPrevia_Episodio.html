@@ -251,6 +251,38 @@
         font-size: 14px;
         color: #666;
     }
+
+    /* Agrega estos estilos en la sección de CSS existente */
+
+#reproductor {
+  margin-top: 20px;
+  min-height: 200px;
+  background-color: #f8fbff;
+  border: 2px dashed #d3e3fd;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+
+#reproductor .jumpshare-container {
+  border: 2px solid #1a73e8;
+}
+
+/* Estilo para cuando hay un video cargado */
+#reproductor:has(iframe) {
+  background-color: white;
+  border: 2px solid #e0e9ff;
+}
+
+/* Estilo para mensajes de error/advertencia */
+#reproductor:has(div:not(.jumpshare-container)) {
+  background-color: #fff8e1;
+  border-color: #ffd54f;
+  color: #8a6d3b;
+  font-weight: 500;
+  text-align: center;
+  padding: 40px 20px;
+}
   </style>
 </head>
 <body>
@@ -371,20 +403,25 @@
     }
 
     async function mostrarVideoFirebase(serie, temporada, idioma, servidor, episodio) {
-      const docRef = doc(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios', episodio);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        console.log("Datos del episodio:", data);
-        if (data.iframe) {
-          reproductor.innerHTML = data.iframe;
-        } else {
-          reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
-        }
+  const docRef = doc(db, 'animes-series', serie, 'Temporadas', temporada, 'Idiomas', idioma, 'Servidores', servidor, 'Episodios', episodio);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    console.log("Datos del episodio:", data);
+    if (data.iframe) {
+      // Verificar si es Jumpshare
+      if (servidor.toLowerCase().includes('jumpshare')) {
+        mostrarVideoJumpshare(data.iframe);
       } else {
-        reproductor.innerHTML = '⚠️ Episodio no encontrado en Firebase.';
+        reproductor.innerHTML = data.iframe;
       }
+    } else {
+      reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
     }
+  } else {
+    reproductor.innerHTML = '⚠️ Episodio no encontrado en Firebase.';
+  }
+}
 
     // Funciones para Cloudflare
     async function cargarSeriesCloudflare() {
@@ -467,24 +504,65 @@
       }
     }
 
-    async function mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio) {
-      try {
-        const response = await fetch(`${CLOUDFLARE_BASE_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
-        if (!response.ok) throw new Error('Error al cargar datos del episodio');
-        
-        const episodios = await response.json();
-        const episodioData = episodios.find(e => e.episodio === episodio);
-        
-        if (episodioData && episodioData.iframe) {
-          reproductor.innerHTML = episodioData.iframe;
-        } else {
-          reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
-        }
-      } catch (error) {
-        console.error('Error cargando video desde Cloudflare:', error);
-        reproductor.innerHTML = '⚠️ Error al cargar el episodio desde Cloudflare.';
+async function mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio) {
+  try {
+    const response = await fetch(`${CLOUDFLARE_BASE_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+    if (!response.ok) throw new Error('Error al cargar datos del episodio');
+    
+    const episodios = await response.json();
+    const episodioData = episodios.find(e => e.episodio === episodio);
+    
+    if (episodioData && episodioData.iframe) {
+      // Verificar si es Jumpshare
+      if (servidor.toLowerCase().includes('jumpshare')) {
+        mostrarVideoJumpshare(episodioData.iframe);
+      } else {
+        reproductor.innerHTML = episodioData.iframe;
       }
+    } else {
+      reproductor.innerHTML = '⚠️ El campo "iframe" no está definido en este episodio.';
     }
+  } catch (error) {
+    console.error('Error cargando video desde Cloudflare:', error);
+    reproductor.innerHTML = '⚠️ Error al cargar el episodio desde Cloudflare.';
+  }
+}
+
+// Nueva función para manejar Jumpshare específicamente
+function mostrarVideoJumpshare(iframeCode) {
+  // Crear un contenedor con relación de aspecto fija
+  const container = document.createElement('div');
+  container.style.position = 'relative';
+  container.style.width = '100%';
+  container.style.paddingBottom = '56.25%'; // Relación 16:9
+  container.style.height = '0';
+  container.style.overflow = 'hidden';
+  container.style.borderRadius = '10px';
+  container.style.backgroundColor = '#000';
+  container.style.marginTop = '10px';
+  
+  // Modificar el iframe de Jumpshare
+  let modifiedIframe = iframeCode;
+  
+  // Verificar y modificar los estilos del iframe
+  if (modifiedIframe.includes('style="')) {
+    // Reemplazar el estilo existente
+    modifiedIframe = modifiedIframe.replace(
+      /style="[^"]*"/,
+      'style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"'
+    );
+  } else {
+    // Agregar estilo si no existe
+    modifiedIframe = modifiedIframe.replace(
+      '<iframe',
+      '<iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"'
+    );
+  }
+  
+  container.innerHTML = modifiedIframe;
+  reproductor.innerHTML = '';
+  reproductor.appendChild(container);
+}
 
     // Funciones de servicio unificadas
     function cargarSeries() {
@@ -528,12 +606,12 @@
     }
 
     function mostrarVideo(serie, temporada, idioma, servidor, episodio) {
-      if (servicioActual === 'firebase') {
-        return mostrarVideoFirebase(serie, temporada, idioma, servidor, episodio);
-      } else {
-        return mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio);
-      }
-    }
+  if (servicioActual === 'firebase') {
+    return mostrarVideoFirebase(serie, temporada, idioma, servidor, episodio);
+  } else {
+    return mostrarVideoCloudflare(serie, temporada, idioma, servidor, episodio);
+  }
+}
 
     // Cambiar servicio
     function cambiarServicio(nuevoServicio) {
