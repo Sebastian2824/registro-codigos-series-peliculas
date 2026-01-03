@@ -46,7 +46,8 @@
       display: flex;
       justify-content: center;
       margin-bottom: 15px;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .servicio-btn {
@@ -54,18 +55,40 @@
       color: #0077b6;
       border: 2px solid #0096c7;
       border-radius: 8px;
-      padding: 8px 15px;
+      padding: 8px 12px;
       font-size: 14px;
       cursor: pointer;
       transition: all 0.3s;
+      min-width: 100px;
     }
 
     .servicio-btn.active {
-      background-color: #0096c7;
       color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     .servicio-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Colores específicos para cada servicio */
+    #firebase-btn.active {
+      background-color: #4285f4;
+      border-color: #4285f4;
+    }
+
+    #cloudflare-btn.active {
+      background-color: #f6821f;
+      border-color: #f6821f;
+    }
+
+    #sheets-btn.active {
+      background-color: #0f9d58;
+      border-color: #0f9d58;
+    }
+
+    .servicio-btn:hover:not(.active) {
       background-color: #e0f7ff;
     }
 
@@ -131,6 +154,21 @@
       color: #d32f2f;
       font-size: 14px;
       margin-top: 10px;
+      padding: 10px;
+      background-color: #ffebee;
+      border-radius: 8px;
+      border: 1px solid #ffcdd2;
+    }
+
+    .mensaje-servicio {
+      text-align: center;
+      color: #0077b6;
+      font-size: 14px;
+      padding: 10px;
+      background-color: #e3f2fd;
+      border-radius: 8px;
+      border: 1px solid #bbdefb;
+      margin-bottom: 10px;
     }
 
     .resultados::-webkit-scrollbar {
@@ -173,7 +211,7 @@
       border-radius: 8px;
       color: #333;
       text-decoration: none;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .resultado-item:hover {
@@ -191,14 +229,21 @@
       background-color: #29cc00;
       color: white;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 15px;
       margin-bottom: 15px;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .back-btn:hover {
       background-color: #20a000;
+      transform: translateY(-2px);
     }
 
     /* Botón para volver a resultados */
@@ -206,14 +251,21 @@
       background-color: #29cc00;
       color: white;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 15px;
       margin-top: 20px;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .back-btn-resultados:hover {
       background-color: #20a000;
+      transform: translateY(-2px);
     }
 
     /* Botones de temporadas normales */
@@ -241,7 +293,7 @@
       border-radius: 8px;
       color: #333;
       text-decoration: none;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .temporada-link:hover {
@@ -282,6 +334,24 @@
       font-size: 14px;
       color: #0077b6;
     }
+
+    /* Indicador de carga */
+    .cargando {
+      text-align: center;
+      padding: 15px;
+      color: #0077b6;
+    }
+
+    .cargando ion-icon {
+      font-size: 24px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -295,6 +365,7 @@
     <div class="servicio-selector">
       <button class="servicio-btn active" id="firebase-btn">Firebase</button>
       <button class="servicio-btn" id="cloudflare-btn">Cloudflare</button>
+      <button class="servicio-btn" id="sheets-btn">Google Sheets</button>
     </div>
 
     <div class="buscador">
@@ -330,26 +401,35 @@
       measurementId: "G-DN632G7XJT"
     };
 
+    // Configuración de Cloudflare
+    const CLOUDFLARE_BASE_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    // Configuración de Google Sheets
+    const GOOGLE_SHEETS_CONFIG = {
+      SPREADSHEET_ID: '1V4LTYiuTDZ_Y_k6GRyVmFm5-G3rVhE6x1KfIcxJfLqM',
+      SHEET_NAME: 'Portadas',
+      RANGE: 'A:D' // Ajusta según las columnas que necesites
+    };
+
     // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     // Estado de la aplicación
-    let servicioActual = 'firebase'; // 'firebase' o 'cloudflare'
+    let servicioActual = 'firebase'; // 'firebase', 'cloudflare' o 'sheets'
     let ultimaSerieBuscada = null;
-
-    // URL base para Cloudflare (debes reemplazar con tu URL real)
-    const CLOUDFLARE_BASE_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
 
     // Elementos DOM
     const firebaseBtn = document.getElementById('firebase-btn');
     const cloudflareBtn = document.getElementById('cloudflare-btn');
+    const sheetsBtn = document.getElementById('sheets-btn');
     const searchInput = document.getElementById('search-input');
     const resultadoDiv = document.getElementById('resultado');
 
     // Configurar eventos para los botones de servicio
     firebaseBtn.addEventListener('click', () => cambiarServicio('firebase'));
     cloudflareBtn.addEventListener('click', () => cambiarServicio('cloudflare'));
+    sheetsBtn.addEventListener('click', () => cambiarServicio('sheets'));
 
     // Configurar evento de búsqueda
     searchInput.addEventListener('keyup', realizarBusqueda);
@@ -361,15 +441,36 @@
       // Actualizar botones
       firebaseBtn.classList.toggle('active', servicio === 'firebase');
       cloudflareBtn.classList.toggle('active', servicio === 'cloudflare');
+      sheetsBtn.classList.toggle('active', servicio === 'sheets');
       
-      // Limpiar resultados
+      // Limpiar resultados y mostrar mensaje
       resultadoDiv.innerHTML = '';
+      mostrarMensajeServicio();
+    }
+
+    // Mostrar mensaje del servicio activo
+    function mostrarMensajeServicio() {
+      let servicioTexto = '';
+      if (servicioActual === 'firebase') servicioTexto = 'Firebase';
+      else if (servicioActual === 'cloudflare') servicioTexto = 'Cloudflare';
+      else servicioTexto = 'Google Sheets';
       
-      // Mostrar mensaje de servicio activo
       const mensaje = document.createElement('div');
-      mensaje.className = 'no-resultados';
-      mensaje.textContent = `Servicio activo: ${servicio.toUpperCase()}. Escribe para buscar.`;
+      mensaje.className = 'mensaje-servicio';
+      mensaje.innerHTML = `<ion-icon name="server-outline"></ion-icon> Servicio activo: <strong>${servicioTexto}</strong>`;
       resultadoDiv.appendChild(mensaje);
+    }
+
+    // Mostrar indicador de carga
+    function mostrarCarga(mensaje = 'Buscando...') {
+      resultadoDiv.innerHTML = '';
+      const cargaDiv = document.createElement('div');
+      cargaDiv.className = 'cargando';
+      cargaDiv.innerHTML = `
+        <ion-icon name="refresh-outline"></ion-icon>
+        <div>${mensaje}</div>
+      `;
+      resultadoDiv.appendChild(cargaDiv);
     }
 
     // Función principal de búsqueda
@@ -378,14 +479,23 @@
       resultadoDiv.innerHTML = "";
 
       if (!input) {
+        mostrarMensajeServicio();
         return;
       }
 
-      if (servicioActual === 'firebase') {
-        buscarConFirebase(input);
-      } else {
-        buscarConCloudflare(input);
-      }
+      // Mostrar indicador de carga
+      mostrarCarga(`Buscando en ${servicioActual}...`);
+
+      // Pequeño delay para evitar búsquedas muy rápidas
+      setTimeout(() => {
+        if (servicioActual === 'firebase') {
+          buscarConFirebase(input);
+        } else if (servicioActual === 'cloudflare') {
+          buscarConCloudflare(input);
+        } else {
+          buscarConGoogleSheets(input);
+        }
+      }, 300);
     }
 
     // Búsqueda con Firebase
@@ -406,7 +516,7 @@
         })
         .catch(error => {
           console.error("Error en la búsqueda Firebase:", error);
-          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al buscar con Firebase. Intenta nuevamente.</div>";
+          mostrarError(`Error al buscar con Firebase. ${error.message}`);
         });
     }
 
@@ -432,17 +542,125 @@
         mostrarResultados(coincidenciasUnicas);
       } catch (error) {
         console.error("Error en la búsqueda Cloudflare:", error);
-        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al buscar con Cloudflare. Intenta nuevamente.</div>";
+        mostrarError(`Error al buscar con Cloudflare. ${error.message}`);
       }
+    }
+
+    // Búsqueda con Google Sheets
+    async function buscarConGoogleSheets(input) {
+      try {
+        // URL para obtener datos en formato CSV
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${GOOGLE_SHEETS_CONFIG.SHEET_NAME}`;
+        
+        const response = await fetch(csvUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        const rows = parseGoogleSheetsCSV(csvText);
+        
+        const coincidenciasUnicas = new Set();
+        
+        // Identificar índices de columnas (basado en primera fila - encabezados)
+        if (rows.length > 0) {
+          const headers = rows[0].map(h => h.trim().toLowerCase());
+          const indexNombre = headers.findIndex(h => h.includes('nombre') || h.includes('serie'));
+          
+          if (indexNombre === -1) {
+            throw new Error('No se encontró la columna de nombre de serie en Google Sheets');
+          }
+          
+          // Procesar filas de datos
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.length > indexNombre) {
+              const nombreSerie = (row[indexNombre] || '').trim();
+              if (nombreSerie.toLowerCase().includes(input)) {
+                coincidenciasUnicas.add(nombreSerie);
+              }
+            }
+          }
+        }
+        
+        mostrarResultados(coincidenciasUnicas);
+      } catch (error) {
+        console.error("Error en la búsqueda Google Sheets:", error);
+        mostrarError(`Error al buscar con Google Sheets. ${error.message}`);
+      }
+    }
+
+    // Función auxiliar para parsear CSV de Google Sheets
+    function parseGoogleSheetsCSV(text) {
+      const rows = [];
+      const lines = text.split('\n');
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        
+        const row = [];
+        let currentCell = '';
+        let insideQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          
+          if (char === '"') {
+            insideQuotes = !insideQuotes;
+          } else if (char === ',' && !insideQuotes) {
+            row.push(currentCell.trim());
+            currentCell = '';
+          } else {
+            currentCell += char;
+          }
+        }
+        
+        row.push(currentCell.trim());
+        
+        const cleanedRow = row.map(cell => {
+          return cell.replace(/^"|"$/g, '');
+        });
+        
+        rows.push(cleanedRow);
+      }
+      
+      return rows;
+    }
+
+    // Mostrar error
+    function mostrarError(mensaje) {
+      resultadoDiv.innerHTML = '';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'no-resultados';
+      errorDiv.innerHTML = `
+        <ion-icon name="alert-circle-outline"></ion-icon><br>
+        ${mensaje}<br><br>
+        <button onclick="cambiarServicio('${servicioActual === 'firebase' ? 'cloudflare' : servicioActual === 'cloudflare' ? 'sheets' : 'firebase'}')" 
+                style="padding: 8px 16px; background: #0077b6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+          Intentar con otro servicio
+        </button>
+      `;
+      resultadoDiv.appendChild(errorDiv);
     }
 
     // Mostrar resultados de búsqueda
     function mostrarResultados(coincidenciasUnicas) {
+      resultadoDiv.innerHTML = '';
+      
       if (coincidenciasUnicas.size === 0) {
-        resultadoDiv.innerHTML = "<div class='no-resultados'>No se encontró ninguna serie con ese nombre.</div>";
+        const noResultados = document.createElement('div');
+        noResultados.className = 'no-resultados';
+        noResultados.innerHTML = `
+          <ion-icon name="search-outline"></ion-icon><br>
+          No se encontró ninguna serie con ese nombre.<br>
+          <small>Intenta con otro término de búsqueda.</small>
+        `;
+        resultadoDiv.appendChild(noResultados);
       } else {
         const title = document.createElement("h3");
-        title.textContent = "Selecciona la serie:";
+        title.textContent = `Selecciona la serie (${coincidenciasUnicas.size} encontradas):`;
+        title.style.padding = "10px 0";
         resultadoDiv.appendChild(title);
 
         coincidenciasUnicas.forEach(serieId => {
@@ -463,17 +681,32 @@
 
           resultadoDiv.appendChild(enlace);
         });
+
+        // Botón para limpiar búsqueda
+        const limpiarBtn = document.createElement('button');
+        limpiarBtn.textContent = "Limpiar búsqueda";
+        limpiarBtn.className = "back-btn-resultados";
+        limpiarBtn.innerHTML = `<ion-icon name="close-outline"></ion-icon> Limpiar búsqueda`;
+        limpiarBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          resultadoDiv.innerHTML = '';
+          mostrarMensajeServicio();
+        });
+        resultadoDiv.appendChild(limpiarBtn);
       }
     }
 
     // Mostrar temporadas de una serie
     function mostrarTemporadas(serieId) {
-      resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
+      resultadoDiv.innerHTML = '';
+      mostrarCarga(`Cargando temporadas de "${serieId}"...`);
 
       if (servicioActual === 'firebase') {
         mostrarTemporadasFirebase(serieId);
-      } else {
+      } else if (servicioActual === 'cloudflare') {
         mostrarTemporadasCloudflare(serieId);
+      } else {
+        mostrarTemporadasGoogleSheets(serieId);
       }
     }
 
@@ -484,30 +717,42 @@
         .collection("Temporadas")
         .get()
         .then(snapshot => {
+          resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
+          
           const container = document.createElement("div");
           container.className = "resultado";
 
-          snapshot.forEach(doc => {
-            const link = document.createElement("a");
-            link.href = "#";
-            link.className = "temporada-link";
-            link.innerHTML = `
-              <ion-icon name="videocam-outline"></ion-icon>
-              <span>${doc.id}</span>
-            `;
-            link.addEventListener("click", (e) => {
-              e.preventDefault();
-              mostrarDetallesTemporada(serieId, doc.id);
+          if (snapshot.empty) {
+            container.innerHTML = `<div class="no-resultados">No se encontraron temporadas para esta serie.</div>`;
+          } else {
+            snapshot.forEach(doc => {
+              const link = document.createElement("a");
+              link.href = "#";
+              link.className = "temporada-link";
+              link.innerHTML = `
+                <ion-icon name="videocam-outline"></ion-icon>
+                <span>${doc.id}</span>
+              `;
+              link.addEventListener("click", (e) => {
+                e.preventDefault();
+                mostrarDetallesTemporada(serieId, doc.id);
+              });
+              container.appendChild(link);
             });
-            container.appendChild(link);
-          });
+          }
 
           // Botón para regresar a resultados
           const backBtn = document.createElement("button");
-          backBtn.textContent = "← Volver a resultados";
+          backBtn.textContent = "Volver a resultados";
           backBtn.className = "back-btn-resultados";
+          backBtn.innerHTML = `<ion-icon name="arrow-back-outline"></ion-icon> Volver a resultados`;
           backBtn.onclick = () => {
-            realizarBusqueda();
+            if (searchInput.value.trim()) {
+              realizarBusqueda();
+            } else {
+              resultadoDiv.innerHTML = '';
+              mostrarMensajeServicio();
+            }
           };
           container.appendChild(backBtn);
 
@@ -515,7 +760,7 @@
         })
         .catch(error => {
           console.error("Error al obtener temporadas Firebase:", error);
-          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar temporadas.</div>";
+          mostrarError(`Error al cargar temporadas. ${error.message}`);
         });
     }
 
@@ -529,48 +774,145 @@
         }
         
         const temporadas = await response.json();
+        resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
+        
         const container = document.createElement("div");
         container.className = "resultado";
 
-        temporadas.forEach(temporada => {
-          const link = document.createElement("a");
-          link.href = "#";
-          link.className = "temporada-link";
-          link.innerHTML = `
-            <ion-icon name="videocam-outline"></ion-icon>
-            <span>${temporada}</span>
-          `;
-          link.addEventListener("click", (e) => {
-            e.preventDefault();
-            mostrarDetallesTemporada(serieId, temporada);
+        if (!temporadas || temporadas.length === 0) {
+          container.innerHTML = `<div class="no-resultados">No se encontraron temporadas para esta serie.</div>`;
+        } else {
+          temporadas.forEach(temporada => {
+            const link = document.createElement("a");
+            link.href = "#";
+            link.className = "temporada-link";
+            link.innerHTML = `
+              <ion-icon name="videocam-outline"></ion-icon>
+              <span>${temporada}</span>
+            `;
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              mostrarDetallesTemporada(serieId, temporada);
+            });
+            container.appendChild(link);
           });
-          container.appendChild(link);
-        });
+        }
 
         // Botón para regresar a resultados
         const backBtn = document.createElement("button");
-        backBtn.textContent = "← Volver a resultados";
+        backBtn.textContent = "Volver a resultados";
         backBtn.className = "back-btn-resultados";
+        backBtn.innerHTML = `<ion-icon name="arrow-back-outline"></ion-icon> Volver a resultados`;
         backBtn.onclick = () => {
-          realizarBusqueda();
+          if (searchInput.value.trim()) {
+            realizarBusqueda();
+          } else {
+            resultadoDiv.innerHTML = '';
+            mostrarMensajeServicio();
+          }
         };
         container.appendChild(backBtn);
 
         resultadoDiv.appendChild(container);
       } catch (error) {
         console.error("Error al obtener temporadas Cloudflare:", error);
-        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar temporadas.</div>";
+        mostrarError(`Error al cargar temporadas. ${error.message}`);
+      }
+    }
+
+    // Mostrar temporadas con Google Sheets
+    async function mostrarTemporadasGoogleSheets(serieId) {
+      try {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${GOOGLE_SHEETS_CONFIG.SHEET_NAME}`;
+        
+        const response = await fetch(csvUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        const rows = parseGoogleSheetsCSV(csvText);
+        
+        resultadoDiv.innerHTML = `<div class="resultado"><h3>${serieId}</h3><p>Selecciona una temporada:</p></div>`;
+        
+        const container = document.createElement("div");
+        container.className = "resultado";
+
+        if (rows.length > 0) {
+          const headers = rows[0].map(h => h.trim().toLowerCase());
+          const indexNombre = headers.findIndex(h => h.includes('nombre') || h.includes('serie'));
+          const indexTemporada = headers.findIndex(h => h.includes('temporada'));
+          
+          const temporadasUnicas = new Set();
+          
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.length > Math.max(indexNombre, indexTemporada)) {
+              const nombre = (row[indexNombre] || '').trim();
+              const temporada = (row[indexTemporada] || '').trim();
+              
+              if (nombre === serieId && temporada) {
+                temporadasUnicas.add(temporada);
+              }
+            }
+          }
+          
+          if (temporadasUnicas.size === 0) {
+            container.innerHTML = `<div class="no-resultados">No se encontraron temporadas para esta serie en Google Sheets.</div>`;
+          } else {
+            temporadasUnicas.forEach(temporada => {
+              const link = document.createElement("a");
+              link.href = "#";
+              link.className = "temporada-link";
+              link.innerHTML = `
+                <ion-icon name="videocam-outline"></ion-icon>
+                <span>${temporada}</span>
+              `;
+              link.addEventListener("click", (e) => {
+                e.preventDefault();
+                mostrarDetallesTemporada(serieId, temporada);
+              });
+              container.appendChild(link);
+            });
+          }
+        } else {
+          container.innerHTML = `<div class="no-resultados">No se encontraron datos en Google Sheets.</div>`;
+        }
+
+        // Botón para regresar a resultados
+        const backBtn = document.createElement("button");
+        backBtn.textContent = "Volver a resultados";
+        backBtn.className = "back-btn-resultados";
+        backBtn.innerHTML = `<ion-icon name="arrow-back-outline"></ion-icon> Volver a resultados`;
+        backBtn.onclick = () => {
+          if (searchInput.value.trim()) {
+            realizarBusqueda();
+          } else {
+            resultadoDiv.innerHTML = '';
+            mostrarMensajeServicio();
+          }
+        };
+        container.appendChild(backBtn);
+
+        resultadoDiv.appendChild(container);
+      } catch (error) {
+        console.error("Error al obtener temporadas Google Sheets:", error);
+        mostrarError(`Error al cargar temporadas. ${error.message}`);
       }
     }
 
     // Mostrar detalles de una temporada específica
     function mostrarDetallesTemporada(serieId, temporadaId) {
-      resultadoDiv.innerHTML = "";
+      resultadoDiv.innerHTML = '';
+      mostrarCarga(`Cargando detalles de "${temporadaId}"...`);
 
       if (servicioActual === 'firebase') {
         mostrarDetallesTemporadaFirebase(serieId, temporadaId);
-      } else {
+      } else if (servicioActual === 'cloudflare') {
         mostrarDetallesTemporadaCloudflare(serieId, temporadaId);
+      } else {
+        mostrarDetallesTemporadaGoogleSheets(serieId, temporadaId);
       }
     }
 
@@ -586,12 +928,12 @@
             const data = doc.data();
             mostrarDetallesTemporadaUI(serieId, temporadaId, data);
           } else {
-            resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
+            mostrarError("Temporada no encontrada en Firebase.");
           }
         })
         .catch(error => {
           console.error("Error al obtener detalles Firebase:", error);
-          resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar detalles.</div>";
+          mostrarError(`Error al cargar detalles. ${error.message}`);
         });
     }
 
@@ -607,35 +949,98 @@
         const data = await response.json();
         
         if (data.error) {
-          resultadoDiv.innerHTML = "<div class='no-resultados'>Temporada no encontrada.</div>";
+          mostrarError("Temporada no encontrada en Cloudflare.");
         } else {
           mostrarDetallesTemporadaUI(serieId, temporadaId, data);
         }
       } catch (error) {
         console.error("Error al obtener detalles Cloudflare:", error);
-        resultadoDiv.innerHTML = "<div class='no-resultados'>Error al cargar detalles.</div>";
+        mostrarError(`Error al cargar detalles. ${error.message}`);
+      }
+    }
+
+    // Mostrar detalles de temporada con Google Sheets
+    async function mostrarDetallesTemporadaGoogleSheets(serieId, temporadaId) {
+      try {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${GOOGLE_SHEETS_CONFIG.SHEET_NAME}`;
+        
+        const response = await fetch(csvUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        const rows = parseGoogleSheetsCSV(csvText);
+        
+        let datosTemporada = null;
+        
+        if (rows.length > 0) {
+          const headers = rows[0].map(h => h.trim().toLowerCase());
+          const indexNombre = headers.findIndex(h => h.includes('nombre') || h.includes('serie'));
+          const indexTemporada = headers.findIndex(h => h.includes('temporada'));
+          const indexImagen = headers.findIndex(h => h.includes('imagen') || h.includes('image'));
+          const indexSitio = headers.findIndex(h => h.includes('sitio') || h.includes('link') || h.includes('url'));
+          
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.length > Math.max(indexNombre, indexTemporada, indexImagen, indexSitio)) {
+              const nombre = (row[indexNombre] || '').trim();
+              const temporada = (row[indexTemporada] || '').trim();
+              
+              if (nombre === serieId && temporada === temporadaId) {
+                datosTemporada = {
+                  imagen: indexImagen !== -1 ? (row[indexImagen] || '').trim() : '',
+                  sitio: indexSitio !== -1 ? (row[indexSitio] || '').trim() : ''
+                };
+                break;
+              }
+            }
+          }
+        }
+        
+        if (datosTemporada) {
+          mostrarDetallesTemporadaUI(serieId, temporadaId, datosTemporada);
+        } else {
+          mostrarError("Temporada no encontrada en Google Sheets.");
+        }
+      } catch (error) {
+        console.error("Error al obtener detalles Google Sheets:", error);
+        mostrarError(`Error al cargar detalles. ${error.message}`);
       }
     }
 
     // Mostrar UI de detalles de temporada
     function mostrarDetallesTemporadaUI(serieId, temporadaId, data) {
+      resultadoDiv.innerHTML = '';
+      
       const resultadoHTML = document.createElement("div");
       resultadoHTML.className = "resultado";
 
       // Título con serie y temporada
       const titulo = document.createElement("h3");
       titulo.textContent = `Excelente que lo Disfrutes`;
+      titulo.style.color = "#06d6a0";
       resultadoHTML.appendChild(titulo);
+
+      const subtitulo = document.createElement("p");
+      subtitulo.textContent = `${serieId} - ${temporadaId}`;
+      subtitulo.style.color = "#0077b6";
+      subtitulo.style.marginBottom = "20px";
+      resultadoHTML.appendChild(subtitulo);
 
       // Imagen si existe
       if (data.imagen) {
         const img = document.createElement("img");
         img.src = data.imagen;
-        img.alt = `${serieId} Temporada ${temporadaId}`;
+        img.alt = `${serieId} ${temporadaId}`;
+        img.onerror = function() {
+          this.src = 'https://via.placeholder.com/250x350?text=Imagen+No+Disponible';
+        };
         resultadoHTML.appendChild(img);
       }
 
-      // Botón "Ver ahora"
+      // Botón "Ver ahora" si hay sitio
       if (data.sitio) {
         const link = document.createElement("a");
         link.href = data.sitio;
@@ -644,18 +1049,26 @@
         link.className = "ver-ahora-link";
         link.innerHTML = `<ion-icon name="play-outline"></ion-icon> Ver Ahora`;
         link.addEventListener("click", () => {
+          // Limpiar búsqueda después de hacer clic
           searchInput.value = "";
           setTimeout(() => {
-            resultadoDiv.innerHTML = "";
+            resultadoDiv.innerHTML = '';
+            mostrarMensajeServicio();
           }, 500);
         });
         resultadoHTML.appendChild(link);
+      } else {
+        const sinSitio = document.createElement("div");
+        sinSitio.className = "no-resultados";
+        sinSitio.innerHTML = `<ion-icon name="link-outline"></ion-icon><br>No hay enlace disponible para esta temporada.`;
+        resultadoHTML.appendChild(sinSitio);
       }
 
       // Botón para regresar a las temporadas
       const backBtn = document.createElement("button");
-      backBtn.textContent = "← Volver a temporadas";
+      backBtn.textContent = "Volver a temporadas";
       backBtn.className = "back-btn";
+      backBtn.innerHTML = `<ion-icon name="arrow-back-outline"></ion-icon> Volver a temporadas`;
       backBtn.addEventListener("click", () => mostrarTemporadas(serieId));
       resultadoHTML.appendChild(backBtn);
       
