@@ -227,6 +227,51 @@ export default {
       }
     }
 
+    // ELIMINAR POR SERVIDOR - animes_series
+if (request.method === 'DELETE' && pathname === '/eliminar-servidor') {
+  try {
+    const { serie, temporada, idioma, servidor } = await request.json();
+
+    if (!serie || !temporada || !idioma || !servidor) {
+      return new Response(JSON.stringify({ 
+        error: "Faltan parámetros requeridos: serie, temporada, idioma, servidor" 
+      }), { 
+        status: 400, 
+        headers: corsHeaders 
+      });
+    }
+
+    const result = await env.animes_plus
+      .prepare(`
+        DELETE FROM animes_series
+        WHERE nombreSerie = ? AND temporada = ? AND idioma = ? AND servidor = ?
+      `)
+      .bind(serie, temporada, idioma, servidor)
+      .run();
+
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({ 
+        error: "No se encontraron episodios para eliminar" 
+      }), { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    return new Response(JSON.stringify({ 
+      message: `✅ Eliminados ${result.changes} episodios del servidor correctamente`,
+      changes: result.changes 
+    }), { 
+      headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
+
     // Registrar nuevos episodios
     if (request.method === 'POST' && pathname === '/registrar') {
       try {
@@ -475,6 +520,51 @@ if (request.method === 'PUT' && pathname === '/actualizar-episodio-url') {
       }
     }
 
+    // ELIMINAR POR SERVIDOR - animes_series_enlaces
+if (request.method === 'DELETE' && pathname === '/eliminar-servidor-url') {
+  try {
+    const { serie, temporada, idioma, servidor } = await request.json();
+
+    if (!serie || !temporada || !idioma || !servidor) {
+      return new Response(JSON.stringify({ 
+        error: "Faltan parámetros requeridos: serie, temporada, idioma, servidor" 
+      }), { 
+        status: 400, 
+        headers: corsHeaders 
+      });
+    }
+
+    const result = await env.animes_plus
+      .prepare(`
+        DELETE FROM animes_series_enlaces
+        WHERE nombreSerie = ? AND temporada = ? AND idioma = ? AND servidor = ?
+      `)
+      .bind(serie, temporada, idioma, servidor)
+      .run();
+
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({ 
+        error: "No se encontraron episodios para eliminar" 
+      }), { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    return new Response(JSON.stringify({ 
+      message: `✅ Eliminados ${result.changes} episodios del servidor correctamente`,
+      changes: result.changes 
+    }), { 
+      headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
+
     // Registrar nuevos episodios
 if (request.method === 'POST' && pathname === '/registrar-url') {
   try {
@@ -722,6 +812,52 @@ if (request.method === 'PUT' && pathname === '/actualizar-episodio-descargas') {
       }
     }
 
+    // ELIMINAR POR SERVIDOR - animes_series_descargas
+if (request.method === 'DELETE' && pathname === '/eliminar-servidor-descargas') {
+  try {
+    const { serie, temporada, idioma, servidor } = await request.json();
+
+    if (!serie || !temporada || !idioma || !servidor) {
+      return new Response(JSON.stringify({ 
+        error: "Faltan parámetros requeridos: serie, temporada, idioma, servidor" 
+      }), { 
+        status: 400, 
+        headers: corsHeaders 
+      });
+    }
+
+    const result = await env.animes_plus
+      .prepare(`
+        DELETE FROM animes_series_descargas
+        WHERE nombreSerie = ? AND temporada = ? AND idioma = ? AND servidor = ?
+      `)
+      .bind(serie, temporada, idioma, servidor)
+      .run();
+
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({ 
+        error: "No se encontraron episodios para eliminar" 
+      }), { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    return new Response(JSON.stringify({ 
+      message: `✅ Eliminados ${result.changes} episodios del servidor correctamente`,
+      changes: result.changes 
+    }), { 
+      headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
+
+
     // Registrar nuevos episodios
 if (request.method === 'POST' && pathname === '/registrar-descargas') {
   try {
@@ -968,6 +1104,51 @@ if (request.method === 'PUT' && pathname === '/actualizar-episodio-original') {
         });
       }
     }
+
+    // ELIMINAR POR SERVIDOR - animes_series_original
+if (request.method === 'DELETE' && pathname === '/eliminar-servidor-original') {
+  try {
+    const { serie, temporada, idioma, servidor } = await request.json();
+
+    if (!serie || !temporada || !idioma || !servidor) {
+      return new Response(JSON.stringify({ 
+        error: "Faltan parámetros requeridos: serie, temporada, idioma, servidor" 
+      }), { 
+        status: 400, 
+        headers: corsHeaders 
+      });
+    }
+
+    const result = await env.animes_plus
+      .prepare(`
+        DELETE FROM animes_series_original
+        WHERE nombreSerie = ? AND temporada = ? AND idioma = ? AND servidor = ?
+      `)
+      .bind(serie, temporada, idioma, servidor)
+      .run();
+
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({ 
+        error: "No se encontraron episodios para eliminar" 
+      }), { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    return new Response(JSON.stringify({ 
+      message: `✅ Eliminados ${result.changes} episodios del servidor correctamente`,
+      changes: result.changes 
+    }), { 
+      headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
 
     // Registrar nuevos episodios
 if (request.method === 'POST' && pathname === '/registrar-original') {

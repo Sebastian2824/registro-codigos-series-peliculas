@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Eliminación - Animes Plus</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .tab-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Paneles */
+    .tab-panel {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Formularios */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    select:focus, input:focus {
+      border-color: #667eea;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    /* Tablas */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #667eea;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    /* Checkboxes */
+    .checkbox-cell {
+      text-align: center;
+      width: 40px;
+    }
+
+    .checkbox-cell input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* Botones */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-right: 10px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
+
+    .btn-danger {
+      background: #e53e3e;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(229,62,62,0.3);
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #dd6b20;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Mensajes */
+    .message {
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #c6f6d5;
+      color: #22543d;
+      border-left: 4px solid #48bb78;
+      display: block;
+    }
+
+    .message.error {
+      background: #fed7d7;
+      color: #742a2a;
+      border-left: 4px solid #e53e3e;
+      display: block;
+    }
+
+    .message.info {
+      background: #bee3f8;
+      color: #2c5282;
+      border-left: 4px solid #4299e1;
+      display: block;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #667eea;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-servidor {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tab-panel {
+        padding: 20px;
+      }
+      
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🗑️ Sistema de Eliminación - Cloudflare</h1>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="iframe">📺 Iframe (animes_series)</button>
+      <button class="tab-btn" data-tab="enlaces">🔗 Enlaces (animes_series_enlaces)</button>
+      <button class="tab-btn" data-tab="descargas">⬇️ Descargas (animes_series_descargas)</button>
+      <button class="tab-btn" data-tab="original">🎬 Original (animes_series_original)</button>
+      <button class="tab-btn" onclick="location.href='../Eliminación de Series General.html'" 
+  style="background-color: #10b981; color: white;">
+  Eliminar en Firebase
+</button>
+    </div>
+
+    <!-- Panel Iframe -->
+    <div class="tab-panel active" id="panel-iframe">
+      <div class="filters">
+        <div class="form-group">
+          <label>📺 Serie:</label>
+          <select id="iframe-serie" onchange="cargarTemporadas('iframe')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>📅 Temporada:</label>
+          <select id="iframe-temporada" onchange="cargarIdiomas('iframe')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🌍 Idioma:</label>
+          <select id="iframe-idioma" onchange="cargarServidores('iframe')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🖥️ Servidor:</label>
+          <select id="iframe-servidor" onchange="cargarEpisodios('iframe')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="iframe-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="iframe-select-all" onchange="seleccionarTodos('iframe')"></th>
+              <th>Episodio</th>
+              <th>Código Iframe</th>
+            </tr>
+          </thead>
+          <tbody id="iframe-tbody">
+            <tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('iframe')">🗑️ Eliminar Episodios Seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('iframe')">⚠️ Eliminar TODOS los episodios de este servidor</button>
+      </div>
+    </div>
+
+    <!-- Panel Enlaces -->
+    <div class="tab-panel" id="panel-enlaces">
+      <div class="filters">
+        <div class="form-group">
+          <label>🔗 Serie:</label>
+          <select id="enlaces-serie" onchange="cargarTemporadas('enlaces')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>📅 Temporada:</label>
+          <select id="enlaces-temporada" onchange="cargarIdiomas('enlaces')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🌍 Idioma:</label>
+          <select id="enlaces-idioma" onchange="cargarServidores('enlaces')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🖥️ Servidor:</label>
+          <select id="enlaces-servidor" onchange="cargarEpisodios('enlaces')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="enlaces-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="enlaces-select-all" onchange="seleccionarTodos('enlaces')"></th>
+              <th>Episodio</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody id="enlaces-tbody">
+            <tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('enlaces')">🗑️ Eliminar Episodios Seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('enlaces')">⚠️ Eliminar TODOS los episodios de este servidor</button>
+      </div>
+    </div>
+
+    <!-- Panel Descargas -->
+    <div class="tab-panel" id="panel-descargas">
+      <div class="filters">
+        <div class="form-group">
+          <label>⬇️ Serie:</label>
+          <select id="descargas-serie" onchange="cargarTemporadas('descargas')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>📅 Temporada:</label>
+          <select id="descargas-temporada" onchange="cargarIdiomas('descargas')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🌍 Idioma:</label>
+          <select id="descargas-idioma" onchange="cargarServidores('descargas')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🖥️ Servidor:</label>
+          <select id="descargas-servidor" onchange="cargarEpisodios('descargas')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="descargas-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="descargas-select-all" onchange="seleccionarTodos('descargas')"></th>
+              <th>Episodio</th>
+              <th>URL de Descarga</th>
+            </tr>
+          </thead>
+          <tbody id="descargas-tbody">
+            <tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('descargas')">🗑️ Eliminar Episodios Seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('descargas')">⚠️ Eliminar TODOS los episodios de este servidor</button>
+      </div>
+    </div>
+
+    <!-- Panel Original -->
+    <div class="tab-panel" id="panel-original">
+      <div class="filters">
+        <div class="form-group">
+          <label>🎬 Serie:</label>
+          <select id="original-serie" onchange="cargarTemporadas('original')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>📅 Temporada:</label>
+          <select id="original-temporada" onchange="cargarIdiomas('original')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🌍 Idioma:</label>
+          <select id="original-idioma" onchange="cargarServidores('original')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🖥️ Servidor:</label>
+          <select id="original-servidor" onchange="cargarEpisodios('original')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="original-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="original-select-all" onchange="seleccionarTodos('original')"></th>
+              <th>Episodio</th>
+              <th>URL Original</th>
+            </tr>
+          </thead>
+          <tbody id="original-tbody">
+            <tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('original')">🗑️ Eliminar Episodios Seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('original')">⚠️ Eliminar TODOS los episodios de este servidor</button>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    const API_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    let episodiosData = {
+      iframe: [],
+      enlaces: [],
+      descargas: [],
+      original: []
+    };
+
+    // Mapeo de tipos a endpoints
+    const endpoints = {
+      iframe: {
+        series: '/nombres-series',
+        temporadas: '/temporadas',
+        idiomas: '/idiomas',
+        servidores: '/servidores',
+        episodios: '/episodios',
+        deleteEpisodio: '/eliminar-episodio',
+        deleteServidor: '/eliminar-servidor'
+      },
+      enlaces: {
+        series: '/nombres-series-url',
+        temporadas: '/temporadas-url',
+        idiomas: '/idiomas-url',
+        servidores: '/servidores-url',
+        episodios: '/episodios-url',
+        deleteEpisodio: '/eliminar-episodio-url',
+        deleteServidor: '/eliminar-servidor-url'
+      },
+      descargas: {
+        series: '/nombres-series-descargas',
+        temporadas: '/temporadas-descargas',
+        idiomas: '/idiomas-descargas',
+        servidores: '/servidores-descargas',
+        episodios: '/episodios-descargas',
+        deleteEpisodio: '/eliminar-episodio-descargas',
+        deleteServidor: '/eliminar-servidor-descargas'
+      },
+      original: {
+        series: '/nombres-series-original',
+        temporadas: '/temporadas-original',
+        idiomas: '/idiomas-original',
+        servidores: '/servidores-original',
+        episodios: '/episodios-original',
+        deleteEpisodio: '/eliminar-episodio-original',
+        deleteServidor: '/eliminar-servidor-original'
+      }
+    };
+
+    // Mostrar mensaje
+    function showMessage(message, type = 'success') {
+      const msgDiv = document.getElementById('message');
+      msgDiv.className = `message ${type}`;
+      msgDiv.innerHTML = message;
+      setTimeout(() => {
+        msgDiv.style.display = 'none';
+        msgDiv.className = 'message';
+      }, 5000);
+    }
+
+    // Cargar series para cada tipo
+    async function cargarSeries(tipo) {
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].series}`);
+        const series = await response.json();
+        const select = document.getElementById(`${tipo}-serie`);
+        select.innerHTML = '<option value="">Seleccionar serie...</option>';
+        series.forEach(serie => {
+          select.innerHTML += `<option value="${serie}">${serie}</option>`;
+        });
+      } catch (error) {
+        console.error(`Error cargando series para ${tipo}:`, error);
+      }
+    }
+
+    // Cargar temporadas
+    async function cargarTemporadas(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporadaSelect = document.getElementById(`${tipo}-temporada`);
+      const idiomaSelect = document.getElementById(`${tipo}-idioma`);
+      const servidorSelect = document.getElementById(`${tipo}-servidor`);
+      
+      if (!serie) {
+        temporadaSelect.innerHTML = '<option value="">Primero selecciona una serie</option>';
+        temporadaSelect.disabled = true;
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].temporadas}?serie=${encodeURIComponent(serie)}`);
+        const temporadas = await response.json();
+        temporadaSelect.innerHTML = '<option value="">Seleccionar temporada...</option>';
+        temporadas.forEach(temp => {
+          temporadaSelect.innerHTML += `<option value="${temp}">${temp}</option>`;
+        });
+        temporadaSelect.disabled = false;
+        
+        // Resetear selects dependientes
+        idiomaSelect.innerHTML = '<option value="">Primero selecciona una temporada</option>';
+        idiomaSelect.disabled = true;
+        servidorSelect.innerHTML = '<option value="">Primero selecciona un idioma</option>';
+        servidorSelect.disabled = true;
+        
+        // Limpiar tabla
+        document.getElementById(`${tipo}-tbody`).innerHTML = '<tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>';
+      } catch (error) {
+        console.error(`Error cargando temporadas para ${tipo}:`, error);
+      }
+    }
+
+    // Cargar idiomas
+    async function cargarIdiomas(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporada = document.getElementById(`${tipo}-temporada`).value;
+      const idiomaSelect = document.getElementById(`${tipo}-idioma`);
+      const servidorSelect = document.getElementById(`${tipo}-servidor`);
+      
+      if (!serie || !temporada) return;
+
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].idiomas}?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
+        const idiomas = await response.json();
+        idiomaSelect.innerHTML = '<option value="">Seleccionar idioma...</option>';
+        idiomas.forEach(idi => {
+          idiomaSelect.innerHTML += `<option value="${idi}">${idi}</option>`;
+        });
+        idiomaSelect.disabled = false;
+        
+        // Resetear servidor
+        servidorSelect.innerHTML = '<option value="">Primero selecciona un idioma</option>';
+        servidorSelect.disabled = true;
+        
+        // Limpiar tabla
+        document.getElementById(`${tipo}-tbody`).innerHTML = '<tr><td colspan="3" style="text-align: center;">Selecciona los filtros para ver los episodios</td></tr>';
+      } catch (error) {
+        console.error(`Error cargando idiomas para ${tipo}:`, error);
+      }
+    }
+
+    // Cargar servidores
+    async function cargarServidores(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporada = document.getElementById(`${tipo}-temporada`).value;
+      const idioma = document.getElementById(`${tipo}-idioma`).value;
+      const servidorSelect = document.getElementById(`${tipo}-servidor`);
+      
+      if (!serie || !temporada || !idioma) return;
+
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].servidores}?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}`);
+        const servidores = await response.json();
+        servidorSelect.innerHTML = '<option value="">Seleccionar servidor...</option>';
+        servidores.forEach(serv => {
+          servidorSelect.innerHTML += `<option value="${serv}">${serv}</option>`;
+        });
+        servidorSelect.disabled = false;
+        
+        // Limpiar tabla
+        document.getElementById(`${tipo}-tbody`).innerHTML = '<tr><td colspan="3" style="text-align: center;">Selecciona un servidor para ver los episodios</td></tr>';
+      } catch (error) {
+        console.error(`Error cargando servidores para ${tipo}:`, error);
+      }
+    }
+
+    // Cargar episodios
+    async function cargarEpisodios(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporada = document.getElementById(`${tipo}-temporada`).value;
+      const idioma = document.getElementById(`${tipo}-idioma`).value;
+      const servidor = document.getElementById(`${tipo}-servidor`).value;
+      
+      if (!serie || !temporada || !idioma || !servidor) return;
+
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].episodios}?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+        const episodios = await response.json();
+        episodiosData[tipo] = episodios;
+        
+        const tbody = document.getElementById(`${tipo}-tbody`);
+        if (episodios.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay episodios para esta selección</td></tr>';
+          return;
+        }
+        
+        tbody.innerHTML = episodios.map(ep => `
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox" value="${ep.episodio}" class="episodio-checkbox-${tipo}"></td>
+            <td>${ep.episodio}</td>
+            <td>${ep.iframe || ep.URL || ep.url || 'N/A'}</td>
+          </tr>
+        `).join('');
+        
+        // Desmarcar select all
+        const selectAll = document.getElementById(`${tipo}-select-all`);
+        if (selectAll) selectAll.checked = false;
+        
+      } catch (error) {
+        console.error(`Error cargando episodios para ${tipo}:`, error);
+        document.getElementById(`${tipo}-tbody`).innerHTML = '<tr><td colspan="3" style="text-align: center;">Error al cargar episodios</td></tr>';
+      }
+    }
+
+    // Seleccionar todos
+    function seleccionarTodos(tipo) {
+      const selectAll = document.getElementById(`${tipo}-select-all`);
+      const checkboxes = document.querySelectorAll(`.episodio-checkbox-${tipo}`);
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    }
+
+    // Eliminar episodios seleccionados
+    async function eliminarSeleccionados(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporada = document.getElementById(`${tipo}-temporada`).value;
+      const idioma = document.getElementById(`${tipo}-idioma`).value;
+      const servidor = document.getElementById(`${tipo}-servidor`).value;
+      
+      const checkboxes = document.querySelectorAll(`.episodio-checkbox-${tipo}:checked`);
+      if (checkboxes.length === 0) {
+        showMessage('Selecciona al menos un episodio para eliminar', 'error');
+        return;
+      }
+      
+      const episodiosAEliminar = Array.from(checkboxes).map(cb => cb.value);
+      
+      if (!confirm(`¿Estás seguro de eliminar ${episodiosAEliminar.length} episodio(s)?`)) return;
+      
+      let eliminados = 0;
+      let errores = 0;
+      
+      for (const episodio of episodiosAEliminar) {
+        try {
+          const response = await fetch(`${API_URL}${endpoints[tipo].deleteEpisodio}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              serie,
+              temporada,
+              idioma,
+              servidor,
+              episodio
+            })
+          });
+          
+          if (response.ok) {
+            eliminados++;
+          } else {
+            errores++;
+          }
+        } catch (error) {
+          errores++;
+          console.error(`Error eliminando episodio ${episodio}:`, error);
+        }
+      }
+      
+      showMessage(`✅ ${eliminados} episodios eliminados correctamente${errores > 0 ? `, ${errores} errores` : ''}`, eliminados > 0 ? 'success' : 'error');
+      
+      // Recargar episodios
+      await cargarEpisodios(tipo);
+    }
+
+    // Eliminar servidor completo
+    async function eliminarServidorCompleto(tipo) {
+      const serie = document.getElementById(`${tipo}-serie`).value;
+      const temporada = document.getElementById(`${tipo}-temporada`).value;
+      const idioma = document.getElementById(`${tipo}-idioma`).value;
+      const servidor = document.getElementById(`${tipo}-servidor`).value;
+      
+      if (!serie || !temporada || !idioma || !servidor) {
+        showMessage('Selecciona todos los filtros antes de eliminar un servidor completo', 'error');
+        return;
+      }
+      
+      const totalEpisodios = episodiosData[tipo].length;
+      if (totalEpisodios === 0) {
+        showMessage('No hay episodios para eliminar en este servidor', 'error');
+        return;
+      }
+      
+      if (!confirm(`⚠️ ADVERTENCIA: Esto eliminará TODOS los ${totalEpisodios} episodios del servidor "${servidor}"\n\n¿Estás completamente seguro?`)) return;
+      
+      try {
+        const response = await fetch(`${API_URL}${endpoints[tipo].deleteServidor}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serie,
+            temporada,
+            idioma,
+            servidor
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          showMessage(result.message, 'success');
+          await cargarEpisodios(tipo);
+        } else {
+          showMessage(result.error || 'Error al eliminar el servidor', 'error');
+        }
+      } catch (error) {
+        console.error(`Error eliminando servidor completo para ${tipo}:`, error);
+        showMessage('Error de conexión al eliminar el servidor', 'error');
+      }
+    }
+
+    // Cambio de pestaña
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+        
+        // Actualizar botones
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Actualizar paneles
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+        document.getElementById(`panel-${tabId}`).classList.add('active');
+        
+        // Cargar series si no están cargadas
+        const select = document.getElementById(`${tabId}-serie`);
+        if (select.options.length <= 1) {
+          cargarSeries(tabId);
+        }
+      });
+    });
+
+    // Cargar todas las series al inicio
+    cargarSeries('iframe');
+    cargarSeries('enlaces');
+    cargarSeries('descargas');
+    cargarSeries('original');
+  </script>
+</body>
+</html>
