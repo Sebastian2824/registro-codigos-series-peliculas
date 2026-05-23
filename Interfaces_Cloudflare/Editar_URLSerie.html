@@ -159,6 +159,7 @@
         display: flex;
         justify-content: flex-end;
         margin-top: 30px;
+        gap: 15px;
     }
     
     .button-group {
@@ -167,14 +168,12 @@
         margin-top: 20px;
     }
     
-    /* Estilo para los botones dentro de las celdas de la tabla */
     td button {
         margin: 0;
         padding: 8px 12px;
         font-size: 14px;
     }
     
-    /* Estilo para los inputs dentro de la tabla */
     td input {
         width: 100%;
         padding: 8px 12px;
@@ -183,7 +182,6 @@
         background-color: white;
     }
     
-    /* Estilo para el botón de agregar fila */
     #btnAgregarFila {
         background-color: #34a853;
         margin-top: 15px;
@@ -193,7 +191,6 @@
         background-color: #2d9249;
     }
 
-    /* Nuevos estilos para diferenciar filas */
     .fila-existente {
         background-color: #f0f8ff !important;
     }
@@ -208,6 +205,175 @@
     
     .btn-registrar {
         background-color: #34a853;
+    }
+
+    /* Estilos para el marco de dominio */
+    .dominio-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .dominio-marco {
+        flex: 2;
+        min-width: 250px;
+    }
+    
+    .dominio-marco label {
+        color: white;
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .dominio-marco input {
+        background: white;
+        border: 2px solid rgba(255,255,255,0.3);
+        font-family: monospace;
+        font-size: 14px;
+    }
+    
+    .dominio-marco input:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+    
+    .botones-dominio {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        min-width: 200px;
+    }
+    
+    .botones-dominio button {
+        flex: 1;
+        background-color: #ffd700;
+        color: #333;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .botones-dominio button:hover {
+        background-color: #ffed4a;
+        transform: translateY(-2px);
+    }
+    
+    .info-dominio {
+        background-color: rgba(255,255,255,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: white;
+        text-align: center;
+    }
+
+    /* Estilos para la barra de progreso */
+    .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+    
+    .progress-container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        min-width: 450px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .progress-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1a73e8;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .progress-info {
+        margin: 15px 0;
+        padding: 10px;
+        background: #f8fbff;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .progress-info p {
+        margin: 5px 0;
+    }
+    
+    .progress-bar-wrapper {
+        background-color: #e0e9ff;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+        height: 30px;
+    }
+    
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #1a73e8, #34a853, #ffd700);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .progress-status {
+        text-align: center;
+        margin-top: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .progress-details {
+        font-family: monospace;
+        font-size: 12px;
+        color: #555;
+        margin-top: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 8px;
+    }
+    
+    .progress-details p {
+        margin: 5px 0;
+        font-size: 11px;
     }
   </style>
 </head>
@@ -258,6 +424,25 @@
       </div>
     </div>
 
+    <!-- Marco de Dominio -->
+    <div class="dominio-container" id="dominioContainer" style="display: none;">
+      <div class="dominio-marco">
+        <label>🌐 Dominio Actual de las URLs</label>
+        <input type="text" id="dominioActual" placeholder="Ej: abyssplayer.com" readonly style="background-color: #f0f0f0;">
+        <div class="info-dominio" id="infoDominio">
+          💡 Se detectará automáticamente al seleccionar un servidor
+        </div>
+      </div>
+      <div class="dominio-marco">
+        <label>✏️ Nuevo Dominio</label>
+        <input type="text" id="nuevoDominio" placeholder="Ej: nuevodominio.com">
+      </div>
+      <div class="botones-dominio">
+        <button id="btnActualizarSerie" onclick="actualizarDominiosSerie()">🔄 Actualizar Esta Serie</button>
+        <button id="btnActualizarTodas" onclick="actualizarDominiosTodasSeries()">🌍 Actualizar Todas las Series</button>
+      </div>
+    </div>
+
     <h2>Episodios y Enlaces URL</h2>
     <div>
       <button onclick="document.getElementById('importarTxt').click()">📂 Importar TXT</button>
@@ -303,184 +488,515 @@
     let idiomaActual = "";
     let servidorActual = "";
 
-    async function cargarSeries() {
-  try {
-    const res = await fetch(`${WORKER_URL}/nombres-series-url`);
-    
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`);
+    // Función para mostrar barra de progreso
+    function mostrarProgreso(titulo, totalItems) {
+      const overlay = document.createElement('div');
+      overlay.className = 'progress-overlay';
+      overlay.id = 'progressOverlay';
+      overlay.innerHTML = `
+        <div class="progress-container">
+          <div class="progress-title">${titulo}</div>
+          <div class="progress-info">
+            <p>📊 Total a procesar: <strong>${totalItems}</strong></p>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" id="progressBar">0%</div>
+          </div>
+          <div class="progress-status" id="progressStatus">Iniciando proceso...</div>
+          <div class="progress-details" id="progressDetails"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      return {
+        update: (progreso, mensaje, detalle) => {
+          const barra = document.getElementById('progressBar');
+          const status = document.getElementById('progressStatus');
+          const details = document.getElementById('progressDetails');
+          
+          if (barra) {
+            const porcentaje = Math.round(progreso);
+            barra.style.width = `${porcentaje}%`;
+            barra.textContent = `${porcentaje}%`;
+          }
+          if (status && mensaje) status.textContent = mensaje;
+          if (details && detalle) {
+            const p = document.createElement('p');
+            p.textContent = detalle;
+            details.appendChild(p);
+            details.scrollTop = details.scrollHeight;
+          }
+        },
+        cerrar: () => {
+          const overlayExistente = document.getElementById('progressOverlay');
+          if (overlayExistente) overlayExistente.remove();
+        }
+      };
     }
 
-    const series = await res.json();
-
-    if (!Array.isArray(series)) {
-      console.error('La respuesta de series no es un array:', series);
-      throw new Error('Formato de respuesta inválido');
+    // Función para extraer dominio de una URL
+    function extraerDominioDeURL(url) {
+      const match = url.match(/https?:\/\/([^\/]+)/);
+      return match ? match[1] : null;
     }
 
-    serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-    series.forEach(nombre => {
-      const option = document.createElement("option");
-      option.value = option.text = nombre;
-      serieSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error cargando series:", error);
-    serieSelect.innerHTML = '<option value="" disabled selected>Error al cargar series</option>';
-  }
-}
+    // Función para actualizar el marco de dominio
+    async function actualizarMarcoDominio() {
+      const servidor = servidorSelect.value;
+      const dominioContainer = document.getElementById('dominioContainer');
+      const dominioActualInput = document.getElementById('dominioActual');
+      const nuevoDominioInput = document.getElementById('nuevoDominio');
+      const infoDominio = document.getElementById('infoDominio');
 
-async function cargarTemporadas() {
-  if (!serieActual) return;
+      if (!servidor || !serieActual || !temporadaActual || !idiomaActual) {
+        dominioContainer.style.display = 'none';
+        return;
+      }
 
-  try {
-    const res = await fetch(`${WORKER_URL}/temporadas-url?serie=${encodeURIComponent(serieActual)}`);
-    
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`);
+      if (servidor.toLowerCase().includes('abyss')) {
+        dominioContainer.style.display = 'flex';
+        
+        try {
+          const res = await fetch(`${WORKER_URL}/episodios-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidor)}`);
+          const episodios = await res.json();
+          
+          let dominioEncontrado = null;
+          if (episodios.length > 0 && episodios[0].url) {
+            dominioEncontrado = extraerDominioDeURL(episodios[0].url);
+          }
+
+          if (dominioEncontrado) {
+            dominioActualInput.value = dominioEncontrado;
+            nuevoDominioInput.placeholder = `Ej: ${dominioEncontrado}`;
+            infoDominio.innerHTML = `✅ Dominio detectado: ${dominioEncontrado}`;
+          } else {
+            dominioActualInput.value = 'No detectado';
+            nuevoDominioInput.placeholder = 'Ej: nuevodominio.com';
+            infoDominio.innerHTML = '⚠️ No se pudo detectar el dominio de las URLs';
+          }
+        } catch (error) {
+          console.error('Error detectando dominio:', error);
+          dominioActualInput.value = 'Error';
+          infoDominio.innerHTML = '❌ Error al detectar el dominio';
+        }
+      } else {
+        dominioContainer.style.display = 'none';
+      }
     }
 
-    const temporadas = await res.json();
-
-    if (!Array.isArray(temporadas)) {
-      console.error('La respuesta de temporadas no es un array:', temporadas);
-      throw new Error('Formato de respuesta inválido');
-    }
-
-    temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-    temporadas.forEach(temp => {
-      const option = document.createElement("option");
-      option.value = option.text = temp;
-      temporadaSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error cargando temporadas:", error);
-    temporadaSelect.innerHTML = '<option value="" disabled selected>Error al cargar temporadas</option>';
-  }
-}
-
-async function cargarIdiomas() {
-  if (!serieActual || !temporadaActual) return;
-
-  try {
-    const res = await fetch(`${WORKER_URL}/idiomas-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}`);
-    
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`);
-    }
-
-    const idiomas = await res.json();
-
-    if (!Array.isArray(idiomas)) {
-      console.error('La respuesta de idiomas no es un array:', idiomas);
-      throw new Error('Formato de respuesta inválido');
-    }
-
-    idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-    idiomas.forEach(idioma => {
-      const option = document.createElement("option");
-      option.value = option.text = idioma;
-      idiomaSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error cargando idiomas:", error);
-    idiomaSelect.innerHTML = '<option value="" disabled selected>Error al cargar idiomas</option>';
-  }
-}
-
-async function cargarServidores() {
-  if (!serieActual || !temporadaActual || !idiomaActual) return;
-
-  try {
-    const res = await fetch(`${WORKER_URL}/servidores-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}`);
-    
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`);
-    }
-
-    const servidores = await res.json();
-
-    if (!Array.isArray(servidores)) {
-      console.error('La respuesta de servidores no es un array:', servidores);
-      throw new Error('Formato de respuesta inválido');
-    }
-
-    servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-    servidores.forEach(servidor => {
-      const option = document.createElement("option");
-      option.value = option.text = servidor;
-      servidorSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error cargando servidores:", error);
-    servidorSelect.innerHTML = '<option value="" disabled selected>Error al cargar servidores</option>';
-  }
-}
-
-   async function cargarEpisodios() {
-  if (!serieActual || !temporadaActual || !idiomaActual || !servidorActual) return;
-
-  try {
-    const res = await fetch(`${WORKER_URL}/episodios-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
-    
-    // Verificar si la respuesta es exitosa
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`);
-    }
-
-    const episodios = await res.json();
-
-    // Verificar que episodios sea un array
-    if (!Array.isArray(episodios)) {
-      console.error('La respuesta no es un array:', episodios);
-      throw new Error('Formato de respuesta inválido');
-    }
-
-    const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-    tabla.innerHTML = "";
-
-    if (episodios.length === 0) {
-      tabla.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay episodios registrados</td></tr>';
-      return;
-    }
-
-    episodios.forEach(ep => {
-      const fila = tabla.insertRow();
-      fila.classList.add("fila-existente");
-      fila.setAttribute("data-episodio-original", ep.episodio);
-
-      const celEpisodio = fila.insertCell();
-      const inputEpisodio = document.createElement("input");
-      inputEpisodio.type = "text";
-      inputEpisodio.value = ep.episodio;
-      celEpisodio.appendChild(inputEpisodio);
-
-      const celUrl = fila.insertCell();
-      const inputUrl = document.createElement("input");
-      inputUrl.type = "text";
-      inputUrl.value = ep.url || "";
-      celUrl.appendChild(inputUrl);
-
-      const celAcciones = fila.insertCell();
+    // Función para actualizar dominios de la serie actual
+    async function actualizarDominiosSerie() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
       
-      const btnActualizar = document.createElement("button");
-      btnActualizar.textContent = "Actualizar";
-      btnActualizar.classList.add("btn-actualizar");
-      celAcciones.appendChild(btnActualizar);
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
 
-      const btnEliminar = document.createElement("button");
-      btnEliminar.textContent = "Eliminar";
-      btnEliminar.classList.add("btn-eliminar");
-      celAcciones.appendChild(btnEliminar);
-    });
-  } catch (error) {
-    console.error("Error cargando episodios:", error);
-    const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-    tabla.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Error al cargar episodios: ${error.message}</td></tr>`;
-  }
-}
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
 
-    // Función para agregar nueva fila (episodio nuevo)
+      // Obtener episodios actuales
+      const res = await fetch(`${WORKER_URL}/episodios-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
+      const episodios = await res.json();
+      
+      if (episodios.length === 0) {
+        alert('No hay episodios para actualizar');
+        return;
+      }
+
+      if (!confirm(`¿Actualizar ${episodios.length} episodios?\nSerie: ${serieActual}\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}`)) {
+        return;
+      }
+
+      const progreso = mostrarProgreso('Actualizando URLs de la Serie', episodios.length);
+      let actualizados = 0;
+      let errores = 0;
+
+      for (let i = 0; i < episodios.length; i++) {
+        const ep = episodios[i];
+        const nuevaUrl = ep.url.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+        
+        if (nuevaUrl !== ep.url) {
+          try {
+            const updateRes = await fetch(`${WORKER_URL}/actualizar-episodio-url`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                serie: serieActual,
+                temporada: temporadaActual,
+                idioma: idiomaActual,
+                servidor: servidorActual,
+                episodio: ep.episodio,
+                url: nuevaUrl
+              })
+            });
+            
+            if (updateRes.ok) {
+              actualizados++;
+              progreso.update(
+                ((i + 1) / episodios.length) * 100,
+                `Procesando: ${i + 1} de ${episodios.length} episodios`,
+                `✅ ${ep.episodio} - URL actualizada: ${nuevaUrl.substring(0, 60)}...`
+              );
+            } else {
+              errores++;
+              progreso.update(
+                ((i + 1) / episodios.length) * 100,
+                `Procesando: ${i + 1} de ${episodios.length} episodios`,
+                `❌ ${ep.episodio} - Error al actualizar`
+              );
+            }
+          } catch (error) {
+            errores++;
+            progreso.update(
+              ((i + 1) / episodios.length) * 100,
+              `Procesando: ${i + 1} de ${episodios.length} episodios`,
+              `❌ ${ep.episodio} - Error: ${error.message}`
+            );
+          }
+        } else {
+          progreso.update(
+            ((i + 1) / episodios.length) * 100,
+            `Procesando: ${i + 1} de ${episodios.length} episodios`,
+            `⏭️ ${ep.episodio} - Sin cambios necesarios`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      progreso.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progreso.cerrar();
+      
+      alert(`✅ Proceso completado:\n- URLs actualizadas: ${actualizados}\n- Errores: ${errores}`);
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
+    }
+
+    // Función para actualizar todas las series con servidor abyss
+    async function actualizarDominiosTodasSeries() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
+      
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
+
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
+
+      if (!confirm(`⚠️ ADVERTENCIA: Esto actualizará TODAS las URLs de TODAS las series con servidor que contenga "abyss"\n\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}\n\n¿Estás completamente seguro?`)) {
+        return;
+      }
+
+      // Obtener todas las series
+      const seriesRes = await fetch(`${WORKER_URL}/nombres-series-url`);
+      const series = await seriesRes.json();
+      
+      const progreso = mostrarProgreso('Analizando estructura', series.length);
+      const urlsPorActualizar = [];
+      
+      for (let i = 0; i < series.length; i++) {
+        const serie = series[i];
+        progreso.update(
+          ((i + 1) / series.length) * 100,
+          `Analizando serie: ${serie}`,
+          `🔍 Buscando servidores "abyss" en ${serie}`
+        );
+        
+        try {
+          const tempsRes = await fetch(`${WORKER_URL}/temporadas-url?serie=${encodeURIComponent(serie)}`);
+          const temporadas = await tempsRes.json();
+          
+          for (const temp of temporadas) {
+            const idiomasRes = await fetch(`${WORKER_URL}/idiomas-url?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}`);
+            const idiomas = await idiomasRes.json();
+            
+            for (const idioma of idiomas) {
+              const servidoresRes = await fetch(`${WORKER_URL}/servidores-url?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}&idioma=${encodeURIComponent(idioma)}`);
+              const servidores = await servidoresRes.json();
+              
+              for (const servidor of servidores) {
+                if (servidor.toLowerCase().includes('abyss')) {
+                  const episodiosRes = await fetch(`${WORKER_URL}/episodios-url?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+                  const episodios = await episodiosRes.json();
+                  
+                  for (const ep of episodios) {
+                    if (ep.url) {
+                      const nuevaUrl = ep.url.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+                      if (nuevaUrl !== ep.url) {
+                        urlsPorActualizar.push({
+                          serie, temp, idioma, servidor,
+                          episodio: ep.episodio,
+                          urlOriginal: ep.url,
+                          nuevaUrl
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Error analizando serie ${serie}:`, error);
+        }
+      }
+      
+      progreso.cerrar();
+      
+      if (urlsPorActualizar.length === 0) {
+        alert('No se encontraron URLs para actualizar');
+        return;
+      }
+      
+      if (!confirm(`Se encontraron ${urlsPorActualizar.length} URLs para actualizar. ¿Deseas continuar?`)) {
+        return;
+      }
+      
+      const progresoActualizacion = mostrarProgreso('Actualizando URLs - Todas las Series', urlsPorActualizar.length);
+      let actualizados = 0;
+      let errores = 0;
+      
+      for (let i = 0; i < urlsPorActualizar.length; i++) {
+        const item = urlsPorActualizar[i];
+        try {
+          const updateRes = await fetch(`${WORKER_URL}/actualizar-episodio-url`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              serie: item.serie,
+              temporada: item.temp,
+              idioma: item.idioma,
+              servidor: item.servidor,
+              episodio: item.episodio,
+              url: item.nuevaUrl
+            })
+          });
+          
+          if (updateRes.ok) {
+            actualizados++;
+            progresoActualizacion.update(
+              ((i + 1) / urlsPorActualizar.length) * 100,
+              `Procesando: ${i + 1} de ${urlsPorActualizar.length}`,
+              `✅ ${item.serie} > ${item.episodio} - URL actualizada`
+            );
+          } else {
+            errores++;
+            progresoActualizacion.update(
+              ((i + 1) / urlsPorActualizar.length) * 100,
+              `Procesando: ${i + 1} de ${urlsPorActualizar.length}`,
+              `❌ ${item.serie} > ${item.episodio} - Error`
+            );
+          }
+        } catch (error) {
+          errores++;
+          progresoActualizacion.update(
+            ((i + 1) / urlsPorActualizar.length) * 100,
+            `Procesando: ${i + 1} de ${urlsPorActualizar.length}`,
+            `❌ ${item.serie} > ${item.episodio} - Error: ${error.message}`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      progresoActualizacion.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progresoActualizacion.cerrar();
+      
+      alert(`✅ Proceso completado:\n- URLs actualizadas: ${actualizados}\n- Errores: ${errores}`);
+      
+      if (serieActual && temporadaActual && idiomaActual && servidorActual) {
+        await cargarEpisodios();
+        await actualizarMarcoDominio();
+      }
+    }
+
+    async function cargarSeries() {
+      try {
+        const res = await fetch(`${WORKER_URL}/nombres-series-url`);
+        
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const series = await res.json();
+
+        if (!Array.isArray(series)) {
+          console.error('La respuesta de series no es un array:', series);
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+        series.forEach(nombre => {
+          const option = document.createElement("option");
+          option.value = option.text = nombre;
+          serieSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando series:", error);
+        serieSelect.innerHTML = '<option value="" disabled selected>Error al cargar series</option>';
+      }
+    }
+
+    async function cargarTemporadas() {
+      if (!serieActual) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/temporadas-url?serie=${encodeURIComponent(serieActual)}`);
+        
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const temporadas = await res.json();
+
+        if (!Array.isArray(temporadas)) {
+          console.error('La respuesta de temporadas no es un array:', temporadas);
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+        temporadas.forEach(temp => {
+          const option = document.createElement("option");
+          option.value = option.text = temp;
+          temporadaSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando temporadas:", error);
+        temporadaSelect.innerHTML = '<option value="" disabled selected>Error al cargar temporadas</option>';
+      }
+    }
+
+    async function cargarIdiomas() {
+      if (!serieActual || !temporadaActual) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/idiomas-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}`);
+        
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const idiomas = await res.json();
+
+        if (!Array.isArray(idiomas)) {
+          console.error('La respuesta de idiomas no es un array:', idiomas);
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+        idiomas.forEach(idioma => {
+          const option = document.createElement("option");
+          option.value = option.text = idioma;
+          idiomaSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando idiomas:", error);
+        idiomaSelect.innerHTML = '<option value="" disabled selected>Error al cargar idiomas</option>';
+      }
+    }
+
+    async function cargarServidores() {
+      if (!serieActual || !temporadaActual || !idiomaActual) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/servidores-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}`);
+        
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const servidores = await res.json();
+
+        if (!Array.isArray(servidores)) {
+          console.error('La respuesta de servidores no es un array:', servidores);
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+        servidores.forEach(servidor => {
+          const option = document.createElement("option");
+          option.value = option.text = servidor;
+          servidorSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error cargando servidores:", error);
+        servidorSelect.innerHTML = '<option value="" disabled selected>Error al cargar servidores</option>';
+      }
+    }
+
+    async function cargarEpisodios() {
+      if (!serieActual || !temporadaActual || !idiomaActual || !servidorActual) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/episodios-url?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
+        
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const episodios = await res.json();
+
+        if (!Array.isArray(episodios)) {
+          console.error('La respuesta no es un array:', episodios);
+          throw new Error('Formato de respuesta inválido');
+        }
+
+        const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+        tabla.innerHTML = "";
+
+        if (episodios.length === 0) {
+          tabla.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay episodios registrados</td></tr>';
+          return;
+        }
+
+        episodios.forEach(ep => {
+          const fila = tabla.insertRow();
+          fila.classList.add("fila-existente");
+          fila.setAttribute("data-episodio-original", ep.episodio);
+
+          const celEpisodio = fila.insertCell();
+          const inputEpisodio = document.createElement("input");
+          inputEpisodio.type = "text";
+          inputEpisodio.value = ep.episodio;
+          celEpisodio.appendChild(inputEpisodio);
+
+          const celUrl = fila.insertCell();
+          const inputUrl = document.createElement("input");
+          inputUrl.type = "text";
+          inputUrl.value = ep.url || "";
+          celUrl.appendChild(inputUrl);
+
+          const celAcciones = fila.insertCell();
+          
+          const btnActualizar = document.createElement("button");
+          btnActualizar.textContent = "Actualizar";
+          btnActualizar.classList.add("btn-actualizar");
+          celAcciones.appendChild(btnActualizar);
+
+          const btnEliminar = document.createElement("button");
+          btnEliminar.textContent = "Eliminar";
+          btnEliminar.classList.add("btn-eliminar");
+          celAcciones.appendChild(btnEliminar);
+        });
+        
+        await actualizarMarcoDominio();
+      } catch (error) {
+        console.error("Error cargando episodios:", error);
+        const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+        tabla.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Error al cargar episodios: ${error.message}</td></tr>`;
+      }
+    }
+
     function agregarFila() {
       const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
       const newRow = tabla.insertRow();
@@ -496,7 +1012,6 @@ async function cargarServidores() {
       `;
     }
 
-    // Función para actualizar un episodio existente
     async function actualizarEpisodio(fila) {
       const episodioOriginal = fila.getAttribute("data-episodio-original");
       const inputs = fila.getElementsByTagName("input");
@@ -526,8 +1041,8 @@ async function cargarServidores() {
 
         if (res.ok) {
           alert("Episodio actualizado correctamente");
-          // Actualizar el episodio original en caso de que haya cambiado
           fila.setAttribute("data-episodio-original", episodioNombre);
+          await actualizarMarcoDominio();
         } else {
           alert("Error al actualizar episodio: " + (data.error || res.status));
         }
@@ -537,7 +1052,6 @@ async function cargarServidores() {
       }
     }
 
-    // Función para registrar un nuevo episodio
     async function registrarNuevoEpisodio(fila) {
       const inputs = fila.getElementsByTagName("input");
       const episodioNombre = inputs[0].value.trim();
@@ -568,18 +1082,17 @@ async function cargarServidores() {
 
         if (res.ok) {
           alert(data.message || "Episodio registrado correctamente");
-          // Convertir la fila nueva en existente
           fila.classList.remove("fila-nueva");
           fila.classList.add("fila-existente");
           fila.setAttribute("data-episodio-original", episodioNombre);
           
-          // Cambiar el botón de Registrar a Actualizar
           const btnRegistrar = fila.querySelector('.btn-registrar');
           if (btnRegistrar) {
             btnRegistrar.textContent = "Actualizar";
             btnRegistrar.classList.remove("btn-registrar");
             btnRegistrar.classList.add("btn-actualizar");
           }
+          await actualizarMarcoDominio();
         } else {
           alert("Error al registrar episodio: " + (data.error || res.statusText));
         }
@@ -589,7 +1102,6 @@ async function cargarServidores() {
       }
     }
 
-    // Función para eliminar un episodio existente
     async function eliminarEpisodio(fila) {
       const episodioNombre = fila.getAttribute("data-episodio-original");
 
@@ -613,6 +1125,7 @@ async function cargarServidores() {
         if (res.ok) {
           alert("Episodio eliminado correctamente");
           fila.remove();
+          await actualizarMarcoDominio();
         } else {
           alert("Error al eliminar episodio: " + (data.error || res.status));
         }
@@ -622,14 +1135,12 @@ async function cargarServidores() {
       }
     }
 
-    // Función para eliminar una fila nueva (sin guardar en BD)
     function eliminarFilaNueva(fila) {
       if (confirm("¿Eliminar esta fila?")) {
         fila.remove();
       }
     }
 
-    // FUNCIONES DE IMPORTACIÓN TXT Y EXCEL
     function configurarImportacionTxt() {
       document.getElementById('importarTxt').addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -710,13 +1221,11 @@ async function cargarServidores() {
       });
     }
 
-    // FUNCIÓN GUARDAR CAMBIOS MEJORADA
     async function guardarCambios() {
       const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
       const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
       const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
 
-      // Actualizar los valores actuales si se agregaron nuevos
       temporadaActual = nuevaTemporada || temporadaActual;
       idiomaActual = nuevoIdioma || idiomaActual;
       servidorActual = nuevoServidor || servidorActual;
@@ -727,7 +1236,6 @@ async function cargarServidores() {
       const registrosNuevos = [];
       const registrosActualizados = [];
 
-      // Procesar todas las filas
       for (const fila of filas) {
         const inputs = fila.getElementsByTagName("input");
         if (!inputs[0] || !inputs[1]) continue;
@@ -789,7 +1297,6 @@ async function cargarServidores() {
       }
     }
 
-    // FUNCIÓN PARA RESETEAR LA INTERFAZ COMPLETAMENTE
     function resetearInterfaz() {
       const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
       tabla.innerHTML = "";
@@ -815,9 +1322,10 @@ async function cargarServidores() {
       temporadaActual = "";
       idiomaActual = "";
       servidorActual = "";
+      
+      document.getElementById('dominioContainer').style.display = 'none';
     }
 
-    // Event delegation para manejar los botones de la tabla
     document.getElementById('tablaBody').addEventListener('click', async (event) => {
       const target = event.target;
       const fila = target.closest('tr');
@@ -840,7 +1348,6 @@ async function cargarServidores() {
       }
     });
 
-    // Las demás funciones se mantienen igual
     function nuevaEntrada(tipo) {
       if (tipo === "temporada") {
         temporadaSelect.disabled = true;
@@ -867,7 +1374,6 @@ async function cargarServidores() {
       }
     }
 
-    // Event listeners para los selects
     serieSelect.addEventListener("change", () => {
       serieActual = serieSelect.value;
       cargarTemporadas();
@@ -883,12 +1389,12 @@ async function cargarServidores() {
       cargarServidores();
     });
 
-    servidorSelect.addEventListener("change", () => {
+    servidorSelect.addEventListener("change", async () => {
       servidorActual = servidorSelect.value;
-      cargarEpisodios();
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
     });
 
-    // Inicializar
     document.addEventListener("DOMContentLoaded", () => {
       cargarSeries();
       configurarImportacionTxt();

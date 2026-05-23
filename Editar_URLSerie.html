@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editar URL de la Serie Registrada</title>
+  <title>Editar URL de la Serie Registrada - Firebase</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
@@ -158,6 +158,7 @@
     .acciones {
         display: flex;
         justify-content: flex-end;
+        gap: 15px;
         margin-top: 30px;
     }
     
@@ -167,14 +168,12 @@
         margin-top: 20px;
     }
     
-    /* Estilo para los botones dentro de las celdas de la tabla */
     td button {
         margin: 0;
         padding: 8px 12px;
         font-size: 14px;
     }
     
-    /* Estilo para los inputs dentro de la tabla */
     td input {
         width: 100%;
         padding: 8px 12px;
@@ -183,7 +182,6 @@
         background-color: white;
     }
     
-    /* Estilo para el botón de agregar fila */
     #btnAgregarFila {
         background-color: #34a853;
         margin-top: 15px;
@@ -192,11 +190,180 @@
     #btnAgregarFila:hover {
         background-color: #2d9249;
     }
+
+    /* Estilos para el marco de dominio */
+    .dominio-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .dominio-marco {
+        flex: 2;
+        min-width: 250px;
+    }
+    
+    .dominio-marco label {
+        color: white;
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .dominio-marco input {
+        background: white;
+        border: 2px solid rgba(255,255,255,0.3);
+        font-family: monospace;
+        font-size: 14px;
+    }
+    
+    .dominio-marco input:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+    
+    .botones-dominio {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        min-width: 200px;
+    }
+    
+    .botones-dominio button {
+        flex: 1;
+        background-color: #ffd700;
+        color: #333;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .botones-dominio button:hover {
+        background-color: #ffed4a;
+        transform: translateY(-2px);
+    }
+    
+    .info-dominio {
+        background-color: rgba(255,255,255,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: white;
+        text-align: center;
+    }
+
+    /* Estilos para la barra de progreso */
+    .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+    
+    .progress-container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        min-width: 450px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .progress-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1a73e8;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .progress-info {
+        margin: 15px 0;
+        padding: 10px;
+        background: #f8fbff;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .progress-info p {
+        margin: 5px 0;
+    }
+    
+    .progress-bar-wrapper {
+        background-color: #e0e9ff;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+        height: 30px;
+    }
+    
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #1a73e8, #34a853, #ffd700);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .progress-status {
+        text-align: center;
+        margin-top: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .progress-details {
+        font-family: monospace;
+        font-size: 12px;
+        color: #555;
+        margin-top: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 8px;
+    }
+    
+    .progress-details p {
+        margin: 5px 0;
+        font-size: 11px;
+    }
 </style>
 </head>
 <body>
   <div class="container">
-    <h1>Editar URL de las Series</h1>
+    <h1>Editar URL de las Series - Firebase</h1>
 
     <div class="form-group">
       <label>Nombre de la Serie</label>
@@ -241,6 +408,25 @@
       </div>
     </div>
 
+    <!-- Marco de Dominio -->
+    <div class="dominio-container" id="dominioContainer" style="display: none;">
+      <div class="dominio-marco">
+        <label>🌐 Dominio Actual de las URLs</label>
+        <input type="text" id="dominioActual" placeholder="Ej: abyssplayer.com" readonly style="background-color: #f0f0f0;">
+        <div class="info-dominio" id="infoDominio">
+          💡 Se detectará automáticamente al seleccionar un servidor
+        </div>
+      </div>
+      <div class="dominio-marco">
+        <label>✏️ Nuevo Dominio</label>
+        <input type="text" id="nuevoDominio" placeholder="Ej: nuevodominio.com">
+      </div>
+      <div class="botones-dominio">
+        <button id="btnActualizarSerie" onclick="actualizarDominiosSerie()">🔄 Actualizar Esta Serie</button>
+        <button id="btnActualizarTodas" onclick="actualizarDominiosTodasSeries()">🌍 Actualizar Todas las Series</button>
+      </div>
+    </div>
+
     <h2>Episodios y Enlaces URL</h2>
     <div>
       <button onclick="document.getElementById('importarTxt').click()">📂 Importar TXT</button>
@@ -253,7 +439,7 @@
         <tr>
           <th>Episodio</th>
           <th>Enlace URL</th>
-          <th>Eliminar</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody id="tablaBody"></tbody>
@@ -263,7 +449,7 @@
     <div class="acciones">
       <button onclick="location.href='Interfaces_Cloudflare/Editar_URLSerie.html'" 
   style="background-color: #10b981; color: white;">
-  Editar con cloudflare
+  Editar con Cloudflare
 </button>
       <button onclick="guardarCambios()">Actualizar</button>
     </div>
@@ -299,6 +485,324 @@
     let temporadaActual = "";
     let idiomaActual = "";
     let servidorActual = "";
+
+    // Función para mostrar barra de progreso
+    function mostrarProgreso(titulo, totalItems) {
+      const overlay = document.createElement('div');
+      overlay.className = 'progress-overlay';
+      overlay.id = 'progressOverlay';
+      overlay.innerHTML = `
+        <div class="progress-container">
+          <div class="progress-title">${titulo}</div>
+          <div class="progress-info">
+            <p>📊 Total a procesar: <strong>${totalItems}</strong></p>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" id="progressBar">0%</div>
+          </div>
+          <div class="progress-status" id="progressStatus">Iniciando proceso...</div>
+          <div class="progress-details" id="progressDetails"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      return {
+        update: (progreso, mensaje, detalle) => {
+          const barra = document.getElementById('progressBar');
+          const status = document.getElementById('progressStatus');
+          const details = document.getElementById('progressDetails');
+          
+          if (barra) {
+            const porcentaje = Math.round(progreso);
+            barra.style.width = `${porcentaje}%`;
+            barra.textContent = `${porcentaje}%`;
+          }
+          if (status && mensaje) status.textContent = mensaje;
+          if (details && detalle) {
+            const p = document.createElement('p');
+            p.textContent = detalle;
+            details.appendChild(p);
+            details.scrollTop = details.scrollHeight;
+          }
+        },
+        cerrar: () => {
+          const overlayExistente = document.getElementById('progressOverlay');
+          if (overlayExistente) overlayExistente.remove();
+        }
+      };
+    }
+
+    // Función para extraer dominio de una URL
+    function extraerDominioDeURL(url) {
+      const match = url.match(/https?:\/\/([^\/]+)/);
+      return match ? match[1] : null;
+    }
+
+    // Función para actualizar el marco de dominio
+    async function actualizarMarcoDominio() {
+      const servidor = servidorSelect.value;
+      const dominioContainer = document.getElementById('dominioContainer');
+      const dominioActualInput = document.getElementById('dominioActual');
+      const nuevoDominioInput = document.getElementById('nuevoDominio');
+      const infoDominio = document.getElementById('infoDominio');
+
+      if (!servidor || !serieActual || !temporadaActual || !idiomaActual) {
+        dominioContainer.style.display = 'none';
+        return;
+      }
+
+      if (servidor.toLowerCase().includes('abyss')) {
+        dominioContainer.style.display = 'flex';
+        
+        const ref = db
+          .collection("animes-series-enlaces")
+          .doc(serieActual)
+          .collection("Temporadas")
+          .doc(temporadaActual)
+          .collection("Idiomas")
+          .doc(idiomaActual)
+          .collection("Servidores")
+          .doc(servidor)
+          .collection("Episodios");
+
+        const snapshot = await ref.limit(1).get();
+        let dominioEncontrado = null;
+        
+        snapshot.forEach(doc => {
+          const url = doc.data().url;
+          dominioEncontrado = extraerDominioDeURL(url);
+        });
+
+        if (dominioEncontrado) {
+          dominioActualInput.value = dominioEncontrado;
+          nuevoDominioInput.placeholder = `Ej: ${dominioEncontrado}`;
+          infoDominio.innerHTML = `✅ Dominio detectado: ${dominioEncontrado}`;
+        } else {
+          dominioActualInput.value = 'No detectado';
+          nuevoDominioInput.placeholder = 'Ej: nuevodominio.com';
+          infoDominio.innerHTML = '⚠️ No se pudo detectar el dominio de las URLs';
+        }
+      } else {
+        dominioContainer.style.display = 'none';
+      }
+    }
+
+    // Función para actualizar dominios de la serie actual
+    async function actualizarDominiosSerie() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
+      
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
+
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
+
+      const ref = db
+        .collection("animes-series-enlaces")
+        .doc(serieActual)
+        .collection("Temporadas")
+        .doc(temporadaActual)
+        .collection("Idiomas")
+        .doc(idiomaActual)
+        .collection("Servidores")
+        .doc(servidorActual)
+        .collection("Episodios");
+
+      const snapshot = await ref.get();
+      const totalEpisodios = snapshot.size;
+      
+      if (totalEpisodios === 0) {
+        alert('No hay episodios para actualizar');
+        return;
+      }
+
+      if (!confirm(`¿Actualizar ${totalEpisodios} episodios?\nSerie: ${serieActual}\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}`)) {
+        return;
+      }
+
+      const progreso = mostrarProgreso('Actualizando URLs de la Serie', totalEpisodios);
+      let actualizados = 0;
+      let errores = 0;
+      let i = 0;
+
+      for (const doc of snapshot.docs) {
+        i++;
+        const urlActual = doc.data().url;
+        const nuevaUrl = urlActual.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+        
+        if (nuevaUrl !== urlActual) {
+          try {
+            await ref.doc(doc.id).update({ url: nuevaUrl });
+            actualizados++;
+            progreso.update(
+              (i / totalEpisodios) * 100,
+              `Procesando: ${i} de ${totalEpisodios} episodios`,
+              `✅ ${doc.id} - URL actualizada`
+            );
+          } catch (error) {
+            errores++;
+            progreso.update(
+              (i / totalEpisodios) * 100,
+              `Procesando: ${i} de ${totalEpisodios} episodios`,
+              `❌ ${doc.id} - Error: ${error.message}`
+            );
+          }
+        } else {
+          progreso.update(
+            (i / totalEpisodios) * 100,
+            `Procesando: ${i} de ${totalEpisodios} episodios`,
+            `⏭️ ${doc.id} - Sin cambios necesarios`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      progreso.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progreso.cerrar();
+      
+      alert(`✅ Proceso completado:\n- URLs actualizadas: ${actualizados}\n- Errores: ${errores}`);
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
+    }
+
+    // Función para actualizar todas las series con servidor abyss
+    async function actualizarDominiosTodasSeries() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
+      
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
+
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
+
+      if (!confirm(`⚠️ ADVERTENCIA: Esto actualizará TODAS las URLs de TODAS las series con servidor que contenga "abyss"\n\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}\n\n¿Estás completamente seguro?`)) {
+        return;
+      }
+
+      const seriesSnapshot = await db.collection("animes-series-enlaces").get();
+      const progreso = mostrarProgreso('Analizando estructura', seriesSnapshot.size);
+      
+      const urlsPorActualizar = [];
+      let seriesProcesadas = 0;
+      let totalSeries = seriesSnapshot.size;
+
+      for (const serieDoc of seriesSnapshot.docs) {
+        const nombreSerie = serieDoc.id;
+        seriesProcesadas++;
+        progreso.update(
+          (seriesProcesadas / totalSeries) * 100,
+          `Analizando serie: ${nombreSerie}`,
+          `🔍 Buscando servidores "abyss" en ${nombreSerie}`
+        );
+        
+        const temporadasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").get();
+        
+        for (const tempDoc of temporadasSnapshot.docs) {
+          const nombreTemp = tempDoc.id;
+          const idiomasSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(nombreTemp).collection("Idiomas").get();
+          
+          for (const idiDoc of idiomasSnapshot.docs) {
+            const nombreIdi = idiDoc.id;
+            const servidoresSnapshot = await db.collection("animes-series-enlaces").doc(nombreSerie).collection("Temporadas").doc(nombreTemp).collection("Idiomas").doc(nombreIdi).collection("Servidores").get();
+            
+            for (const servDoc of servidoresSnapshot.docs) {
+              const nombreServ = servDoc.id;
+              
+              if (nombreServ.toLowerCase().includes('abyss')) {
+                const episodiosRef = db
+                  .collection("animes-series-enlaces")
+                  .doc(nombreSerie)
+                  .collection("Temporadas")
+                  .doc(nombreTemp)
+                  .collection("Idiomas")
+                  .doc(nombreIdi)
+                  .collection("Servidores")
+                  .doc(nombreServ)
+                  .collection("Episodios");
+                
+                const episodiosSnapshot = await episodiosRef.get();
+                
+                for (const epDoc of episodiosSnapshot.docs) {
+                  const urlActual = epDoc.data().url;
+                  const nuevaUrl = urlActual.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+                  
+                  if (nuevaUrl !== urlActual) {
+                    urlsPorActualizar.push({
+                      ref: episodiosRef,
+                      id: epDoc.id,
+                      info: `${nombreSerie} > ${nombreTemp} > ${nombreIdi} > ${nombreServ} > ${epDoc.id}`
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      progreso.cerrar();
+      
+      if (urlsPorActualizar.length === 0) {
+        alert('No se encontraron URLs para actualizar');
+        return;
+      }
+      
+      if (!confirm(`Se encontraron ${urlsPorActualizar.length} URLs para actualizar. ¿Deseas continuar?`)) {
+        return;
+      }
+      
+      const progresoActualizacion = mostrarProgreso('Actualizando URLs - Todas las Series', urlsPorActualizar.length);
+      let actualizados = 0;
+      let errores = 0;
+      
+      for (let i = 0; i < urlsPorActualizar.length; i++) {
+        const item = urlsPorActualizar[i];
+        try {
+          const epDoc = await item.ref.doc(item.id).get();
+          const urlActual = epDoc.data().url;
+          const nuevaUrl = urlActual.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+          
+          await item.ref.doc(item.id).update({ url: nuevaUrl });
+          actualizados++;
+          progresoActualizacion.update(
+            ((i + 1) / urlsPorActualizar.length) * 100,
+            `Procesando: ${i + 1} de ${urlsPorActualizar.length}`,
+            `✅ ${item.info}`
+          );
+        } catch (error) {
+          errores++;
+          progresoActualizacion.update(
+            ((i + 1) / urlsPorActualizar.length) * 100,
+            `Procesando: ${i + 1} de ${urlsPorActualizar.length}`,
+            `❌ ${item.info} - Error: ${error.message}`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      progresoActualizacion.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progresoActualizacion.cerrar();
+      
+      alert(`✅ Proceso completado:\n- URLs actualizadas: ${actualizados}\n- Errores: ${errores}`);
+      
+      if (serieActual && temporadaActual && idiomaActual && servidorActual) {
+        await cargarEpisodios();
+        await actualizarMarcoDominio();
+      }
+    }
 
     async function cargarSeries() {
       const snapshot = await db.collection("animes-series-enlaces").get();
@@ -340,100 +844,77 @@
       });
     }
 
-   async function cargarEpisodios() {
-  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-  tabla.innerHTML = "";
+    async function cargarEpisodios() {
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      tabla.innerHTML = "";
 
-  const temporada = temporadaSelect.value;
-  const idioma = idiomaSelect.value;
-  const servidor = servidorSelect.value;
+      const temporada = temporadaSelect.value;
+      const idioma = idiomaSelect.value;
+      const servidor = servidorSelect.value;
 
-  if (!temporada || !idioma || !servidor) return;
+      if (!temporada || !idioma || !servidor) return;
 
-  const ref = db
-    .collection("animes-series-enlaces")
-    .doc(serieActual)
-    .collection("Temporadas")
-    .doc(temporada)
-    .collection("Idiomas")
-    .doc(idioma)
-    .collection("Servidores")
-    .doc(servidor)
-    .collection("Episodios");
+      const ref = db
+        .collection("animes-series-enlaces")
+        .doc(serieActual)
+        .collection("Temporadas")
+        .doc(temporada)
+        .collection("Idiomas")
+        .doc(idioma)
+        .collection("Servidores")
+        .doc(servidor)
+        .collection("Episodios");
 
-  const snapshot = await ref.get();
-  snapshot.forEach(doc => {
-    const fila = tabla.insertRow();
-
-    const celEpisodio = fila.insertCell();
-    const inputEpisodio = document.createElement("input");
-    inputEpisodio.type = "text";
-    inputEpisodio.value = doc.id;
-    inputEpisodio.disabled = true; // No permitir editar nombre del documento (id)
-    celEpisodio.appendChild(inputEpisodio);
-
-    const celIframe = fila.insertCell();
-    const inputIframe = document.createElement("input");
-    inputIframe.type = "text";
-    inputIframe.value = doc.data().url;
-    celIframe.appendChild(inputIframe);
-
-    const celAcciones = fila.insertCell();
-
-    // Botón Guardar
-    const btnGuardar = document.createElement("button");
-    btnGuardar.textContent = "Guardar";
-    btnGuardar.onclick = async () => {
-      const nuevoIframe = inputIframe.value.trim();
-      if (nuevoIframe !== "") {
-        await ref.doc(doc.id).update({ url: nuevoIframe });
-        alert("Episodio actualizado");
+      const snapshot = await ref.get();
+      
+      if (snapshot.empty) {
+        tabla.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay episodios registrados</td></tr>';
       }
-    };
-    celAcciones.appendChild(btnGuardar);
+      
+      snapshot.forEach(doc => {
+        const fila = tabla.insertRow();
 
-    // Botón Eliminar
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "Eliminar";
-    btnEliminar.onclick = async () => {
-      if (confirm("¿Estás seguro de eliminar este episodio?")) {
-        await ref.doc(doc.id).delete();
-        fila.remove();
-      }
-    };
-    celAcciones.appendChild(btnEliminar);
-  });
-}
+        const celEpisodio = fila.insertCell();
+        const inputEpisodio = document.createElement("input");
+        inputEpisodio.type = "text";
+        inputEpisodio.value = doc.id;
+        inputEpisodio.disabled = true;
+        celEpisodio.appendChild(inputEpisodio);
 
+        const celIframe = fila.insertCell();
+        const inputIframe = document.createElement("input");
+        inputIframe.type = "text";
+        inputIframe.value = doc.data().url;
+        celIframe.appendChild(inputIframe);
 
-function cargarParaEdicion(episodio, url) {
-  document.getElementById("input-episodio").value = episodio;
-  document.getElementById("input-codigo").value = url;
-}
+        const celAcciones = fila.insertCell();
 
-async function eliminarEpisodio(episodio) {
-  if (!confirm(`¿Estás seguro de eliminar el episodio "${episodio}"?`)) return;
+        const btnGuardar = document.createElement("button");
+        btnGuardar.textContent = "Guardar";
+        btnGuardar.onclick = async () => {
+          const nuevoIframe = inputIframe.value.trim();
+          if (nuevoIframe !== "") {
+            await ref.doc(doc.id).update({ url: nuevoIframe });
+            alert("Episodio actualizado");
+            await actualizarMarcoDominio();
+          }
+        };
+        celAcciones.appendChild(btnGuardar);
 
-  const temporada = temporadaSelect.value;
-  const idioma = idiomaSelect.value;
-  const servidor = servidorSelect.value;
-
-  const ref = db
-    .collection("animes-series-enlaces")
-    .doc(serieActual)
-    .collection("Temporadas")
-    .doc(temporada)
-    .collection("Idiomas")
-    .doc(idioma)
-    .collection("Servidores")
-    .doc(servidor)
-    .collection("Episodios")
-    .doc(episodio);
-
-  await ref.delete();
-  await cargarEpisodios(); // Refresca la tabla
-}
-
+        const btnEliminar = document.createElement("button");
+        btnEliminar.textContent = "Eliminar";
+        btnEliminar.onclick = async () => {
+          if (confirm("¿Estás seguro de eliminar este episodio?")) {
+            await ref.doc(doc.id).delete();
+            fila.remove();
+            await actualizarMarcoDominio();
+          }
+        };
+        celAcciones.appendChild(btnEliminar);
+      });
+      
+      await actualizarMarcoDominio();
+    }
 
     function nuevaEntrada(tipo) {
       if (tipo === "temporada") {
@@ -462,211 +943,234 @@ async function eliminarEpisodio(episodio) {
     }
 
     function agregarFila() {
-  const table = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
-  const newRow = table.insertRow();
+      const table = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+      const newRow = table.insertRow();
 
-  newRow.innerHTML = `
-    <td><input type="text" placeholder="Ej: Episodio X"></td>
-    <td><input type="text" placeholder="https://..."></td>
-    <td>
-      <button onclick="guardarNuevoEpisodio(this)">Guardar</button>
-      <button onclick="eliminarFila(this)">Eliminar</button>
-    </td>
-  `;
-}
+      newRow.innerHTML = `
+        <td><input type="text" placeholder="Ej: Episodio X"></td>
+        <td><input type="text" placeholder="https://..."></td>
+        <td>
+          <button onclick="guardarNuevoEpisodio(this)">Guardar</button>
+          <button onclick="eliminarFila(this)">Eliminar</button>
+        </td>
+      `;
+    }
 
-async function guardarNuevoEpisodio(boton) {
-  const fila = boton.parentElement.parentElement;
-  const episodioInput = fila.cells[0].querySelector('input');
-  const iframeInput = fila.cells[1].querySelector('input');
+    async function guardarNuevoEpisodio(boton) {
+      const fila = boton.parentElement.parentElement;
+      const episodioInput = fila.cells[0].querySelector('input');
+      const iframeInput = fila.cells[1].querySelector('input');
 
-  const episodioNombre = episodioInput.value.trim();
-  const url = iframeInput.value.trim();
+      const episodioNombre = episodioInput.value.trim();
+      const url = iframeInput.value.trim();
 
-  const temporada = temporadaSelect.value || temporadaInput?.value?.trim();
-  const idioma = idiomaSelect.value || idiomaInput?.value?.trim();
-  const servidor = servidorSelect.value || servidorInput?.value?.trim();
+      const temporada = temporadaSelect.value || temporadaInput?.value?.trim();
+      const idioma = idiomaSelect.value || idiomaInput?.value?.trim();
+      const servidor = servidorSelect.value || servidorInput?.value?.trim();
 
-  if (!serieActual || !temporada || !idioma || !servidor || !episodioNombre || !url) {
-    alert("Por favor completa todos los campos antes de guardar.");
-    return;
-  }
+      if (!serieActual || !temporada || !idioma || !servidor || !episodioNombre || !url) {
+        alert("Por favor completa todos los campos antes de guardar.");
+        return;
+      }
 
-  try {
-    const ref = db
-      .collection("animes-series-enlaces")
-      .doc(serieActual)
-      .collection("Temporadas")
-      .doc(temporada)
-      .collection("Idiomas")
-      .doc(idioma)
-      .collection("Servidores")
-      .doc(servidor)
-      .collection("Episodios")
-      .doc(episodioNombre);
+      try {
+        const ref = db
+          .collection("animes-series-enlaces")
+          .doc(serieActual)
+          .collection("Temporadas")
+          .doc(temporada)
+          .collection("Idiomas")
+          .doc(idioma)
+          .collection("Servidores")
+          .doc(servidor)
+          .collection("Episodios")
+          .doc(episodioNombre);
 
-    await ref.set({ url });
+        await ref.set({ url });
 
-    alert("Nuevo episodio registrado con éxito.");
-    cargarEpisodios(); // Refresca la tabla
-  } catch (error) {
-    console.error("Error al guardar episodio:", error);
-    alert("Hubo un error al guardar el episodio.");
-  }
-  location.reload();
-}
-
+        alert("Nuevo episodio registrado con éxito.");
+        cargarEpisodios();
+      } catch (error) {
+        console.error("Error al guardar episodio:", error);
+        alert("Hubo un error al guardar el episodio.");
+      }
+    }
 
     function eliminarFila(boton) {
       const fila = boton.parentNode.parentNode;
       fila.parentNode.removeChild(fila);
     }
     
-     document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('importarTxt').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const contenido = e.target.result;
-        const lineas = contenido.split('\n');
-
-        const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
-
-        lineas.forEach(linea => {
-          if (linea.trim() === '') return;
-          const partes = linea.split(';');
-          if (partes.length !== 2) return;
-
-          const episodio = partes[0].trim();
-          const codigo = partes[1].trim();
-
-          const newRow = tabla.insertRow();
-          newRow.innerHTML = `
-            <td><input type="text" value="${episodio}"></td>
-            <td><input type="text" value="${codigo}"></td>
-            <td><button onclick="eliminarFila(this)">Eliminar</button></td>
-          `;
-        });
-
-        alert("Importación completada.");
-      };
-      reader.readAsText(file);
-    });
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Manejar importación desde archivo Excel
-    const inputExcel = document.getElementById('importarExcel');
-    if (inputExcel) {
-      inputExcel.addEventListener('change', function(event) {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('importarTxt').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = function(e) {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const contenido = e.target.result;
+          const lineas = contenido.split('\n');
 
           const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
 
-          rows.forEach(row => {
-            if (row.length < 2) return;
-            const episodio = String(row[0]).trim();
-            const codigo = String(row[1]).trim();
+          lineas.forEach(linea => {
+            if (linea.trim() === '') return;
+            const partes = linea.split(';');
+            if (partes.length !== 2) return;
 
-            if (episodio && codigo) {
-              const nuevaFila = tabla.insertRow();
-              nuevaFila.innerHTML = `
-                <td><input type="text" value="${episodio}"></td>
-                <td><input type="text" value="${codigo}"></td>
-                <td><button onclick="eliminarFila(this)">Eliminar</button></td>
-              `;
-            }
+            const episodio = partes[0].trim();
+            const codigo = partes[1].trim();
+
+            const newRow = tabla.insertRow();
+            newRow.innerHTML = `
+              <td><input type="text" value="${episodio}"></td>
+              <td><input type="text" value="${codigo}"></td>
+              <td><button onclick="eliminarFila(this)">Eliminar</button></td>
+            `;
           });
 
-          alert("Importación desde Excel completada.");
+          alert("Importación completada.");
+          event.target.value = '';
         };
-        reader.readAsArrayBuffer(file);
+        reader.readAsText(file);
       });
-    }});
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputExcel = document.getElementById('importarExcel');
+      if (inputExcel) {
+        inputExcel.addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
+
+            rows.forEach(row => {
+              if (row.length < 2) return;
+              const episodio = String(row[0]).trim();
+              const codigo = String(row[1]).trim();
+
+              if (episodio && codigo) {
+                const nuevaFila = tabla.insertRow();
+                nuevaFila.innerHTML = `
+                  <td><input type="text" value="${episodio}"></td>
+                  <td><input type="text" value="${codigo}"></td>
+                  <td><button onclick="eliminarFila(this)">Eliminar</button></td>
+                `;
+              }
+            });
+
+            alert("Importación desde Excel completada.");
+            event.target.value = '';
+          };
+          reader.readAsArrayBuffer(file);
+        });
+      }
+    });
 
     async function guardarCambios() {
-  const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
-  const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
-  const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
+      const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
+      const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
+      const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
 
-  // 1. Validar y crear nueva temporada si existe
-  if (nuevaTemporada) {
-    temporadaActual = nuevaTemporada;
-    await db.collection("animes-series-enlaces")
-            .doc(serieActual)
-            .collection("Temporadas")
-            .doc(temporadaActual)
-            .set({ creada: true });
-  }
+      if (nuevaTemporada) {
+        temporadaActual = nuevaTemporada;
+        await db.collection("animes-series-enlaces")
+                .doc(serieActual)
+                .collection("Temporadas")
+                .doc(temporadaActual)
+                .set({ creada: true });
+      }
 
-  // 2. Validar y crear nuevo idioma si existe
-  if (nuevoIdioma) {
-    idiomaActual = nuevoIdioma;
-    await db.collection("animes-series-enlaces")
-            .doc(serieActual)
-            .collection("Temporadas")
-            .doc(temporadaActual)
-            .collection("Idiomas")
-            .doc(idiomaActual)
-            .set({ creado: true });
-  }
+      if (nuevoIdioma) {
+        idiomaActual = nuevoIdioma;
+        await db.collection("animes-series-enlaces")
+                .doc(serieActual)
+                .collection("Temporadas")
+                .doc(temporadaActual)
+                .collection("Idiomas")
+                .doc(idiomaActual)
+                .set({ creado: true });
+      }
 
-  // 3. Validar y crear nuevo servidor si existe
-  if (nuevoServidor) {
-    servidorActual = nuevoServidor;
-    await db.collection("animes-series-enlaces")
-            .doc(serieActual)
-            .collection("Temporadas")
-            .doc(temporadaActual)
-            .collection("Idiomas")
-            .doc(idiomaActual)
-            .collection("Servidores")
-            .doc(servidorActual)
-            .set({ creado: true });
-  }
+      if (nuevoServidor) {
+        servidorActual = nuevoServidor;
+        await db.collection("animes-series-enlaces")
+                .doc(serieActual)
+                .collection("Temporadas")
+                .doc(temporadaActual)
+                .collection("Idiomas")
+                .doc(idiomaActual)
+                .collection("Servidores")
+                .doc(servidorActual)
+                .set({ creado: true });
+      }
 
-  // 4. Guardar episodios escritos en la tabla
-  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-  const filas = tabla.getElementsByTagName("tr");
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      const filas = tabla.getElementsByTagName("tr");
 
-  for (const fila of filas) {
-    const inputs = fila.getElementsByTagName("input");
-    const nombreEpisodio = inputs[0]?.value?.trim();
-    const url = inputs[1]?.value?.trim();
+      for (const fila of filas) {
+        const inputs = fila.getElementsByTagName("input");
+        const nombreEpisodio = inputs[0]?.value?.trim();
+        const url = inputs[1]?.value?.trim();
 
-    if (nombreEpisodio && url) {
-      await db.collection("animes-series-enlaces")
-              .doc(serieActual)
-              .collection("Temporadas")
-              .doc(temporadaActual)
-              .collection("Idiomas")
-              .doc(idiomaActual)
-              .collection("Servidores")
-              .doc(servidorActual)
-              .collection("Episodios")
-              .doc(nombreEpisodio)
-              .set({ url });
+        if (nombreEpisodio && url) {
+          await db.collection("animes-series-enlaces")
+                  .doc(serieActual)
+                  .collection("Temporadas")
+                  .doc(temporadaActual)
+                  .collection("Idiomas")
+                  .doc(idiomaActual)
+                  .collection("Servidores")
+                  .doc(servidorActual)
+                  .collection("Episodios")
+                  .doc(nombreEpisodio)
+                  .set({ url });
+        }
+      }
+
+      cargarTemporadas();
+      cargarEpisodios();
+
+      alert("Datos guardados correctamente.");
+      resetearInterfaz();
     }
-  }
 
-  // 5. Recargar listas (por si se agregó algo nuevo)
-  cargarTemporadas();
-  cargarEpisodios();
-
-  alert("Datos guardados correctamente.");
-  location.reload();
-}
-
+    function resetearInterfaz() {
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      tabla.innerHTML = "";
+      
+      document.getElementById("nuevaTemporada").value = "";
+      document.getElementById("nuevoIdioma").value = "";
+      document.getElementById("nuevoServidor").value = "";
+      
+      nuevaTemporadaInput.classList.add("hidden");
+      nuevoIdiomaInput.classList.add("hidden");
+      nuevoServidorInput.classList.add("hidden");
+      
+      temporadaSelect.disabled = false;
+      idiomaSelect.disabled = false;
+      servidorSelect.disabled = false;
+      
+      serieSelect.value = "";
+      temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      
+      serieActual = "";
+      temporadaActual = "";
+      idiomaActual = "";
+      servidorActual = "";
+      
+      document.getElementById('dominioContainer').style.display = 'none';
+    }
 
     serieSelect.addEventListener("change", () => {
       serieActual = serieSelect.value;
@@ -683,9 +1187,10 @@ async function guardarNuevoEpisodio(boton) {
       cargarServidores();
     });
 
-    servidorSelect.addEventListener("change", () => {
+    servidorSelect.addEventListener("change", async () => {
       servidorActual = servidorSelect.value;
-      cargarEpisodios();
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
     });
 
     document.addEventListener("DOMContentLoaded", cargarSeries);

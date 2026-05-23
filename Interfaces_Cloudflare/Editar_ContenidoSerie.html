@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editar Serie Registrada</title>
+  <title>Editar Serie Registrada - Cloudflare</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* Tus estilos CSS se mantienen igual */
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
@@ -159,6 +158,7 @@
     .acciones {
         display: flex;
         justify-content: flex-end;
+        gap: 15px;
         margin-top: 30px;
     }
     
@@ -168,14 +168,12 @@
         margin-top: 20px;
     }
     
-    /* Estilo para los botones dentro de las celdas de la tabla */
     td button {
         margin: 0;
         padding: 8px 12px;
         font-size: 14px;
     }
     
-    /* Estilo para los inputs dentro de la tabla */
     td input {
         width: 100%;
         padding: 8px 12px;
@@ -184,7 +182,6 @@
         background-color: white;
     }
     
-    /* Estilo para el botón de agregar fila */
     #btnAgregarFila {
         background-color: #34a853;
         margin-top: 15px;
@@ -194,7 +191,6 @@
         background-color: #2d9249;
     }
 
-    /* Nuevos estilos para diferenciar filas */
     .fila-existente {
         background-color: #f0f8ff !important;
     }
@@ -210,11 +206,180 @@
     .btn-registrar {
         background-color: #34a853;
     }
+
+    /* Estilos para el marco de dominio */
+    .dominio-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .dominio-marco {
+        flex: 2;
+        min-width: 250px;
+    }
+    
+    .dominio-marco label {
+        color: white;
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .dominio-marco input {
+        background: white;
+        border: 2px solid rgba(255,255,255,0.3);
+        font-family: monospace;
+        font-size: 14px;
+    }
+    
+    .dominio-marco input:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+    
+    .botones-dominio {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        min-width: 200px;
+    }
+    
+    .botones-dominio button {
+        flex: 1;
+        background-color: #ffd700;
+        color: #333;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .botones-dominio button:hover {
+        background-color: #ffed4a;
+        transform: translateY(-2px);
+    }
+    
+    .info-dominio {
+        background-color: rgba(255,255,255,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: white;
+        text-align: center;
+    }
+
+    /* Estilos para la barra de progreso */
+    .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+    
+    .progress-container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        min-width: 450px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .progress-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1a73e8;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .progress-info {
+        margin: 15px 0;
+        padding: 10px;
+        background: #f8fbff;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .progress-info p {
+        margin: 5px 0;
+    }
+    
+    .progress-bar-wrapper {
+        background-color: #e0e9ff;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+        height: 30px;
+    }
+    
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #1a73e8, #34a853, #ffd700);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .progress-status {
+        text-align: center;
+        margin-top: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .progress-details {
+        font-family: monospace;
+        font-size: 12px;
+        color: #555;
+        margin-top: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 8px;
+    }
+    
+    .progress-details p {
+        margin: 5px 0;
+        font-size: 11px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Editar Series</h1>
+    <h1>Editar Series - Cloudflare</h1>
 
     <div class="form-group">
       <label>Nombre de la Serie</label>
@@ -256,6 +421,25 @@
       <div id="nuevoServidorInput" class="hidden">
         <input type="text" id="nuevoServidor" placeholder="Ej: Servidor 01" />
         <button type="button" onclick="cancelarEntrada('servidor')">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Marco de Dominio -->
+    <div class="dominio-container" id="dominioContainer" style="display: none;">
+      <div class="dominio-marco">
+        <label>🌐 Dominio Actual de los Iframes</label>
+        <input type="text" id="dominioActual" placeholder="Ej: abyssplayer.com" readonly style="background-color: #f0f0f0;">
+        <div class="info-dominio" id="infoDominio">
+          💡 Se detectará automáticamente al seleccionar un servidor
+        </div>
+      </div>
+      <div class="dominio-marco">
+        <label>✏️ Nuevo Dominio</label>
+        <input type="text" id="nuevoDominio" placeholder="Ej: nuevodominio.com">
+      </div>
+      <div class="botones-dominio">
+        <button id="btnActualizarSerie" onclick="actualizarDominiosSerie()">🔄 Actualizar Esta Serie</button>
+        <button id="btnActualizarTodas" onclick="actualizarDominiosTodasSeries()">🌍 Actualizar Todas las Series</button>
       </div>
     </div>
 
@@ -303,10 +487,342 @@
     let idiomaActual = "";
     let servidorActual = "";
 
+    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+
+    // Función para mostrar barra de progreso
+    function mostrarProgreso(titulo, totalItems) {
+      const overlay = document.createElement('div');
+      overlay.className = 'progress-overlay';
+      overlay.id = 'progressOverlay';
+      overlay.innerHTML = `
+        <div class="progress-container">
+          <div class="progress-title">${titulo}</div>
+          <div class="progress-info">
+            <p>📊 Total a procesar: <strong>${totalItems}</strong></p>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" id="progressBar">0%</div>
+          </div>
+          <div class="progress-status" id="progressStatus">Iniciando proceso...</div>
+          <div class="progress-details" id="progressDetails"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      return {
+        update: (progreso, mensaje, detalle) => {
+          const barra = document.getElementById('progressBar');
+          const status = document.getElementById('progressStatus');
+          const details = document.getElementById('progressDetails');
+          
+          if (barra) {
+            const porcentaje = Math.round(progreso);
+            barra.style.width = `${porcentaje}%`;
+            barra.textContent = `${porcentaje}%`;
+          }
+          if (status && mensaje) status.textContent = mensaje;
+          if (details && detalle) {
+            const p = document.createElement('p');
+            p.textContent = detalle;
+            details.appendChild(p);
+            details.scrollTop = details.scrollHeight;
+          }
+        },
+        cerrar: () => {
+          const overlayExistente = document.getElementById('progressOverlay');
+          if (overlayExistente) overlayExistente.remove();
+        }
+      };
+    }
+
+    // Función para extraer dominio de un iframe
+    function extraerDominio(iframeHtml) {
+      const match = iframeHtml.match(/src="https?:\/\/([^\/"]+)/);
+      return match ? match[1] : null;
+    }
+
+    // Función para actualizar el marco de dominio
+    async function actualizarMarcoDominio() {
+      const servidor = servidorSelect.value;
+      const dominioContainer = document.getElementById('dominioContainer');
+      const dominioActualInput = document.getElementById('dominioActual');
+      const nuevoDominioInput = document.getElementById('nuevoDominio');
+      const infoDominio = document.getElementById('infoDominio');
+
+      if (!servidor || !serieActual || !temporadaActual || !idiomaActual) {
+        dominioContainer.style.display = 'none';
+        return;
+      }
+
+      if (servidor.toLowerCase().includes('abyss')) {
+        dominioContainer.style.display = 'flex';
+        
+        try {
+          const res = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidor)}`);
+          const episodios = await res.json();
+          
+          let dominioEncontrado = null;
+          if (episodios.length > 0) {
+            dominioEncontrado = extraerDominio(episodios[0].iframe);
+          }
+
+          if (dominioEncontrado) {
+            dominioActualInput.value = dominioEncontrado;
+            nuevoDominioInput.placeholder = `Ej: ${dominioEncontrado}`;
+            infoDominio.innerHTML = `✅ Dominio detectado: ${dominioEncontrado}`;
+          } else {
+            dominioActualInput.value = 'No detectado';
+            nuevoDominioInput.placeholder = 'Ej: nuevodominio.com';
+            infoDominio.innerHTML = '⚠️ No se pudo detectar el dominio de los episodios';
+          }
+        } catch (error) {
+          console.error('Error detectando dominio:', error);
+          dominioActualInput.value = 'Error';
+          infoDominio.innerHTML = '❌ Error al detectar el dominio';
+        }
+      } else {
+        dominioContainer.style.display = 'none';
+      }
+    }
+
+    // Función para actualizar dominios de la serie actual
+    async function actualizarDominiosSerie() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
+      
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
+
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
+
+      // Obtener episodios actuales
+      const res = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
+      const episodios = await res.json();
+      
+      if (episodios.length === 0) {
+        alert('No hay episodios para actualizar');
+        return;
+      }
+
+      if (!confirm(`¿Actualizar ${episodios.length} episodios?\nSerie: ${serieActual}\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}`)) {
+        return;
+      }
+
+      const progreso = mostrarProgreso('Actualizando Serie', episodios.length);
+      let actualizados = 0;
+      let errores = 0;
+
+      for (let i = 0; i < episodios.length; i++) {
+        const ep = episodios[i];
+        const nuevoIframe = ep.iframe.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+        
+        if (nuevoIframe !== ep.iframe) {
+          try {
+            const updateRes = await fetch(`${WORKER_URL}/actualizar-episodio`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                serie: serieActual,
+                temporada: temporadaActual,
+                idioma: idiomaActual,
+                servidor: servidorActual,
+                episodio: ep.episodio,
+                iframe: nuevoIframe
+              })
+            });
+            
+            if (updateRes.ok) {
+              actualizados++;
+              progreso.update(
+                ((i + 1) / episodios.length) * 100,
+                `Procesando: ${i + 1} de ${episodios.length} episodios`,
+                `✅ ${ep.episodio} - Actualizado correctamente`
+              );
+            } else {
+              errores++;
+              progreso.update(
+                ((i + 1) / episodios.length) * 100,
+                `Procesando: ${i + 1} de ${episodios.length} episodios`,
+                `❌ ${ep.episodio} - Error al actualizar`
+              );
+            }
+          } catch (error) {
+            errores++;
+            progreso.update(
+              ((i + 1) / episodios.length) * 100,
+              `Procesando: ${i + 1} de ${episodios.length} episodios`,
+              `❌ ${ep.episodio} - Error: ${error.message}`
+            );
+          }
+        } else {
+          progreso.update(
+            ((i + 1) / episodios.length) * 100,
+            `Procesando: ${i + 1} de ${episodios.length} episodios`,
+            `⏭️ ${ep.episodio} - Sin cambios necesarios`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      progreso.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progreso.cerrar();
+      
+      alert(`✅ Proceso completado:\n- Episodios actualizados: ${actualizados}\n- Errores: ${errores}`);
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
+    }
+
+    // Función para actualizar todas las series con servidor abyss
+    async function actualizarDominiosTodasSeries() {
+      const nuevoDominio = document.getElementById('nuevoDominio').value.trim();
+      const dominioActual = document.getElementById('dominioActual').value.trim();
+      
+      if (!nuevoDominio) {
+        alert('Por favor, ingresa un nuevo dominio válido');
+        return;
+      }
+
+      if (nuevoDominio === dominioActual) {
+        alert('El nuevo dominio es igual al actual. No se realizarán cambios.');
+        return;
+      }
+
+      if (!confirm(`⚠️ ADVERTENCIA: Esto actualizará TODOS los episodios de TODAS las series con servidor que contenga "abyss"\n\nDominio actual: ${dominioActual}\nNuevo dominio: ${nuevoDominio}\n\n¿Estás completamente seguro?`)) {
+        return;
+      }
+
+      // Obtener todas las series
+      const seriesRes = await fetch(`${WORKER_URL}/nombres-series`);
+      const series = await seriesRes.json();
+      
+      const progreso = mostrarProgreso('Analizando estructura', series.length);
+      const episodiosPorActualizar = [];
+      
+      for (let i = 0; i < series.length; i++) {
+        const serie = series[i];
+        progreso.update(
+          ((i + 1) / series.length) * 100,
+          `Analizando serie: ${serie}`,
+          `🔍 Buscando servidores "abyss" en ${serie}`
+        );
+        
+        try {
+          const tempsRes = await fetch(`${WORKER_URL}/temporadas?serie=${encodeURIComponent(serie)}`);
+          const temporadas = await tempsRes.json();
+          
+          for (const temp of temporadas) {
+            const idiomasRes = await fetch(`${WORKER_URL}/idiomas?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}`);
+            const idiomas = await idiomasRes.json();
+            
+            for (const idioma of idiomas) {
+              const servidoresRes = await fetch(`${WORKER_URL}/servidores?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}&idioma=${encodeURIComponent(idioma)}`);
+              const servidores = await servidoresRes.json();
+              
+              for (const servidor of servidores) {
+                if (servidor.toLowerCase().includes('abyss')) {
+                  const episodiosRes = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temp)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+                  const episodios = await episodiosRes.json();
+                  
+                  for (const ep of episodios) {
+                    const nuevoIframe = ep.iframe.replace(new RegExp(`https?://${dominioActual.replace(/\./g, '\\.')}`, 'g'), `https://${nuevoDominio}`);
+                    if (nuevoIframe !== ep.iframe) {
+                      episodiosPorActualizar.push({
+                        serie, temp, idioma, servidor,
+                        episodio: ep.episodio,
+                        iframeOriginal: ep.iframe,
+                        nuevoIframe
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Error analizando serie ${serie}:`, error);
+        }
+      }
+      
+      progreso.cerrar();
+      
+      if (episodiosPorActualizar.length === 0) {
+        alert('No se encontraron episodios para actualizar');
+        return;
+      }
+      
+      if (!confirm(`Se encontraron ${episodiosPorActualizar.length} episodios para actualizar. ¿Deseas continuar?`)) {
+        return;
+      }
+      
+      const progresoActualizacion = mostrarProgreso('Actualizando Todas las Series', episodiosPorActualizar.length);
+      let actualizados = 0;
+      let errores = 0;
+      
+      for (let i = 0; i < episodiosPorActualizar.length; i++) {
+        const item = episodiosPorActualizar[i];
+        try {
+          const updateRes = await fetch(`${WORKER_URL}/actualizar-episodio`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              serie: item.serie,
+              temporada: item.temp,
+              idioma: item.idioma,
+              servidor: item.servidor,
+              episodio: item.episodio,
+              iframe: item.nuevoIframe
+            })
+          });
+          
+          if (updateRes.ok) {
+            actualizados++;
+            progresoActualizacion.update(
+              ((i + 1) / episodiosPorActualizar.length) * 100,
+              `Procesando: ${i + 1} de ${episodiosPorActualizar.length}`,
+              `✅ ${item.serie} > ${item.episodio} - Actualizado`
+            );
+          } else {
+            errores++;
+            progresoActualizacion.update(
+              ((i + 1) / episodiosPorActualizar.length) * 100,
+              `Procesando: ${i + 1} de ${episodiosPorActualizar.length}`,
+              `❌ ${item.serie} > ${item.episodio} - Error`
+            );
+          }
+        } catch (error) {
+          errores++;
+          progresoActualizacion.update(
+            ((i + 1) / episodiosPorActualizar.length) * 100,
+            `Procesando: ${i + 1} de ${episodiosPorActualizar.length}`,
+            `❌ ${item.serie} > ${item.episodio} - Error: ${error.message}`
+          );
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      progresoActualizacion.update(100, '¡Proceso completado!', `📊 Resumen: ${actualizados} actualizados, ${errores} errores`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      progresoActualizacion.cerrar();
+      
+      alert(`✅ Proceso completado:\n- Episodios actualizados: ${actualizados}\n- Errores: ${errores}`);
+      
+      if (serieActual && temporadaActual && idiomaActual && servidorActual) {
+        await cargarEpisodios();
+        await actualizarMarcoDominio();
+      }
+    }
+
     // Función para cargar series
     async function cargarSeries() {
       try {
-        const res = await fetch('https://proyect-cloud-flare.apiprueba2025.workers.dev/nombres-series');
+        const res = await fetch(`${WORKER_URL}/nombres-series`);
         const series = await res.json();
 
         serieSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
@@ -320,12 +836,11 @@
       }
     }
 
-    // Función para cargar temporadas
     async function cargarTemporadas() {
       if (!serieActual) return;
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/temporadas?serie=${encodeURIComponent(serieActual)}`);
+        const res = await fetch(`${WORKER_URL}/temporadas?serie=${encodeURIComponent(serieActual)}`);
         const temporadas = await res.json();
 
         temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
@@ -339,12 +854,11 @@
       }
     }
 
-    // Función para cargar idiomas
     async function cargarIdiomas() {
       if (!serieActual || !temporadaActual) return;
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/idiomas?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}`);
+        const res = await fetch(`${WORKER_URL}/idiomas?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}`);
         const idiomas = await res.json();
 
         idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
@@ -358,12 +872,11 @@
       }
     }
 
-    // Función para cargar servidores
     async function cargarServidores() {
       if (!serieActual || !temporadaActual || !idiomaActual) return;
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/servidores?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}`);
+        const res = await fetch(`${WORKER_URL}/servidores?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}`);
         const servidores = await res.json();
 
         servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
@@ -377,12 +890,11 @@
       }
     }
 
-    // Función para cargar episodios
     async function cargarEpisodios() {
       if (!serieActual || !temporadaActual || !idiomaActual || !servidorActual) return;
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/episodios?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
+        const res = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serieActual)}&temporada=${encodeURIComponent(temporadaActual)}&idioma=${encodeURIComponent(idiomaActual)}&servidor=${encodeURIComponent(servidorActual)}`);
         const episodios = await res.json();
 
         const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
@@ -417,19 +929,20 @@
           btnEliminar.classList.add("btn-eliminar");
           celAcciones.appendChild(btnEliminar);
         });
+        
+        await actualizarMarcoDominio();
       } catch (error) {
         console.error("Error cargando episodios:", error);
       }
     }
 
-    // Función para agregar nueva fila (episodio nuevo)
     function agregarFila() {
       const tabla = document.getElementById('tabla-episodios').getElementsByTagName('tbody')[0];
       const newRow = tabla.insertRow();
       newRow.classList.add("fila-nueva");
 
       newRow.innerHTML = `
-        <td><input type="text" placeholder="Ej: Episodio X"></td>
+        <tr><input type="text" placeholder="Ej: Episodio X"></td>
         <td><input type="text" placeholder="<iframe>...</iframe>"></td>
         <td>
           <button class="btn-registrar">Registrar</button>
@@ -438,7 +951,6 @@
       `;
     }
 
-    // Función para actualizar un episodio existente
     async function actualizarEpisodio(fila) {
       const episodioOriginal = fila.getAttribute("data-episodio-original");
       const inputs = fila.getElementsByTagName("input");
@@ -451,7 +963,7 @@
       }
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/actualizar-episodio`, {
+        const res = await fetch(`${WORKER_URL}/actualizar-episodio`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -468,8 +980,8 @@
 
         if (res.ok) {
           alert("Episodio actualizado correctamente");
-          // Actualizar el episodio original en caso de que haya cambiado
           fila.setAttribute("data-episodio-original", episodioNombre);
+          await actualizarMarcoDominio();
         } else {
           alert("Error al actualizar episodio: " + (data.error || res.status));
         }
@@ -479,7 +991,6 @@
       }
     }
 
-    // Función para registrar un nuevo episodio
     async function registrarNuevoEpisodio(fila) {
       const inputs = fila.getElementsByTagName("input");
       const episodioNombre = inputs[0].value.trim();
@@ -500,7 +1011,7 @@
       }];
 
       try {
-        const res = await fetch('https://proyect-cloud-flare.apiprueba2025.workers.dev/registrar', {
+        const res = await fetch(`${WORKER_URL}/registrar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ registros })
@@ -510,18 +1021,17 @@
 
         if (res.ok) {
           alert(data.message || "Episodio registrado correctamente");
-          // Convertir la fila nueva en existente
           fila.classList.remove("fila-nueva");
           fila.classList.add("fila-existente");
           fila.setAttribute("data-episodio-original", episodioNombre);
           
-          // Cambiar el botón de Registrar a Actualizar
           const btnRegistrar = fila.querySelector('.btn-registrar');
           if (btnRegistrar) {
             btnRegistrar.textContent = "Actualizar";
             btnRegistrar.classList.remove("btn-registrar");
             btnRegistrar.classList.add("btn-actualizar");
           }
+          await actualizarMarcoDominio();
         } else {
           alert("Error al registrar episodio: " + (data.error || res.statusText));
         }
@@ -531,14 +1041,13 @@
       }
     }
 
-    // Función para eliminar un episodio existente
     async function eliminarEpisodio(fila) {
       const episodioNombre = fila.getAttribute("data-episodio-original");
 
       if (!confirm(`¿Eliminar episodio "${episodioNombre}"?`)) return;
 
       try {
-        const res = await fetch(`https://proyect-cloud-flare.apiprueba2025.workers.dev/eliminar-episodio`, {
+        const res = await fetch(`${WORKER_URL}/eliminar-episodio`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -555,6 +1064,7 @@
         if (res.ok) {
           alert("Episodio eliminado correctamente");
           fila.remove();
+          await actualizarMarcoDominio();
         } else {
           alert("Error al eliminar episodio: " + (data.error || res.status));
         }
@@ -564,14 +1074,12 @@
       }
     }
 
-    // Función para eliminar una fila nueva (sin guardar en BD)
     function eliminarFilaNueva(fila) {
       if (confirm("¿Eliminar esta fila?")) {
         fila.remove();
       }
     }
 
-    // FUNCIONES DE IMPORTACIÓN TXT Y EXCEL
     function configurarImportacionTxt() {
       document.getElementById('importarTxt').addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -604,7 +1112,6 @@
           });
 
           alert(`Importación completada. Se agregaron ${lineas.length} episodios.`);
-          // Limpiar el input file
           event.target.value = '';
         };
         reader.readAsText(file);
@@ -647,142 +1154,105 @@
           });
 
           alert(`Importación desde Excel completada. Se agregaron ${contador} episodios.`);
-          // Limpiar el input file
           event.target.value = '';
         };
         reader.readAsArrayBuffer(file);
       });
     }
 
-    // FUNCIÓN GUARDAR CAMBIOS MEJORADA - ACTUALIZA TODOS LOS EPISODIOS
-    // FUNCIÓN GUARDAR CAMBIOS MEJORADA - RESETEA LA INTERFAZ PARA NUEVA SELECCIÓN
-async function guardarCambios() {
-  const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
-  const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
-  const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
+    async function guardarCambios() {
+      const nuevaTemporada = document.getElementById("nuevaTemporada").value.trim();
+      const nuevoIdioma = document.getElementById("nuevoIdioma").value.trim();
+      const nuevoServidor = document.getElementById("nuevoServidor").value.trim();
 
-  // Actualizar los valores actuales si se agregaron nuevos
-  const temporadaUsar = nuevaTemporada || temporadaActual;
-  const idiomaUsar = nuevoIdioma || idiomaActual;
-  const servidorUsar = nuevoServidor || servidorActual;
+      const temporadaUsar = nuevaTemporada || temporadaActual;
+      const idiomaUsar = nuevoIdioma || idiomaActual;
+      const servidorUsar = nuevoServidor || servidorActual;
 
-  // Validar que tenemos todos los datos necesarios
-  if (!serieActual || !temporadaUsar || !idiomaUsar || !servidorUsar) {
-    alert("Por favor, completa todos los campos: Serie, Temporada, Idioma y Servidor.");
-    return;
-  }
+      if (!serieActual || !temporadaUsar || !idiomaUsar || !servidorUsar) {
+        alert("Por favor, completa todos los campos: Serie, Temporada, Idioma y Servidor.");
+        return;
+      }
 
-  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-  const filas = tabla.getElementsByTagName("tr");
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      const filas = tabla.getElementsByTagName("tr");
 
-  const registrosNuevos = [];
-  const registrosActualizados = [];
+      const todosRegistros = [];
 
-  // Procesar todas las filas
-  for (const fila of filas) {
-    const inputs = fila.getElementsByTagName("input");
-    if (!inputs[0] || !inputs[1]) continue;
+      for (const fila of filas) {
+        const inputs = fila.getElementsByTagName("input");
+        if (!inputs[0] || !inputs[1]) continue;
 
-    const episodioNombre = inputs[0].value.trim();
-    const iframe = inputs[1].value.trim();
+        const episodioNombre = inputs[0].value.trim();
+        const iframe = inputs[1].value.trim();
 
-    if (episodioNombre && iframe) {
-      const registro = {
-        nombreSerie: serieActual,
-        temporada: temporadaUsar,
-        idioma: idiomaUsar,
-        servidor: servidorUsar,
-        episodio: episodioNombre,
-        iframe: iframe
-      };
+        if (episodioNombre && iframe) {
+          todosRegistros.push({
+            nombreSerie: serieActual,
+            temporada: temporadaUsar,
+            idioma: idiomaUsar,
+            servidor: servidorUsar,
+            episodio: episodioNombre,
+            iframe: iframe
+          });
+        }
+      }
 
-      if (fila.classList.contains("fila-nueva")) {
-        registrosNuevos.push(registro);
-      } else {
-        registrosActualizados.push(registro);
+      if (todosRegistros.length === 0) {
+        alert("No hay episodios para guardar.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${WORKER_URL}/registrar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registros: todosRegistros })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(`✅ ${todosRegistros.length} episodios guardados correctamente.`);
+          resetearInterfaz();
+        } else {
+          alert("Error al guardar los cambios: " + (data.error || res.statusText));
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error al guardar los cambios: " + error.message);
       }
     }
-  }
 
-  if (registrosNuevos.length === 0 && registrosActualizados.length === 0) {
-    alert("No hay episodios para guardar.");
-    return;
-  }
-
-  try {
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
-
-    // Combinar todos los registros (nuevos y actualizados)
-    const todosRegistros = [...registrosNuevos, ...registrosActualizados];
-
-    const res = await fetch(`${WORKER_URL}/registrar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registros: todosRegistros })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      let mensaje = "✅ Cambios guardados correctamente.\n";
-      if (registrosNuevos.length > 0) {
-        mensaje += `• ${registrosNuevos.length} nuevos episodios registrados\n`;
-      }
-      if (registrosActualizados.length > 0) {
-        mensaje += `• ${registrosActualizados.length} episodios actualizados`;
-      }
+    function resetearInterfaz() {
+      const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
+      tabla.innerHTML = "";
       
-      alert(mensaje);
+      document.getElementById("nuevaTemporada").value = "";
+      document.getElementById("nuevoIdioma").value = "";
+      document.getElementById("nuevoServidor").value = "";
       
-      // RESET COMPLETO DE LA INTERFAZ
-      resetearInterfaz();
+      nuevaTemporadaInput.classList.add("hidden");
+      nuevoIdiomaInput.classList.add("hidden");
+      nuevoServidorInput.classList.add("hidden");
       
-    } else {
-      alert("Error al guardar los cambios: " + (data.error || res.statusText));
+      temporadaSelect.disabled = false;
+      idiomaSelect.disabled = false;
+      servidorSelect.disabled = false;
+      
+      serieSelect.value = "";
+      temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+      
+      serieActual = "";
+      temporadaActual = "";
+      idiomaActual = "";
+      servidorActual = "";
+      
+      document.getElementById('dominioContainer').style.display = 'none';
     }
-  } catch (error) {
-    console.error(error);
-    alert("Error al guardar los cambios: " + error.message);
-  }
-}
 
-// FUNCIÓN PARA RESETEAR LA INTERFAZ
-function resetearInterfaz() {
-  // Limpiar tabla de episodios
-  const tabla = document.getElementById("tabla-episodios").getElementsByTagName("tbody")[0];
-  tabla.innerHTML = "";
-  
-  // Limpiar inputs de nueva entrada
-  document.getElementById("nuevaTemporada").value = "";
-  document.getElementById("nuevoIdioma").value = "";
-  document.getElementById("nuevoServidor").value = "";
-  
-  // Ocultar inputs de nueva entrada
-  nuevaTemporadaInput.classList.add("hidden");
-  nuevoIdiomaInput.classList.add("hidden");
-  nuevoServidorInput.classList.add("hidden");
-  
-  // Reactivar selects
-  temporadaSelect.disabled = false;
-  idiomaSelect.disabled = false;
-  servidorSelect.disabled = false;
-  
-  // Resetear TODOS los selects a estado inicial
-  serieSelect.value = "";
-  temporadaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-  idiomaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-  servidorSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-  
-  // Resetear TODAS las variables globales
-  serieActual = "";
-  temporadaActual = "";
-  idiomaActual = "";
-  servidorActual = "";
-  
-  console.log("Interfaz completamente reseteada - Lista para nueva selección");
-}
-
-    // Event delegation para manejar los botones de la tabla
     document.getElementById('tablaBody').addEventListener('click', async (event) => {
       const target = event.target;
       const fila = target.closest('tr');
@@ -805,7 +1275,6 @@ function resetearInterfaz() {
       }
     });
 
-    // Las demás funciones se mantienen igual
     function nuevaEntrada(tipo) {
       if (tipo === "temporada") {
         temporadaSelect.disabled = true;
@@ -832,7 +1301,6 @@ function resetearInterfaz() {
       }
     }
 
-    // Event listeners para los selects
     serieSelect.addEventListener("change", () => {
       serieActual = serieSelect.value;
       cargarTemporadas();
@@ -848,12 +1316,12 @@ function resetearInterfaz() {
       cargarServidores();
     });
 
-    servidorSelect.addEventListener("change", () => {
+    servidorSelect.addEventListener("change", async () => {
       servidorActual = servidorSelect.value;
-      cargarEpisodios();
+      await cargarEpisodios();
+      await actualizarMarcoDominio();
     });
 
-    // Inicializar
     document.addEventListener("DOMContentLoaded", () => {
       cargarSeries();
       configurarImportacionTxt();
