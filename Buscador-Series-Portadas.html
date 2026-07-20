@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscador Multi-Servicio · Animes Plus</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(145deg, #f0f5fe 0%, #e6edf9 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Contenedor principal estilo "card" */
+    .contenedor-buscador {
+      max-width: 480px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(10, 30, 60, 0.12), 0 8px 24px rgba(0, 20, 50, 0.06);
+      padding: 32px 28px 28px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    /* Título */
+    .titulo-buscador {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .titulo-buscador .main-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0b2b5c;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .titulo-buscador .sub-title {
+      font-size: 15px;
+      font-weight: 400;
+      color: #5e6f8d;
+      margin-top: 4px;
+    }
+
+    /* Selector de servicio */
+    .servicio-selector {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .servicio-btn {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid transparent;
+      border-radius: 40px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      letter-spacing: 0.2px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      flex: 1 0 auto;
+      max-width: 130px;
+    }
+
+    .servicio-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    .servicio-btn.active {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      border-color: transparent;
+    }
+
+    /* Colores activos por servicio */
+    #firebase-btn.active {
+      background: #1a73e8;
+      box-shadow: 0 6px 14px rgba(26, 115, 232, 0.25);
+    }
+
+    #cloudflare-btn.active {
+      background: #f6821f;
+      box-shadow: 0 6px 14px rgba(246, 130, 31, 0.25);
+    }
+
+    #sheets-btn.active {
+      background: #0f9d58;
+      box-shadow: 0 6px 14px rgba(15, 157, 88, 0.25);
+    }
+
+    /* Buscador */
+    .buscador {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 4px 4px 4px 18px;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .search:focus-within {
+      border-color: #1a73e8;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+    }
+
+    .search ion-icon {
+      font-size: 22px;
+      color: #64748b;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .search input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      padding: 12px 0;
+      outline: none;
+      font-weight: 500;
+      color: #0b2b5c;
+      font-family: inherit;
+    }
+
+    .search input::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    /* Área de resultados */
+    .resultados {
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .resultados::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .resultados::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .resultados::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Mensaje de servicio activo */
+    .mensaje-servicio {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #f1f5f9;
+      border-radius: 40px;
+      padding: 10px 16px;
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .mensaje-servicio ion-icon {
+      font-size: 18px;
+      color: #1a73e8;
+    }
+
+    .mensaje-servicio strong {
+      color: #0b2b5c;
+      font-weight: 700;
+    }
+
+    /* Resultado individual (serie) */
+    .resultado-item,
+    .temporada-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #f8fafc;
+      padding: 14px 18px;
+      margin: 6px 0;
+      border-radius: 16px;
+      color: #0b2b5c;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .resultado-item:hover,
+    .temporada-link:hover {
+      background: #eef2ff;
+      border-color: #1a73e8;
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.08);
+    }
+
+    .resultado-item ion-icon,
+    .temporada-link ion-icon {
+      font-size: 22px;
+      color: #1a73e8;
+      flex-shrink: 0;
+    }
+
+    .resultado-item span,
+    .temporada-link span {
+      font-size: 15px;
+      font-weight: 500;
+      color: #0b2b5c;
+    }
+
+    /* Título de "Selecciona la serie" */
+    .resultados h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+      margin: 16px 0 10px 0;
+      padding: 0 4px;
+      letter-spacing: -0.2px;
+    }
+
+    .resultados .resultado h3 {
+      font-size: 20px;
+      color: #0b2b5c;
+      margin-bottom: 4px;
+    }
+
+    .resultados .resultado p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    /* Imagen dentro de detalles */
+    .resultado img {
+      max-width: 220px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin: 12px auto 18px;
+      display: block;
+      border: 1px solid #e9edf4;
+    }
+
+    /* Botón "Ver Ahora" */
+    .ver-ahora-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      margin: 8px auto 16px;
+      background: linear-gradient(135deg, #06d6a0, #059669);
+      color: white;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(6, 214, 160, 0.25);
+      border: none;
+      width: fit-content;
+      cursor: pointer;
+    }
+
+    .ver-ahora-link:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 12px 28px rgba(6, 214, 160, 0.35);
+    }
+
+    .ver-ahora-link ion-icon {
+      font-size: 22px;
+    }
+
+    /* Botones de navegación (volver) */
+    .back-btn,
+    .back-btn-resultados {
+      background: #e9edf4;
+      color: #1e293b;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      margin: 6px auto 0;
+      border: 1px solid transparent;
+    }
+
+    .back-btn:hover,
+    .back-btn-resultados:hover {
+      background: #d1d9e6;
+      transform: translateY(-1px);
+    }
+
+    .back-btn-resultados {
+      background: #f1f5f9;
+      margin-top: 16px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .back-btn-resultados:hover {
+      background: #e2e8f0;
+    }
+
+    /* Botón de limpiar búsqueda */
+    .limpiar-btn {
+      background: transparent;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+
+    .limpiar-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Mensaje de error / no resultados */
+    .no-resultados {
+      text-align: center;
+      padding: 24px 16px;
+      background: #fef2f2;
+      border-radius: 20px;
+      color: #991b1b;
+      font-size: 14px;
+      border: 1px solid #fecaca;
+      margin: 12px 0;
+    }
+
+    .no-resultados ion-icon {
+      font-size: 32px;
+      color: #dc2626;
+      margin-bottom: 8px;
+    }
+
+    .no-resultados small {
+      display: block;
+      margin-top: 8px;
+      color: #7f1d1d;
+      opacity: 0.8;
+    }
+
+    /* Indicador de carga */
+    .cargando {
+      text-align: center;
+      padding: 30px 16px;
+      color: #1a73e8;
+    }
+
+    .cargando ion-icon {
+      font-size: 32px;
+      animation: spin 1s linear infinite;
+      display: block;
+      margin: 0 auto 12px;
+      color: #1a73e8;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #94a3b8;
+      border-top: 1px solid #e9edf4;
+      padding-top: 18px;
+    }
+
+    .footer ion-icon {
+      color: #1a73e8;
+      font-size: 18px;
+    }
+
+    .footer span:last-child {
+      font-weight: 600;
+      color: #0b2b5c;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .contenedor-buscador {
+        padding: 24px 18px;
+        border-radius: 24px;
+      }
+
+      .titulo-buscador .main-title {
+        font-size: 22px;
+      }
+
+      .servicio-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+        max-width: 100px;
+      }
+
+      .search input {
+        font-size: 14px;
+        padding: 10px 0;
+      }
+
+      .resultado-item,
+      .temporada-link {
+        padding: 12px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor-buscador">
+    <!-- Título -->
+    <div class="titulo-buscador">
+      <div class="main-title">🔍 Buscador</div>
+      <div class="sub-title">Series y Películas Disponibles</div>
+    </div>
+
+    <!-- Selector de servicio -->
+    <div class="servicio-selector">
+      <button class="servicio-btn active" id="firebase-btn">Firebase</button>
+      <button class="servicio-btn" id="cloudflare-btn">Cloudflare</button>
+      <button class="servicio-btn" id="sheets-btn">Google Sheets</button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="buscador">
+      <div class="search">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="text" id="search-input" placeholder="Escribe el nombre de la serie..." />
+      </div>
+    </div>
+
+    <!-- Área de resultados -->
+    <div class="resultados" id="resultado"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>Search by</span>
+      <ion-icon name="play-circle-outline"></ion-icon>
+      <span>Animes Plus</span>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="js_multi_servidor/Buscador_SeriesPortadas_Controller.js"></script>
+</body>
+</html>

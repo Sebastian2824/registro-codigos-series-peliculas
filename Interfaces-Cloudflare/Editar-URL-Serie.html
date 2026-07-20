@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar URL de Series · Cloudflare</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 36px 40px;
+      box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08), 0 8px 24px rgba(0, 20, 40, 0.04);
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #0b2b5c;
+      text-align: center;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    h1 i {
+      color: #f6821f;
+      font-size: 28px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0b2b5c;
+      margin-top: 32px;
+      margin-bottom: 18px;
+      border-bottom: 3px solid #e9edf4;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 i {
+      color: #f6821f;
+      font-size: 20px;
+    }
+
+    .form-group {
+      background: #f8fafc;
+      padding: 20px 24px;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+      transition: box-shadow 0.2s;
+    }
+
+    .form-group:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #0b2b5c;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .form-group label i {
+      margin-right: 8px;
+      color: #f6821f;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 15px;
+      background: white;
+      transition: all 0.2s;
+      font-family: inherit;
+      color: #0b2b5c;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: #f6821f;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.1);
+    }
+
+    select:disabled, input:disabled {
+      background: #f1f5f9;
+      opacity: 0.7;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .inline-actions button {
+      padding: 8px 18px;
+      font-size: 14px;
+      border-radius: 40px;
+      background: #e9edf4;
+      color: #1e293b;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+
+    .inline-actions button:hover {
+      background: #d1d9e6;
+      transform: translateY(-1px);
+    }
+
+    .hidden-input-group {
+      display: none;
+      margin-top: 10px;
+      padding: 14px;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .hidden-input-group input {
+      border-radius: 12px;
+    }
+
+    .hidden-input-group .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .hidden-input-group .btn-group button {
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: #e9edf4;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .hidden-input-group .btn-group button:first-child {
+      background: #f6821f;
+      color: white;
+    }
+
+    .hidden-input-group .btn-group button:first-child:hover {
+      background: #d96f1a;
+    }
+
+    .hidden-input-group .btn-group button:last-child {
+      background: #e9edf4;
+      color: #1e293b;
+    }
+
+    .hidden-input-group .btn-group button:last-child:hover {
+      background: #d1d9e6;
+    }
+
+    /* Dominio */
+    .dominio-container {
+      background: linear-gradient(135deg, #fef3e8 0%, #fde8d0 100%);
+      border-radius: 24px;
+      padding: 24px 28px;
+      margin-top: 24px;
+      border: 1px solid #fadcb5;
+      display: none;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-end;
+    }
+
+    .dominio-container.visible {
+      display: flex;
+    }
+
+    .dominio-marco {
+      flex: 1 1 200px;
+      min-width: 180px;
+    }
+
+    .dominio-marco label {
+      display: block;
+      font-weight: 600;
+      color: #0b2b5c;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .dominio-marco label i {
+      margin-right: 6px;
+    }
+
+    .dominio-marco input {
+      border-radius: 14px;
+      border-color: #fadcb5;
+      background: white;
+    }
+
+    .dominio-marco input:focus {
+      border-color: #f6821f;
+    }
+
+    .info-dominio {
+      background: white;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-size: 13px;
+      color: #0b2b5c;
+      margin-top: 8px;
+      display: inline-block;
+      border: 1px solid #fadcb5;
+    }
+
+    .botones-dominio {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      flex: 1 1 240px;
+    }
+
+    .botones-dominio button {
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .botones-dominio button:first-child {
+      background: #f6821f;
+      color: white;
+    }
+
+    .botones-dominio button:first-child:hover {
+      background: #d96f1a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(246, 130, 31, 0.3);
+    }
+
+    .botones-dominio button:last-child {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .botones-dominio button:last-child:hover {
+      background: #1557b0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+    }
+
+    /* Episodios */
+    .episodios-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .episodios-header .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .episodios-header button {
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+    }
+
+    .episodios-header button:hover {
+      background: #d1d9e6;
+      transform: translateY(-1px);
+    }
+
+    .episodios-header .btn-excel {
+      background: #10b981;
+      color: white;
+    }
+
+    .episodios-header .btn-excel:hover {
+      background: #059669;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      background: white;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    td input[type="text"] {
+      border-radius: 12px;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 14px;
+      width: 100%;
+      min-width: 120px;
+    }
+
+    td input[type="text"]:focus {
+      border-color: #f6821f;
+    }
+
+    td .acciones {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    td .acciones button {
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    td .acciones .btn-actualizar {
+      background: #f6821f;
+      color: white;
+    }
+
+    td .acciones .btn-actualizar:hover {
+      background: #d96f1a;
+    }
+
+    td .acciones .btn-registrar {
+      background: #10b981;
+      color: white;
+    }
+
+    td .acciones .btn-registrar:hover {
+      background: #059669;
+    }
+
+    td .acciones .btn-eliminar,
+    td .acciones .btn-eliminar-fila {
+      background: #f1f5f9;
+      color: #dc2626;
+    }
+
+    td .acciones .btn-eliminar:hover,
+    td .acciones .btn-eliminar-fila:hover {
+      background: #fee2e2;
+    }
+
+    .btn-agregar {
+      margin-top: 18px;
+      padding: 10px 24px;
+      border-radius: 40px;
+      background: #10b981;
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+
+    .btn-agregar:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .acciones-finales {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .acciones-finales button {
+      padding: 12px 32px;
+      border-radius: 40px;
+      border: none;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: inherit;
+      background: #f6821f;
+      color: white;
+    }
+
+    .acciones-finales button:hover {
+      background: #d96f1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(246, 130, 31, 0.25);
+    }
+
+    .acciones-finales .btn-firebase {
+      background: #1a73e8;
+    }
+
+    .acciones-finales .btn-firebase:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.25);
+    }
+
+    /* Barra de progreso */
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .progress-container {
+      background: white;
+      border-radius: 32px;
+      padding: 36px 40px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .progress-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .progress-info {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .progress-info p {
+      margin: 4px 0;
+    }
+
+    .progress-bar-wrapper {
+      background: #e9edf4;
+      border-radius: 60px;
+      overflow: hidden;
+      height: 28px;
+      margin: 16px 0;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #f6821f, #10b981, #1a73e8);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 60px;
+    }
+
+    .progress-status {
+      text-align: center;
+      font-size: 14px;
+      color: #475569;
+      margin: 8px 0 12px;
+    }
+
+    .progress-details {
+      max-height: 160px;
+      overflow-y: auto;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #1e293b;
+      margin-top: 8px;
+    }
+
+    .progress-details p {
+      margin: 4px 0;
+      padding: 2px 0;
+      border-bottom: 1px solid #e9edf4;
+    }
+
+    .progress-details .success-text { color: #10b981; }
+    .progress-details .error-text { color: #dc2626; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .container { padding: 24px 18px; }
+      h1 { font-size: 24px; }
+      h2 { font-size: 20px; }
+      .dominio-container { padding: 20px; }
+      .acciones-finales { justify-content: center; }
+      .acciones-finales button { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 18px 14px; }
+      .form-group { padding: 16px; }
+      .inline-actions { flex-direction: column; align-items: stretch; }
+      .episodios-header .btn-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-cloud"></i> Editar URL de Series · Cloudflare</h1>
+
+    <!-- Serie -->
+    <div class="form-group">
+      <label><i class="fas fa-tv"></i> Nombre de la Serie</label>
+      <select id="serieSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+    </div>
+
+    <!-- Temporada -->
+    <div class="form-group">
+      <label><i class="fas fa-layer-group"></i> Temporada</label>
+      <select id="temporadaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <div class="inline-actions">
+        <button onclick="nuevaEntrada('temporada')"><i class="fas fa-plus"></i> Nueva Temporada</button>
+      </div>
+      <div id="nuevaTemporadaInput" class="hidden-input-group">
+        <input type="text" id="nuevaTemporada" placeholder="Ej: Temporada 02" />
+        <div class="btn-group">
+          <button onclick="guardarNuevaEntrada('temporada')">Guardar</button>
+          <button onclick="cancelarEntrada('temporada')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Idioma -->
+    <div class="form-group">
+      <label><i class="fas fa-language"></i> Idioma</label>
+      <select id="idiomaSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <div class="inline-actions">
+        <button onclick="nuevaEntrada('idioma')"><i class="fas fa-plus"></i> Nuevo Idioma</button>
+      </div>
+      <div id="nuevoIdiomaInput" class="hidden-input-group">
+        <input type="text" id="nuevoIdioma" placeholder="Ej: Español" />
+        <div class="btn-group">
+          <button onclick="guardarNuevaEntrada('idioma')">Guardar</button>
+          <button onclick="cancelarEntrada('idioma')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servidor -->
+    <div class="form-group">
+      <label><i class="fas fa-server"></i> Servidor</label>
+      <select id="servidorSelect">
+        <option value="" disabled selected>Seleccionar...</option>
+      </select>
+      <div class="inline-actions">
+        <button onclick="nuevaEntrada('servidor')"><i class="fas fa-plus"></i> Nuevo Servidor</button>
+      </div>
+      <div id="nuevoServidorInput" class="hidden-input-group">
+        <input type="text" id="nuevoServidor" placeholder="Ej: Servidor 01" />
+        <div class="btn-group">
+          <button onclick="guardarNuevaEntrada('servidor')">Guardar</button>
+          <button onclick="cancelarEntrada('servidor')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dominio -->
+    <div class="dominio-container" id="dominioContainer">
+      <div class="dominio-marco">
+        <label><i class="fas fa-globe"></i> Dominio Actual de las URLs</label>
+        <input type="text" id="dominioActual" placeholder="abyssplayer.com" readonly style="background:#f1f5f9;" />
+        <div class="info-dominio" id="infoDominio">
+          <i class="fas fa-info-circle"></i> Se detectará automáticamente al seleccionar un servidor
+        </div>
+      </div>
+      <div class="dominio-marco">
+        <label><i class="fas fa-pen"></i> Nuevo Dominio</label>
+        <input type="text" id="nuevoDominio" placeholder="Ej: nuevodominio.com" />
+      </div>
+      <div class="botones-dominio">
+        <button id="btnActualizarSerie" onclick="actualizarDominiosSerie()"><i class="fas fa-sync-alt"></i> Actualizar Esta Serie</button>
+        <button id="btnActualizarTodas" onclick="actualizarDominiosTodasSeries()"><i class="fas fa-globe-americas"></i> Actualizar Todas las Series</button>
+      </div>
+    </div>
+
+    <!-- Episodios -->
+    <h2><i class="fas fa-list-ul"></i> Episodios y Enlaces URL</h2>
+    <div class="episodios-header">
+      <div class="btn-group">
+        <button onclick="document.getElementById('importarTxt').click()"><i class="fas fa-file-alt"></i> Importar TXT</button>
+        <button class="btn-excel" onclick="document.getElementById('importarExcel').click()"><i class="fas fa-file-excel"></i> Importar Excel</button>
+        <input type="file" id="importarTxt" accept=".txt" style="display:none;" />
+        <input type="file" id="importarExcel" accept=".xlsx, .xls" style="display:none;" />
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="tabla-episodios">
+        <thead>
+          <tr>
+            <th>Episodio</th>
+            <th>Enlace URL</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody"></tbody>
+      </table>
+    </div>
+
+    <button class="btn-agregar" onclick="agregarFila()"><i class="fas fa-plus-circle"></i> Agregar Fila</button>
+
+    <!-- Acciones finales -->
+    <div class="acciones-finales">
+      <button class="btn-firebase" onclick="location.href='../Editar-URL-Serie.html'">
+        <i class="fas fa-fire"></i> Editar con Firebase
+      </button>
+      <button onclick="guardarCambios()"><i class="fas fa-save"></i> Guardar Todos los Cambios</button>
+    </div>
+  </div>
+
+  <script src="../js_cloudflare/Editar_URLSerie_Controller.js"></script>
+  
+</body>
+</html>

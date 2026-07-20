@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Principal · Gestión de Series</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (gratuito) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f7fc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #0b2b5c 0%, #1a4b8c 100%);
+      color: #fff;
+      padding: 24px 40px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 6px 20px rgba(10, 30, 60, 0.25);
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-left h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+
+    .header-left p {
+      font-size: 14px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .logout-btn i {
+      font-size: 16px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      padding: 48px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Grid de tarjetas */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    /* Tarjeta */
+    .menu-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 28px 20px 24px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 20, 50, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      backdrop-filter: blur(2px);
+    }
+
+    .menu-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(26, 115, 232, 0.15), transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .menu-card:hover::after {
+      opacity: 1;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(26, 115, 232, 0.12);
+      border-color: rgba(26, 115, 232, 0.15);
+    }
+
+    .card-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 28px;
+      background: #eef4ff;
+      color: #1a5bb5;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .menu-card:hover .card-icon {
+      background: #1a73e8;
+      color: #fff;
+      transform: scale(1.02) rotate(-2deg);
+      box-shadow: 0 8px 18px rgba(26, 115, 232, 0.25);
+    }
+
+    /* Asignamos colores distintos a algunos iconos (solo estético) */
+    .menu-card:nth-child(6n+1) .card-icon { background: #e6f0ff; color: #1a5bb5; }
+    .menu-card:nth-child(6n+2) .card-icon { background: #eaf5ff; color: #0077b6; }
+    .menu-card:nth-child(6n+3) .card-icon { background: #f0f4ff; color: #3b4f8c; }
+    .menu-card:nth-child(6n+4) .card-icon { background: #ecf3ff; color: #2a5f8a; }
+    .menu-card:nth-child(6n+5) .card-icon { background: #e8f0fe; color: #1f4e7a; }
+    .menu-card:nth-child(6n+6) .card-icon { background: #e3edfe; color: #1a4b7a; }
+
+    .menu-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0b2b5c;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .menu-card p {
+      font-size: 13.5px;
+      color: #5e6f8d;
+      line-height: 1.5;
+      max-width: 220px;
+      margin: 0 auto;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #0b2b5c;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      padding: 18px 20px;
+      font-size: 13px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      letter-spacing: 0.2px;
+      margin-top: auto;
+    }
+
+    .footer span {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 18px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .header-left h1 {
+        font-size: 22px;
+      }
+
+      .logout-btn {
+        padding: 8px 18px;
+        font-size: 13px;
+        align-self: flex-start;
+      }
+
+      .main-content {
+        padding: 28px 16px;
+      }
+
+      .grid-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .menu-card {
+        padding: 20px 14px;
+      }
+
+      .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+      }
+
+      .menu-card h3 {
+        font-size: 15px;
+      }
+
+      .menu-card p {
+        font-size: 12.5px;
+        max-width: 180px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+        max-width: 380px;
+        margin: 0 auto;
+      }
+
+      .header-left h1 {
+        font-size: 20px;
+      }
+
+      .logout-btn {
+        font-size: 12px;
+        padding: 6px 14px;
+      }
+    }
+
+    /* Animación de entrada suave */
+    .menu-card {
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .menu-card:nth-child(1) { animation-delay: 0.02s; }
+    .menu-card:nth-child(2) { animation-delay: 0.04s; }
+    .menu-card:nth-child(3) { animation-delay: 0.06s; }
+    .menu-card:nth-child(4) { animation-delay: 0.08s; }
+    .menu-card:nth-child(5) { animation-delay: 0.10s; }
+    .menu-card:nth-child(6) { animation-delay: 0.12s; }
+    .menu-card:nth-child(7) { animation-delay: 0.14s; }
+    .menu-card:nth-child(8) { animation-delay: 0.16s; }
+    .menu-card:nth-child(9) { animation-delay: 0.18s; }
+    .menu-card:nth-child(10) { animation-delay: 0.20s; }
+    .menu-card:nth-child(11) { animation-delay: 0.22s; }
+    .menu-card:nth-child(12) { animation-delay: 0.24s; }
+    .menu-card:nth-child(13) { animation-delay: 0.26s; }
+    .menu-card:nth-child(14) { animation-delay: 0.28s; }
+    .menu-card:nth-child(15) { animation-delay: 0.30s; }
+    .menu-card:nth-child(16) { animation-delay: 0.32s; }
+    .menu-card:nth-child(17) { animation-delay: 0.34s; }
+    .menu-card:nth-child(18) { animation-delay: 0.36s; }
+    .menu-card:nth-child(19) { animation-delay: 0.38s; }
+    .menu-card:nth-child(20) { animation-delay: 0.40s; }
+    .menu-card:nth-child(21) { animation-delay: 0.42s; }
+    .menu-card:nth-child(22) { animation-delay: 0.44s; }
+    .menu-card:nth-child(23) { animation-delay: 0.46s; }
+    .menu-card:nth-child(24) { animation-delay: 0.48s; }
+    .menu-card:nth-child(25) { animation-delay: 0.50s; }
+    .menu-card:nth-child(26) { animation-delay: 0.52s; }
+    .menu-card:nth-child(27) { animation-delay: 0.54s; }
+    .menu-card:nth-child(28) { animation-delay: 0.56s; }
+    .menu-card:nth-child(29) { animation-delay: 0.58s; }
+    .menu-card:nth-child(30) { animation-delay: 0.60s; }
+    .menu-card:nth-child(31) { animation-delay: 0.62s; }
+    .menu-card:nth-child(32) { animation-delay: 0.64s; }
+    .menu-card:nth-child(33) { animation-delay: 0.66s; }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(18px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <h1>Panel de Administración</h1>
+      <p>Gestiona tus series, episodios y contenido</p>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='index.html'">
+      <i class="fas fa-sign-out-alt"></i>
+      Cerrar Sesión
+    </button>
+  </header>
+
+  <main class="main-content">
+    <div class="grid-container">
+      <!-- Eliminar Series -->
+      <div class="menu-card" onclick="window.location.href='Eliminación-de-Series-General.html'">
+        <div class="card-icon"><i class="fas fa-trash-alt"></i></div>
+        <h3>Eliminar Series</h3>
+        <p>Elimina series específicas por servidor y episodio</p>
+      </div>
+
+      <!-- Registrar Nueva Serie -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nueva-Serie.html'">
+        <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
+        <h3>Registrar Nueva Serie</h3>
+        <p>Agrega nuevas series con temporadas, idiomas y servidores</p>
+      </div>
+
+      <!-- Importar Series (Excel) -->
+      <div class="menu-card" onclick="window.location.href='Registro&Editar-Excel-Contenido-Serie.html'">
+        <div class="card-icon"><i class="fas fa-file-excel"></i></div>
+        <h3>Importar Series</h3>
+        <p>Registra y actualiza series y temporadas desde Excel</p>
+      </div>
+
+      <!-- Editar Series -->
+      <div class="menu-card" onclick="window.location.href='Editar-Contenido-Serie.html'">
+        <div class="card-icon"><i class="fas fa-edit"></i></div>
+        <h3>Editar Series</h3>
+        <p>Modifica series existentes, temporadas o episodios</p>
+      </div>
+
+      <!-- Lista de Series -->
+      <div class="menu-card" onclick="window.location.href='Vista-Previa-Episodio.html'">
+        <div class="card-icon"><i class="fas fa-list"></i></div>
+        <h3>Lista de Series</h3>
+        <p>Visualiza todas las series registradas en el sistema</p>
+      </div>
+
+      <!-- Exportar Series -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-Series-Registradas.html'">
+        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Exportar</h3>
+        <p>Exportar series o películas registradas</p>
+      </div>
+
+      <!-- Registrar Enlaces -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nuevo-Enlace.html'">
+        <div class="card-icon"><i class="fas fa-link"></i></div>
+        <h3>Registrar Enlaces</h3>
+        <p>Agrega nuevos enlaces para series y episodios</p>
+      </div>
+
+      <!-- Importar Enlaces (Excel) -->
+      <div class="menu-card" onclick="window.location.href='Registro&Editar-Excel-URL-Serie.html'">
+        <div class="card-icon"><i class="fas fa-link"></i></div>
+        <h3>Importar Enlaces</h3>
+        <p>Registra o actualiza múltiples enlaces por episodio desde Excel</p>
+      </div>
+
+      <!-- Editar Enlaces -->
+      <div class="menu-card" onclick="window.location.href='Editar-URL-Serie.html'">
+        <div class="card-icon"><i class="fas fa-pencil-alt"></i></div>
+        <h3>Editar Enlaces</h3>
+        <p>Modifica o elimina enlaces existentes</p>
+      </div>
+
+      <!-- Exportar Enlaces -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-URL-Series-Registradas.html'">
+        <div class="card-icon"><i class="fas fa-file-export"></i></div>
+        <h3>Exportar Enlaces</h3>
+        <p>Exporta los enlaces registrados en diferentes formatos</p>
+      </div>
+
+      <!-- Registrar Serie de Descarga -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nueva-Descarga.html'">
+        <div class="card-icon"><i class="fas fa-cloud-download-alt"></i></div>
+        <h3>Registrar Serie de Descarga</h3>
+        <p>Agrega nuevas series con enlaces de descarga directa</p>
+      </div>
+
+      <!-- Importar Enlaces de Descarga (Excel) -->
+      <div class="menu-card" onclick="window.location.href='Registro&Editar-Excel-Serie-Descarga.html'">
+        <div class="card-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <h3>Importar Enlaces de Descarga</h3>
+        <p>Agrega o actualiza series de descarga directa desde Excel</p>
+      </div>
+
+      <!-- Editar Series de Descarga -->
+      <div class="menu-card" onclick="window.location.href='Editar-Serie-Descarga.html'">
+        <div class="card-icon"><i class="fas fa-file-download"></i></div>
+        <h3>Editar Series de Descarga</h3>
+        <p>Modifica o actualiza los enlaces de descarga de las series</p>
+      </div>
+
+      <!-- Exportar Series de Descarga -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-Serie-Descarga.html'">
+        <div class="card-icon"><i class="fas fa-file-archive"></i></div>
+        <h3>Exportar Series de Descarga</h3>
+        <p>Exporta los enlaces de descarga en diferentes formatos</p>
+      </div>
+
+      <!-- Redimensionar Iframes -->
+      <div class="menu-card" onclick="window.location.href='Redimensionar-Iframes-Registrados.html'">
+        <div class="card-icon"><i class="fas fa-expand-alt"></i></div>
+        <h3>Redimensionar Iframes</h3>
+        <p>Ajusta el tamaño de los iframes registrados para mejor visualización</p>
+      </div>
+
+      <!-- Registrar Portada -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nueva-Portada.html'">
+        <div class="card-icon"><i class="fas fa-image"></i></div>
+        <h3>Registrar Portada</h3>
+        <p>Agrega nuevas portadas e imágenes para las series registradas</p>
+      </div>
+
+      <!-- Editar Portada -->
+      <div class="menu-card" onclick="window.location.href='Editar-Portada-Serie.html'">
+        <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
+        <h3>Editar Portada</h3>
+        <p>Modifica o actualiza las portadas existentes de las series</p>
+      </div>
+
+      <!-- Exportar Portadas -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-Portadas-Registradas.html'">
+        <div class="card-icon"><i class="fas fa-file-export"></i></div>
+        <h3>Exportar Portadas</h3>
+        <p>Exporta los enlaces de las portadas registrados</p>
+      </div>
+
+      <!-- Buscar por Portada -->
+      <div class="menu-card" onclick="window.location.href='Buscador-Series-Portadas.html'">
+        <div class="card-icon"><i class="fas fa-search"></i></div>
+        <h3>Buscar por Portada</h3>
+        <p>Encuentra series mediante búsqueda visual de sus portadas</p>
+      </div>
+
+      <!-- Registrar Contenido Original -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nueva-Serie-Original.html'">
+        <div class="card-icon"><i class="fas fa-crown"></i></div>
+        <h3>Registrar Contenido Original</h3>
+        <p>Agrega nuevas series originales completos</p>
+      </div>
+
+      <!-- Importar Originales (Excel) -->
+      <div class="menu-card" onclick="window.location.href='Registro&Editar-Excel-Serie-Original.html'">
+        <div class="card-icon"><i class="fas fa-crown"></i></div>
+        <h3>Importar Originales</h3>
+        <p>Agrega o actualiza series originales desde un archivo Excel</p>
+      </div>
+
+      <!-- Editar Contenido Original -->
+      <div class="menu-card" onclick="window.location.href='Editar-Serie-Original.html'">
+        <div class="card-icon"><i class="fas fa-edit"></i></div>
+        <h3>Editar Contenido Original</h3>
+        <p>Modifica la información de las series originales registradas</p>
+      </div>
+
+      <!-- Exportar Contenido Original -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-Serie-Original.html'">
+        <div class="card-icon"><i class="fas fa-file-export"></i></div>
+        <h3>Exportar Contenido Original</h3>
+        <p>Genera reportes y exporta el catálogo de series originales</p>
+      </div>
+
+      <!-- Registrar Índice de Serie -->
+      <div class="menu-card" onclick="window.location.href='Registro-Nuevo-Indice.html'">
+        <div class="card-icon"><i class="fas fa-bookmark"></i></div>
+        <h3>Registrar Índice de Serie</h3>
+        <p>Crea y configura nuevos índices para organizar las series</p>
+      </div>
+
+      <!-- Editar Índice -->
+      <div class="menu-card" onclick="window.location.href='Editar-Indice.html'">
+        <div class="card-icon"><i class="fas fa-book-open"></i></div>
+        <h3>Editar Índice de Serie</h3>
+        <p>Modifica la estructura y organización de los índices existentes</p>
+      </div>
+
+      <!-- Exportar Índice -->
+      <div class="menu-card" onclick="window.location.href='Exportar-Indice.html'">
+        <div class="card-icon"><i class="fas fa-file-export"></i></div>
+        <h3>Exportar Índice de Series</h3>
+        <p>Genera reportes y exporta la estructura de índices de series</p>
+      </div>
+
+      <!-- Transferir Tabla de Series -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Contenido-Serie.html'">
+        <div class="card-icon"><i class="fas fa-table"></i></div>
+        <h3>Transferir Tabla de Series</h3>
+        <p>Migra los datos de la tabla principal de series a Cloudflare</p>
+      </div>
+
+      <!-- Transferir Tabla Series URL -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Serie-URL.html'">
+        <div class="card-icon"><i class="fas fa-link"></i></div>
+        <h3>Transferir Tabla Series URL</h3>
+        <p>Migra las URLs asociadas a las series hacia Cloudflare</p>
+      </div>
+
+      <!-- Transferir Tabla Series Descargas -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Serie-Descarga.html'">
+        <div class="card-icon"><i class="fas fa-download"></i></div>
+        <h3>Transferir Tabla Series Descargas</h3>
+        <p>Migra los datos de descargas de series a Cloudflare</p>
+      </div>
+
+      <!-- Transferir Tabla Series Originales -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Serie-Original.html'">
+        <div class="card-icon"><i class="fas fa-film"></i></div>
+        <h3>Transferir Tabla Series Originales</h3>
+        <p>Migra los datos de series originales a Cloudflare</p>
+      </div>
+
+      <!-- Transferir Tabla Portadas -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Portada.html'">
+        <div class="card-icon"><i class="fas fa-image"></i></div>
+        <h3>Transferir Tabla Portadas de Series</h3>
+        <p>Migra las portadas e imágenes de series a Cloudflare</p>
+      </div>
+
+      <!-- Transferir Índice -->
+      <div class="menu-card" onclick="window.location.href='Transferencia-de-Servicios-Indice.html'">
+        <div class="card-icon"><i class="fas fa-list-alt"></i></div>
+        <h3>Transferir Índice de Series</h3>
+        <p>Migra la estructura de índices de series a Cloudflare</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>Sistema de Gestión de Series &copy; 2026 · <span>Todos los derechos reservados</span></p>
+  </footer>
+</body>
+</html>

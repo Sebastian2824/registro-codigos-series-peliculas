@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Serie · Firebase</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      background: #ffffff;
+      padding: 20px 28px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h2 i {
+      color: #1a73e8;
+    }
+
+    .header .badge {
+      background: #e9edf4;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header .badge i {
+      color: #1a73e8;
+    }
+
+    .header .badge.cloudflare {
+      background: #f6821f;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header .badge.cloudflare:hover {
+      background: #d96f1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.2);
+    }
+
+    /* Tarjeta de formulario */
+    .form-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
+      border: 1px solid #e9edf4;
+    }
+
+    .form-card .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-card .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: #0b2b5c;
+      margin-bottom: 6px;
+    }
+
+    .form-card .form-group label i {
+      margin-right: 6px;
+      color: #1a73e8;
+      width: 18px;
+      text-align: center;
+    }
+
+    .form-card .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 15px;
+      background: #fafcff;
+      transition: all 0.2s;
+      font-family: inherit;
+      color: #1e293b;
+    }
+
+    .form-card .form-group input:focus {
+      border-color: #1a73e8;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.08);
+      background: white;
+    }
+
+    /* Sección de episodios */
+    .episodios-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .episodios-header h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .episodios-header h3 i {
+      color: #1a73e8;
+    }
+
+    .episodios-header .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .episodios-header .btn-group button {
+      padding: 8px 18px;
+      border-radius: 40px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+    }
+
+    .episodios-header .btn-group button:hover {
+      background: #d1d9e6;
+      transform: translateY(-2px);
+    }
+
+    .episodios-header .btn-group .btn-excel {
+      background: #10b981;
+      color: white;
+    }
+
+    .episodios-header .btn-group .btn-excel:hover {
+      background: #059669;
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      background: white;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 10px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    td input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      background: white;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    td input:focus {
+      border-color: #1a73e8;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.06);
+    }
+
+    td .btn-eliminar {
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f1f5f9;
+      color: #dc2626;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+
+    td .btn-eliminar:hover {
+      background: #fee2e2;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .action-buttons .left-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-cloudflare {
+      background: #f6821f;
+      color: white;
+    }
+    .btn-cloudflare:hover {
+      background: #d96f1a;
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+      .header h2 { font-size: 22px; }
+      .form-card { padding: 20px; }
+      .action-buttons { flex-direction: column; align-items: stretch; }
+      .action-buttons .left-group { flex-direction: column; }
+      .btn { justify-content: center; }
+      .episodios-header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      table { font-size: 13px; }
+      th, td { padding: 8px 10px; }
+      td input { font-size: 13px; padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Encabezado -->
+    <div class="header">
+      <h2><i class="fas fa-plus-circle"></i> Registrar Serie</h2>
+      <span class="badge"><i class="fas fa-fire"></i> Firebase</span>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-card">
+      <div class="form-group">
+        <label><i class="fas fa-tv"></i> Nombre de la serie</label>
+        <input type="text" id="serieNombre" placeholder="Ej: Mi Serie Favorita" />
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-layer-group"></i> Temporada (ej: Temporada 1)</label>
+        <input type="text" id="temporada" placeholder="Ej: Temporada 1" />
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-language"></i> Idioma (ej: Sub-Español)</label>
+        <input type="text" id="idioma" placeholder="Ej: Sub-Español" />
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-server"></i> Servidor (ej: Google-Drive)</label>
+        <input type="text" id="servidor" placeholder="Ej: Google-Drive" />
+      </div>
+    </div>
+
+    <!-- Episodios -->
+    <div class="form-card">
+      <div class="episodios-header">
+        <h3><i class="fas fa-list-ul"></i> Episodios y Códigos de Incrustación</h3>
+        <div class="btn-group">
+          <button onclick="document.getElementById('importarTxt').click()"><i class="fas fa-file-alt"></i> Importar TXT</button>
+          <button class="btn-excel" onclick="document.getElementById('importarExcel').click()"><i class="fas fa-file-excel"></i> Importar Excel</button>
+          <input type="file" id="importarTxt" accept=".txt" style="display: none;">
+          <input type="file" id="importarExcel" accept=".xlsx, .xls" style="display: none;">
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="tablaEpisodios">
+          <thead>
+            <tr>
+              <th>Episodio</th>
+              <th>Código de incrustación</th>
+              <th style="width: 120px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" placeholder="Ej: Episodio 1"></td>
+              <td><input type="text" placeholder="&lt;iframe&gt;...&lt;/iframe&gt;"></td>
+              <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <div class="left-group">
+          <button class="btn btn-success" id="btnAgregarFila"><i class="fas fa-plus-circle"></i> Agregar fila</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button class="btn btn-cloudflare" onclick="location.href='Interfaces-Cloudflare/Registro-Nueva-Serie.html'">
+            <i class="fas fa-cloud"></i> Registrar con Cloudflare
+          </button>
+          <button class="btn btn-primary" id="btnGuardar"><i class="fas fa-save"></i> Guardar en Firebase</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js_firebase/Registro_NuevaSerie_Controller.js"></script>
+
+</body>
+</html>

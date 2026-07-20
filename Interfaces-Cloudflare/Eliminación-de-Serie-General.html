@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Eliminación · Cloudflare</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+      background: #ffffff;
+      padding: 20px 28px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h1 i {
+      color: #f6821f;
+    }
+
+    .header .badge {
+      background: #e9edf4;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header .badge i {
+      color: #f6821f;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      color: #475569;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .tab-btn.active {
+      background: #f6821f;
+      border-color: #f6821f;
+      color: white;
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.2);
+    }
+
+    .tab-btn i {
+      font-size: 16px;
+    }
+
+    .tab-btn.firebase {
+      background: #1a73e8;
+      border-color: #1a73e8;
+      color: white;
+    }
+
+    .tab-btn.firebase:hover {
+      background: #1557b0;
+      border-color: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
+    }
+
+    /* Paneles */
+    .tab-panel {
+      display: none;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      animation: fadeUp 0.35s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Filtros */
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      background: #f8fafc;
+      padding: 20px 24px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      border: 1px solid #e9edf4;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-group label i {
+      color: #f6821f;
+      width: 18px;
+      text-align: center;
+    }
+
+    select {
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 14px;
+      background: white;
+      font-family: inherit;
+      color: #1e293b;
+      transition: all 0.2s;
+      cursor: pointer;
+      appearance: auto;
+    }
+
+    select:focus {
+      border-color: #f6821f;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.1);
+    }
+
+    select:disabled {
+      background: #f1f5f9;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      background: white;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    td {
+      padding: 12px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .checkbox-cell {
+      width: 40px;
+      text-align: center;
+    }
+
+    .checkbox-cell input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #f6821f;
+    }
+
+    /* Wrapper para iframes de Jumpshare */
+    .iframe-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 6px;
+    }
+    .iframe-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
+    }
+
+    .btn-warning {
+      background: #f6821f;
+      color: white;
+    }
+    .btn-warning:hover {
+      background: #d96f1a;
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+    }
+
+    /* Mensajes */
+    .message {
+      padding: 14px 20px;
+      border-radius: 16px;
+      margin-top: 24px;
+      display: none;
+      font-weight: 500;
+      border-left: 4px solid transparent;
+    }
+
+    .message.success {
+      background: #e6f7e6;
+      color: #0a5e0a;
+      border-color: #34a853;
+      display: block;
+    }
+
+    .message.error {
+      background: #fde8e8;
+      color: #991b1b;
+      border-color: #dc2626;
+      display: block;
+    }
+
+    .message.info {
+      background: #e8f0fe;
+      color: #1a4b8c;
+      border-color: #1a73e8;
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+      .header h1 { font-size: 22px; }
+      .tab-panel { padding: 20px; }
+      .filters { grid-template-columns: 1fr; padding: 16px; }
+      .action-buttons { flex-direction: column; align-items: stretch; }
+      .btn { justify-content: center; }
+      .iframe-wrapper { max-width: 100%; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Encabezado -->
+    <div class="header">
+      <h1><i class="fas fa-cloud"></i> Sistema de Eliminación</h1>
+      <span class="badge"><i class="fas fa-server"></i> Cloudflare</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="iframe"><i class="fas fa-film"></i> Iframe</button>
+      <button class="tab-btn" data-tab="enlaces"><i class="fas fa-link"></i> Enlaces</button>
+      <button class="tab-btn" data-tab="descargas"><i class="fas fa-download"></i> Descargas</button>
+      <button class="tab-btn" data-tab="original"><i class="fas fa-crown"></i> Original</button>
+      <button class="tab-btn firebase" onclick="location.href='../Eliminación-de-Series-General.html'">
+        <i class="fas fa-fire"></i> Firebase
+      </button>
+    </div>
+
+    <!-- Panel Iframe -->
+    <div class="tab-panel active" id="panel-iframe">
+      <div class="filters">
+        <div class="form-group">
+          <label><i class="fas fa-tv"></i> Serie</label>
+          <select id="iframe-serie" onchange="cargarTemporadas('iframe')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Temporada</label>
+          <select id="iframe-temporada" onchange="cargarIdiomas('iframe')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-language"></i> Idioma</label>
+          <select id="iframe-idioma" onchange="cargarServidores('iframe')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-server"></i> Servidor</label>
+          <select id="iframe-servidor" onchange="cargarEpisodios('iframe')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="iframe-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="iframe-select-all" onchange="seleccionarTodos('iframe')"></th>
+              <th>Episodio</th>
+              <th>Código Iframe</th>
+            </tr>
+          </thead>
+          <tbody id="iframe-tbody">
+            <tr><td colspan="3" style="text-align:center; padding:30px; color:#94a3b8;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('iframe')"><i class="fas fa-trash-alt"></i> Eliminar seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('iframe')"><i class="fas fa-exclamation-triangle"></i> Eliminar servidor completo</button>
+      </div>
+    </div>
+
+    <!-- Panel Enlaces -->
+    <div class="tab-panel" id="panel-enlaces">
+      <div class="filters">
+        <div class="form-group">
+          <label><i class="fas fa-tv"></i> Serie</label>
+          <select id="enlaces-serie" onchange="cargarTemporadas('enlaces')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Temporada</label>
+          <select id="enlaces-temporada" onchange="cargarIdiomas('enlaces')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-language"></i> Idioma</label>
+          <select id="enlaces-idioma" onchange="cargarServidores('enlaces')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-server"></i> Servidor</label>
+          <select id="enlaces-servidor" onchange="cargarEpisodios('enlaces')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="enlaces-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="enlaces-select-all" onchange="seleccionarTodos('enlaces')"></th>
+              <th>Episodio</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody id="enlaces-tbody">
+            <tr><td colspan="3" style="text-align:center; padding:30px; color:#94a3b8;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('enlaces')"><i class="fas fa-trash-alt"></i> Eliminar seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('enlaces')"><i class="fas fa-exclamation-triangle"></i> Eliminar servidor completo</button>
+      </div>
+    </div>
+
+    <!-- Panel Descargas -->
+    <div class="tab-panel" id="panel-descargas">
+      <div class="filters">
+        <div class="form-group">
+          <label><i class="fas fa-tv"></i> Serie</label>
+          <select id="descargas-serie" onchange="cargarTemporadas('descargas')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Temporada</label>
+          <select id="descargas-temporada" onchange="cargarIdiomas('descargas')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-language"></i> Idioma</label>
+          <select id="descargas-idioma" onchange="cargarServidores('descargas')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-server"></i> Servidor</label>
+          <select id="descargas-servidor" onchange="cargarEpisodios('descargas')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="descargas-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="descargas-select-all" onchange="seleccionarTodos('descargas')"></th>
+              <th>Episodio</th>
+              <th>URL de Descarga</th>
+            </tr>
+          </thead>
+          <tbody id="descargas-tbody">
+            <tr><td colspan="3" style="text-align:center; padding:30px; color:#94a3b8;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('descargas')"><i class="fas fa-trash-alt"></i> Eliminar seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('descargas')"><i class="fas fa-exclamation-triangle"></i> Eliminar servidor completo</button>
+      </div>
+    </div>
+
+    <!-- Panel Original -->
+    <div class="tab-panel" id="panel-original">
+      <div class="filters">
+        <div class="form-group">
+          <label><i class="fas fa-tv"></i> Serie</label>
+          <select id="original-serie" onchange="cargarTemporadas('original')">
+            <option value="">Seleccionar serie...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Temporada</label>
+          <select id="original-temporada" onchange="cargarIdiomas('original')" disabled>
+            <option value="">Primero selecciona una serie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-language"></i> Idioma</label>
+          <select id="original-idioma" onchange="cargarServidores('original')" disabled>
+            <option value="">Primero selecciona una temporada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-server"></i> Servidor</label>
+          <select id="original-servidor" onchange="cargarEpisodios('original')" disabled>
+            <option value="">Primero selecciona un idioma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="original-tabla">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" id="original-select-all" onchange="seleccionarTodos('original')"></th>
+              <th>Episodio</th>
+              <th>URL Original</th>
+            </tr>
+          </thead>
+          <tbody id="original-tbody">
+            <tr><td colspan="3" style="text-align:center; padding:30px; color:#94a3b8;">Selecciona los filtros para ver los episodios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-danger" onclick="eliminarSeleccionados('original')"><i class="fas fa-trash-alt"></i> Eliminar seleccionados</button>
+        <button class="btn btn-warning" onclick="eliminarServidorCompleto('original')"><i class="fas fa-exclamation-triangle"></i> Eliminar servidor completo</button>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script src="../js_cloudflare/Eliminación_de_Series_General_Controller.js"></script>
+  
+</body>
+</html>

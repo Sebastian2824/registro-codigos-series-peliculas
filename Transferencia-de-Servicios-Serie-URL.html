@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferir Enlaces · Firebase → Cloudflare</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      background: #ffffff;
+      padding: 20px 28px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h2 i {
+      color: #1a73e8;
+    }
+
+    .header .badge {
+      background: #e9edf4;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header .badge i {
+      color: #1a73e8;
+    }
+
+    .header .badge.cloudflare {
+      background: #f6821f;
+      color: white;
+    }
+
+    /* Tarjetas */
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0b2b5c;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #e9edf4;
+      padding-bottom: 10px;
+    }
+
+    .card h3 i {
+      color: #1a73e8;
+    }
+
+    /* Controles */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Filtros */
+    .filter-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+      margin-top: 8px;
+    }
+
+    .filter-section .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-section .form-group label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-section .form-group label i {
+      color: #1a73e8;
+      width: 16px;
+      text-align: center;
+    }
+
+    .filter-section .form-group input {
+      padding: 8px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+      transition: all 0.2s;
+      min-width: 160px;
+    }
+
+    .filter-section .form-group input:focus {
+      border-color: #1a73e8;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.08);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #e9edf4;
+      max-height: 480px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .iframe-cell {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      color: #1a73e8;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Paginación */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 6px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 30px;
+      background: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #1e293b;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      transform: translateY(-2px);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pagination-info {
+      font-weight: 600;
+      color: #0b2b5c;
+      padding: 0 12px;
+    }
+
+    /* Barras de progreso */
+    .progress-container {
+      margin: 16px 0 8px;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 16px 20px;
+      border: 1px solid #e9edf4;
+    }
+
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 24px;
+      background: #e9edf4;
+      border-radius: 60px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #1a73e8, #10b981);
+      border-radius: 60px;
+      transition: width 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .progress-text {
+      margin-top: 8px;
+      font-weight: 600;
+      color: #1a73e8;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* Estadísticas */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid #e9edf4;
+    }
+
+    .stat-box h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .stat-box .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a73e8;
+    }
+
+    /* Depuración */
+    .debug-info {
+      background: #f8fafc;
+      border: 1px solid #e9edf4;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #1e293b;
+    }
+
+    .debug-info div {
+      padding: 4px 0;
+      border-bottom: 1px solid #e9edf4;
+    }
+
+    .debug-info strong {
+      color: #1a73e8;
+    }
+
+    .debug-info hr {
+      border: none;
+      border-top: 1px solid #e9edf4;
+      margin: 6px 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+      .header h2 { font-size: 22px; }
+      .card { padding: 18px; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .btn { justify-content: center; }
+      .filter-section { flex-direction: column; align-items: stretch; }
+      .filter-actions { flex-direction: column; align-items: stretch; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .pagination button { font-size: 13px; padding: 4px 12px; }
+    }
+
+    @media (max-width: 480px) {
+      table { font-size: 13px; }
+      th, td { padding: 6px 10px; }
+      .stats { grid-template-columns: 1fr; }
+      .iframe-cell { max-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Encabezado -->
+    <header class="header">
+      <h2><i class="fas fa-cloud-upload-alt"></i> Transferir Enlaces</h2>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <span class="badge"><i class="fas fa-fire"></i> Firebase</span>
+        <span class="badge cloudflare"><i class="fas fa-cloud"></i> Cloudflare</span>
+      </div>
+    </header>
+
+    <!-- Configuración -->
+    <div class="card">
+      <h3><i class="fas fa-sliders-h"></i> Configuración</h3>
+      <div class="controls">
+        <button class="btn btn-primary" id="btnCargarFirebase"><i class="fas fa-database"></i> Cargar Datos de Firebase</button>
+        <button class="btn btn-success" id="btnTransferir" disabled><i class="fas fa-cloud-upload-alt"></i> Transferir a Cloudflare</button>
+        <button class="btn btn-danger" id="btnLimpiar"><i class="fas fa-trash-alt"></i> Limpiar Tabla</button>
+      </div>
+
+      <!-- Barra de progreso de carga -->
+      <div id="loadingProgress" class="progress-container" style="display: none;">
+        <div class="progress-bar-wrapper">
+          <div id="loadingProgressBar" class="progress-bar">0%</div>
+        </div>
+        <div id="loadingProgressText" class="progress-text">Cargando...</div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filter-section">
+        <div class="form-group">
+          <label><i class="fas fa-tv"></i> Serie</label>
+          <input type="text" id="filterSerie" placeholder="Nombre de la serie">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-layer-group"></i> Temporada</label>
+          <input type="text" id="filterTemporada" placeholder="Nombre de temporada">
+        </div>
+        <div class="filter-actions">
+          <button class="btn btn-primary" id="btnAplicarFiltro"><i class="fas fa-filter"></i> Aplicar</button>
+          <button class="btn btn-outline" id="btnLimpiarFiltro"><i class="fas fa-undo"></i> Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos -->
+    <div class="card">
+      <h3><i class="fas fa-list-ul"></i> Datos de Firebase</h3>
+      <div class="table-container">
+        <div id="tablaDatos">
+          <p style="text-align: center; padding: 40px; color: #94a3b8;">
+            <i class="fas fa-info-circle" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+            Carga los datos de Firebase para visualizarlos
+          </p>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div id="pagination" class="pagination" style="display: none;">
+        <button id="btnFirstPage">Primera</button>
+        <button id="btnPrevPage">Anterior</button>
+        <span id="paginationInfo" class="pagination-info">Página 1 de 1</span>
+        <button id="btnNextPage">Siguiente</button>
+        <button id="btnLastPage">Última</button>
+      </div>
+    </div>
+
+    <!-- Progreso de transferencia -->
+    <div id="transferProgress" class="progress-container" style="display: none;">
+      <div class="progress-bar-wrapper">
+        <div id="transferProgressBar" class="progress-bar">0%</div>
+      </div>
+      <div id="transferProgressText" class="progress-text">Transferiendo...</div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="card">
+      <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+      <div class="stats">
+        <div class="stat-box">
+          <h4>Series</h4>
+          <div class="stat-value" id="statSeries">0</div>
+        </div>
+        <div class="stat-box">
+          <h4>Temporadas</h4>
+          <div class="stat-value" id="statTemporadas">0</div>
+        </div>
+        <div class="stat-box">
+          <h4>Episodios</h4>
+          <div class="stat-value" id="statEpisodios">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Depuración -->
+    <div class="card">
+      <h3><i class="fas fa-bug"></i> Información de Depuración</h3>
+      <button class="btn btn-outline" id="btnToggleDebug"><i class="fas fa-eye"></i> Mostrar/Ocultar</button>
+      <div id="debugInfo" class="debug-info" style="display: none;">
+        <div id="debugContent"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js_multi_servidor/Transferencia de Servicios_SerieURL.js"></script>
+
+</body>
+</html>

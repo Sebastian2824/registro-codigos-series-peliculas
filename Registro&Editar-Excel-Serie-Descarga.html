@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Series de Descarga · Firebase</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      background: #ffffff;
+      padding: 20px 28px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h2 i {
+      color: #1a73e8;
+    }
+
+    .header .badge {
+      background: #e9edf4;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header .badge i {
+      color: #1a73e8;
+    }
+
+    .header .badge.cloudflare {
+      background: #f6821f;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header .badge.cloudflare:hover {
+      background: #d96f1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.2);
+    }
+
+    /* Tarjetas */
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0b2b5c;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #e9edf4;
+      padding-bottom: 10px;
+    }
+
+    .card h3 i {
+      color: #1a73e8;
+    }
+
+    /* Área de carga */
+    .upload-area {
+      border: 2px dashed #e2e8f0;
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #fafcff;
+      position: relative;
+    }
+
+    .upload-area:hover {
+      border-color: #1a73e8;
+      background: #f0f7ff;
+    }
+
+    .upload-area i {
+      font-size: 48px;
+      color: #1a73e8;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .upload-area p {
+      font-size: 16px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .upload-area .sub {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .upload-area input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Botones */
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-cloudflare {
+      background: #f6821f;
+      color: white;
+    }
+    .btn-cloudflare:hover {
+      background: #d96f1a;
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    /* Tabla de previsualización */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #e9edf4;
+      margin-top: 12px;
+      max-height: 460px;
+      overflow-y: auto;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      white-space: normal;
+    }
+
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .iframe-cell {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      color: #1a73e8;
+      max-width: 300px;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    /* Mensaje vacío */
+    .empty-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-size: 15px;
+    }
+
+    .empty-message i {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+
+    /* Barra de progreso (overlay) */
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .progress-container {
+      background: white;
+      border-radius: 28px;
+      padding: 32px 36px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .progress-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .progress-title i {
+      color: #1a73e8;
+    }
+
+    .progress-info {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .progress-info p {
+      margin: 4px 0;
+    }
+
+    .progress-bar-wrapper {
+      background: #e9edf4;
+      border-radius: 60px;
+      overflow: hidden;
+      height: 28px;
+      margin: 16px 0;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #1a73e8, #10b981, #f6821f);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 60px;
+    }
+
+    .progress-status {
+      text-align: center;
+      font-size: 14px;
+      color: #475569;
+      margin: 8px 0 12px;
+    }
+
+    .progress-details {
+      max-height: 160px;
+      overflow-y: auto;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      color: #1e293b;
+      margin-top: 8px;
+    }
+
+    .progress-details p {
+      margin: 4px 0;
+      padding: 2px 0;
+      border-bottom: 1px solid #e9edf4;
+    }
+
+    .progress-details .success-text { color: #10b981; }
+    .progress-details .error-text { color: #dc2626; }
+    .progress-details .info-text { color: #1a73e8; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+      .header h2 { font-size: 22px; }
+      .card { padding: 18px; }
+      .upload-area { padding: 24px 16px; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .btn { justify-content: center; }
+      .progress-container { padding: 24px 20px; }
+    }
+
+    @media (max-width: 480px) {
+      table { font-size: 13px; }
+      th, td { padding: 6px 10px; }
+      .iframe-cell { max-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Encabezado -->
+    <header class="header">
+      <h2><i class="fas fa-download"></i> Importar Series de Descarga</h2>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <span class="badge"><i class="fas fa-fire"></i> Firebase</span>
+        <span class="badge cloudflare" onclick="location.href='Interfaces-Cloudflare/Registro&Editar-Excel-Serie-Descarga.html'">
+          <i class="fas fa-cloud"></i> Cloudflare
+        </span>
+      </div>
+    </header>
+
+    <!-- Subida de archivo -->
+    <div class="card">
+      <h3><i class="fas fa-upload"></i> Cargar archivo Excel</h3>
+      <div class="upload-area" id="uploadArea">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Selecciona un archivo <strong>.xlsx</strong></p>
+        <span class="sub">Arrastra o haz clic para seleccionar</span>
+        <input type="file" id="inputExcel" accept=".xlsx">
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-cloudflare" onclick="location.href='Interfaces-Cloudflare/Registro&Editar-Excel-Serie-Descarga.html'">
+          <i class="fas fa-cloud"></i> Ir al registro con Cloudflare
+        </button>
+        <button class="btn btn-success" id="saveButton" disabled>
+          <i class="fas fa-save"></i> Guardar en Firebase
+        </button>
+      </div>
+    </div>
+
+    <!-- Previsualización -->
+    <div class="card">
+      <h3><i class="fas fa-table"></i> Previsualización de datos</h3>
+      <div class="table-container">
+        <div id="panelPreview">
+          <div class="empty-message">
+            <i class="fas fa-file-excel"></i>
+            Carga un archivo Excel para ver los datos
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js_firebase/Registro&Editar_Excel_SerieDescarga.js"></script>
+
+</body>
+</html>

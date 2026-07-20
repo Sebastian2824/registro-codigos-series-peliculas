@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Series Enlaces · Cloudflare</title>
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 24px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      background: #ffffff;
+      padding: 20px 28px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h2 i {
+      color: #f6821f;
+    }
+
+    .header .badge {
+      background: #e9edf4;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header .badge i {
+      color: #f6821f;
+    }
+
+    .header .badge.firebase {
+      background: #1a73e8;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header .badge.firebase:hover {
+      background: #1557b0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.2);
+    }
+
+    /* Filtros */
+    .filtros-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+      background: #f8fafc;
+      padding: 20px 24px;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+    }
+
+    .filtros-container .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1 1 150px;
+      min-width: 130px;
+    }
+
+    .filtros-container .form-group label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filtros-container .form-group label i {
+      color: #f6821f;
+      width: 16px;
+      text-align: center;
+    }
+
+    .filtros-container select {
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 14px;
+      background: white;
+      font-family: inherit;
+      color: #1e293b;
+      transition: all 0.2s;
+      cursor: pointer;
+      appearance: auto;
+      width: 100%;
+    }
+
+    .filtros-container select:focus {
+      border-color: #f6821f;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.1);
+    }
+
+    .filtros-container .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      background: #e9edf4;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-primary {
+      background: #f6821f;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #d96f1a;
+      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-secondary {
+      background: #8b5cf6;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #7c3aed;
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.25);
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e9edf4;
+      background: white;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0b2b5c;
+      font-weight: 700;
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .url-link {
+      color: #1a73e8;
+      font-weight: 500;
+      text-decoration: underline;
+      word-break: break-all;
+      font-size: 13px;
+    }
+
+    .url-link:hover {
+      color: #1557b0;
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      border-radius: 30px;
+      padding: 4px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #1e293b;
+      font-family: inherit;
+    }
+
+    .btn-copy:hover {
+      background: #e9edf4;
+      border-color: #94a3b8;
+      transform: scale(1.05);
+    }
+
+    /* Paginación */
+    #paginacion {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    #paginacion button {
+      padding: 8px 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      background: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #1e293b;
+    }
+
+    #paginacion button:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      transform: translateY(-2px);
+    }
+
+    #paginacion button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #paginacion span {
+      font-weight: 600;
+      color: #0b2b5c;
+      padding: 0 8px;
+    }
+
+    /* Mensaje vacío */
+    .empty-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-size: 15px;
+    }
+
+    .empty-message i {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+      .header h2 { font-size: 22px; }
+      .filtros-container { flex-direction: column; align-items: stretch; padding: 16px; }
+      .filtros-container .form-group { flex: 1 1 auto; }
+      .filtros-container .btn-group { flex-wrap: wrap; }
+      .filtros-container .btn-group .btn { flex: 1; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      table { font-size: 13px; }
+      th, td { padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Encabezado -->
+    <div class="header">
+      <h2><i class="fas fa-link"></i> Series Enlaces</h2>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <span class="badge"><i class="fas fa-cloud"></i> Cloudflare</span>
+        <span class="badge firebase" onclick="location.href='../Exportar-URL-Series-Registradas.html'">
+          <i class="fas fa-fire"></i> Exportar con Firebase
+        </span>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-container">
+      <div class="form-group">
+        <label><i class="fas fa-tv"></i> Serie</label>
+        <select id="filtroSerie"><option value="">Todas las series</option></select>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-layer-group"></i> Temporada</label>
+        <select id="filtroTemporada"><option value="">Todas las temporadas</option></select>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-language"></i> Idioma</label>
+        <select id="filtroIdioma"><option value="">Todos los idiomas</option></select>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-server"></i> Servidor</label>
+        <select id="filtroServidor"><option value="">Todos los servidores</option></select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-filter"></i> Aplicar</button>
+        <button class="btn btn-outline" onclick="resetearFiltros()"><i class="fas fa-undo"></i> Resetear</button>
+        <button class="btn btn-success" onclick="exportarTablaAExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+        <button class="btn btn-secondary" onclick="copiarTodosURLs()"><i class="fas fa-copy"></i> Copiar Todos</button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-container">
+      <table id="tablaSeries">
+        <thead>
+          <tr>
+            <th>Serie</th>
+            <th>Temporada</th>
+            <th>Idioma</th>
+            <th>Servidor</th>
+            <th>Episodio</th>
+            <th style="max-width: 300px;">Enlace URL</th>
+            <th>Copiar</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div id="paginacion"></div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../js_cloudflare/Exportar_URLSeriesRegistradas_Controller.js"></script>
+
+</body>
+</html>

@@ -1794,6 +1794,96 @@ if (request.method === 'GET' && pathname === '/indice-año') {
   }
 }
 
+// Obtener TODOS los datos de animes_series de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-series') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
+// Obtener TODOS los datos de animes_series_descargas de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-descargas') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series_descargas").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
+// Obtener TODOS los datos de animes_series_enlaces de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-enlaces') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series_enlaces").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
+// Obtener TODOS los datos de animes_series_indice de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-indice') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series_indice").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
+// Obtener TODOS los datos de animes_series_original de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-original') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series_original").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
+// Obtener TODOS los datos de animes_series_portadas de una sola vez
+if (request.method === 'GET' && pathname === '/todos-los-animes-portadas') {
+  try {
+    const result = await env.animes_plus.prepare("SELECT * FROM animes_series_portadas").all();
+    return new Response(JSON.stringify(result.results), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
+  }
+}
+
     // Ruta no encontrada
     return new Response('Ruta no encontrada', { 
       status: 404, 
