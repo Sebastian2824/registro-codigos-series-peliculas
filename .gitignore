@@ -1,9 +1,8 @@
 # Credenciales
-credentials.json
-Credentials/credentials.json
+Credentials/
 
-# Node
-node_modules/
+# Bancked
+Bancked/
 
 # Logs
 *.log
