@@ -172,21 +172,30 @@
     }
 
     .btn-primary {
-      background: #1a73e8;
+      background: #10b981;
       color: white;
     }
     .btn-primary:hover {
+      background: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-cloudflare {
+      background: #1a73e8;
+      color: white;
+    }
+    .btn-cloudflare:hover {
       background: #1557b0;
       box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
     }
 
-    .btn-cloudflare {
-      background: #f6821f;
+    .btn-sql-server {
+      background: #1a73e8;
       color: white;
     }
-    .btn-cloudflare:hover {
-      background: #d96f1a;
-      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+    .btn-sql-server:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
     }
 
     /* Responsive */
@@ -210,9 +219,6 @@
       <h2><i class="fas fa-book"></i> Registrar Índice de Serie</h2>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <span class="badge"><i class="fas fa-fire"></i> Firebase</span>
-        <span class="badge cloudflare" onclick="location.href='Interfaces-Cloudflare/Registro-Nuevo-Indice.html'">
-          <i class="fas fa-cloud"></i> Cloudflare
-        </span>
       </div>
     </div>
 
@@ -261,8 +267,11 @@
 
       <div class="action-buttons">
         <button class="btn btn-cloudflare" onclick="location.href='../Interfaces-Cloudflare/Registro-Nuevo-Indice.html'">
-          <i class="fas fa-cloud"></i> Registrar con Cloudflare
+          <i class="fas fa-cloud"></i> Cloudflare
         </button>
+        <button class="btn btn-sql-server" onclick="location.href='../Interfaces-Azure/Registro-Nuevo-Indice.html'">
+            <i class="fas fa-cloud"></i> SQL Server
+          </button>
         <button class="btn btn-primary" id="btnGuardar">
           <i class="fas fa-save"></i> Guardar en Firebase
         </button>

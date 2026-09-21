@@ -3,20 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar Índice · Cloudflare</title>
-  <!-- Google Fonts (Inter) -->
+  <title>Registrar Índice · SQL Server</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* Reset y base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -27,12 +20,64 @@
       min-height: 100vh;
     }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
+    .container { max-width: 800px; margin: 0 auto; }
+
+    /* ============ NAVEGACIÓN ============ */
+    .service-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 60px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Encabezado */
+    .service-selector .service-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #475569;
+      margin-right: 8px;
+    }
+
+    .service-btn {
+      padding: 8px 20px;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      background: white;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      text-decoration: none;
+    }
+
+    .service-btn i { font-size: 16px; }
+    .service-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .service-btn.active {
+      background: #0078D4;
+      color: white;
+      border-color: #0078D4;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+    }
+    .service-btn.active i { color: white; }
+
+    .service-btn .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+    .service-btn .dot.firebase   { background: #34a853; }
+    .service-btn .dot.cloudflare { background: #f6821f; }
+    .service-btn .dot.sqlserver  { background: #0078D4; }
+
+    /* ============ HEADER ============ */
     .header {
       display: flex;
       align-items: center;
@@ -55,13 +100,11 @@
       gap: 12px;
     }
 
-    .header h2 i {
-      color: #f6821f;
-    }
+    .header h2 i { color: #0078D4; }
 
     .header .badge {
-      background: #e9edf4;
-      color: #1e293b;
+      background: #e1f0ff;
+      color: #0b2b5c;
       padding: 6px 14px;
       border-radius: 40px;
       font-size: 14px;
@@ -69,26 +112,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      border: 1px solid #b8daff;
     }
 
-    .header .badge i {
-      color: #f6821f;
-    }
+    .header .badge i { color: #0078D4; }
 
-    .header .badge.firebase {
-      background: #1a73e8;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .header .badge.firebase:hover {
-      background: #1557b0;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.2);
-    }
-
-    /* Tarjeta de formulario */
+    /* ============ FORM CARD ============ */
     .form-card {
       background: #ffffff;
       border-radius: 24px;
@@ -98,9 +127,7 @@
       border: 1px solid #e9edf4;
     }
 
-    .form-card .form-group {
-      margin-bottom: 20px;
-    }
+    .form-card .form-group { margin-bottom: 20px; }
 
     .form-card .form-group label {
       display: block;
@@ -112,7 +139,7 @@
 
     .form-card .form-group label i {
       margin-right: 6px;
-      color: #f6821f;
+      color: #0078D4;
       width: 18px;
       text-align: center;
     }
@@ -130,9 +157,9 @@
     }
 
     .form-card .form-group input:focus {
-      border-color: #f6821f;
+      border-color: #0078D4;
       outline: none;
-      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.08);
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.08);
       background: white;
     }
 
@@ -151,14 +178,10 @@
       gap: 4px;
     }
 
-    .error-message.hidden {
-      display: none;
-    }
+    .error-message.hidden { display: none; }
 
-    /* Vista previa */
-    .preview-section {
-      margin-top: 8px;
-    }
+    /* ============ VISTA PREVIA ============ */
+    .preview-section { margin-top: 8px; }
 
     .preview-section h3 {
       font-size: 16px;
@@ -170,9 +193,7 @@
       gap: 8px;
     }
 
-    .preview-section h3 i {
-      color: #f6821f;
-    }
+    .preview-section h3 i { color: #0078D4; }
 
     .preview-container {
       background: #f8fafc;
@@ -188,7 +209,7 @@
 
     .preview-container.has-image {
       border-style: solid;
-      border-color: #f6821f;
+      border-color: #0078D4;
     }
 
     .preview-image {
@@ -212,11 +233,9 @@
       color: #cbd5e1;
     }
 
-    .preview-error {
-      color: #dc2626;
-    }
+    .preview-error { color: #dc2626; }
 
-    /* Acciones */
+    /* ============ ACCIONES ============ */
     .action-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -238,32 +257,27 @@
       align-items: center;
       gap: 8px;
       font-family: inherit;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    }
-
-    .btn-primary {
-      background: #f6821f;
       color: white;
     }
-    .btn-primary:hover {
-      background: #d96f1a;
-      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); }
+
+    .btn-primary { background: #10b981; }
+    .btn-primary:hover { background: #059669; box-shadow: 0 6px 16px rgba(0, 120, 212, 0.25); }
+
+    .btn-firebase { background: #1a73e8; }
+    .btn-firebase:hover { background: #1557b0; box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25); }
+
+    .btn-cloudflare { background: #1a73e8; }
+    .btn-cloudflare:hover { background: #1557b0; box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25); }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
     }
 
-    .btn-firebase {
-      background: #1a73e8;
-      color: white;
-    }
-    .btn-firebase:hover {
-      background: #1557b0;
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
-    }
-
-    /* Responsive */
+    /* ============ RESPONSIVE ============ */
     @media (max-width: 640px) {
       body { padding: 16px; }
       .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
@@ -278,18 +292,29 @@
   </style>
 </head>
 <body>
-
   <div class="container">
+
+    <!-- Navegación entre interfaces -->
+   <!--  <div class="service-selector">
+      <span class="service-label"><i class="fas fa-exchange-alt"></i> Registrar con:</span>
+      <a href="../Interfaces-Firebase/Registro-Nuevo-Indice.html" class="service-btn">
+        <span class="dot firebase"></span>
+        <i class="fas fa-fire"></i> Firebase
+      </a>
+      <a href="../Interfaces-Cloudflare/Registro-Nuevo-Indice.html" class="service-btn">
+        <span class="dot cloudflare"></span>
+        <i class="fas fa-cloud"></i> Cloudflare
+      </a>
+      <button class="service-btn active">
+        <span class="dot sqlserver"></span>
+        <i class="fas fa-database"></i> SQL Server
+      </button>
+    </div>-->
 
     <!-- Encabezado -->
     <div class="header">
       <h2><i class="fas fa-book"></i> Registrar Índice de Serie</h2>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <span class="badge"><i class="fas fa-cloud"></i> Cloudflare</span>
-        <span class="badge firebase" onclick="location.href='../Registro-Nuevo-Indice.html'">
-          <i class="fas fa-fire"></i> Firebase
-        </span>
-      </div>
+      <span class="badge"><i class="fas fa-database"></i> Azure SQL Database</span>
     </div>
 
     <!-- Formulario -->
@@ -351,16 +376,18 @@
 
       <div class="action-buttons">
         <button class="btn btn-firebase" onclick="location.href='../Interfaces-Firebase/Registro-Nuevo-Indice.html'">
-          <i class="fas fa-fire"></i> Registrar con Firebase
+          <i class="fas fa-fire"></i> Firebase
+        </button>
+        <button class="btn btn-cloudflare" onclick="location.href='../Interfaces-Cloudflare/Registro-Nuevo-Indice.html'">
+          <i class="fas fa-cloud"></i> Cloudflare
         </button>
         <button class="btn btn-primary" id="btnGuardar">
-          <i class="fas fa-save"></i> Guardar en Cloudflare
+          <i class="fas fa-save"></i> Guardar en SQL Server
         </button>
       </div>
     </div>
   </div>
 
-  <script src="../../Controllers/js_cloudflare/Registro_NuevoIndice_Contoller.js"></script>
-
+  <script src="../../Controllers/js_azure/Registro_NuevoIndice_Contoller.js"></script>
 </body>
 </html>

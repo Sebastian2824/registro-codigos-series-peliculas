@@ -3,20 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editar Portada · Cloudflare</title>
-  <!-- Google Fonts (Inter) -->
+  <title>Editar Portada · SQL Server</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* Reset y base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -40,6 +33,68 @@
       box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08), 0 8px 24px rgba(0, 20, 40, 0.04);
     }
 
+    /* ============ NAVEGACIÓN ENTRE INTERFACES ============ */
+    .service-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 60px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 28px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-selector .service-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #475569;
+      margin-right: 8px;
+    }
+
+    .service-btn {
+      padding: 8px 20px;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      background: white;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      text-decoration: none;
+    }
+
+    .service-btn i { font-size: 16px; }
+    .service-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .service-btn.active {
+      background: #0078D4;
+      color: white;
+      border-color: #0078D4;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+    }
+
+    .service-btn.active i { color: white; }
+
+    .service-btn .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .service-btn .dot.firebase   { background: #34a853; }
+    .service-btn .dot.cloudflare { background: #f6821f; }
+    .service-btn .dot.sqlserver  { background: #0078D4; }
+
     h1 {
       font-size: 28px;
       font-weight: 700;
@@ -53,14 +108,9 @@
       gap: 12px;
     }
 
-    h1 i {
-      color: #f6821f;
-      font-size: 26px;
-    }
+    h1 i { color: #0078D4; font-size: 26px; }
 
-    .form-group {
-      margin-bottom: 24px;
-    }
+    .form-group { margin-bottom: 24px; }
 
     .form-group label {
       display: block;
@@ -72,7 +122,7 @@
 
     .form-group label i {
       margin-right: 8px;
-      color: #f6821f;
+      color: #0078D4;
       width: 20px;
       text-align: center;
     }
@@ -92,21 +142,14 @@
 
     .form-group select:focus,
     .form-group input[type="text"]:focus {
-      border-color: #f6821f;
+      border-color: #0078D4;
       outline: none;
-      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.1);
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.1);
       background: white;
     }
 
-    .form-group select {
-      appearance: auto;
-      cursor: pointer;
-    }
-
-    .form-group select:disabled {
-      background: #f1f5f9;
-      opacity: 0.7;
-    }
+    .form-group select { appearance: auto; cursor: pointer; }
+    .form-group select:disabled { background: #f1f5f9; opacity: 0.7; }
 
     .inline-group {
       display: flex;
@@ -114,9 +157,7 @@
       align-items: center;
     }
 
-    .inline-group select {
-      flex: 1;
-    }
+    .inline-group select { flex: 1; }
 
     .inline-group .btn-icon {
       width: 48px;
@@ -125,7 +166,7 @@
       border-radius: 16px;
       border: 2px solid #e2e8f0;
       background: #fafcff;
-      color: #f6821f;
+      color: #0078D4;
       font-size: 20px;
       cursor: pointer;
       transition: all 0.2s;
@@ -136,11 +177,11 @@
     }
 
     .inline-group .btn-icon:hover {
-      background: #f6821f;
+      background: #0078D4;
       color: white;
-      border-color: #f6821f;
+      border-color: #0078D4;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(246, 130, 31, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
     }
 
     .hidden-input-group {
@@ -152,9 +193,7 @@
       border: 1px solid #e2e8f0;
     }
 
-    .hidden-input-group input {
-      border-radius: 12px;
-    }
+    .hidden-input-group input { border-radius: 12px; }
 
     .hidden-input-group .btn-group {
       display: flex;
@@ -174,22 +213,12 @@
     }
 
     .hidden-input-group .btn-group button:first-child {
-      background: #f6821f;
+      background: #0078D4;
       color: white;
     }
 
-    .hidden-input-group .btn-group button:first-child:hover {
-      background: #d96f1a;
-    }
-
-    .hidden-input-group .btn-group button:last-child {
-      background: #e9edf4;
-      color: #1e293b;
-    }
-
-    .hidden-input-group .btn-group button:last-child:hover {
-      background: #d1d9e6;
-    }
+    .hidden-input-group .btn-group button:first-child:hover { background: #005a9e; }
+    .hidden-input-group .btn-group button:last-child:hover { background: #d1d9e6; }
 
     .error-message {
       color: #dc2626;
@@ -200,9 +229,7 @@
       gap: 6px;
     }
 
-    .error-message.hidden {
-      display: none;
-    }
+    .error-message.hidden { display: none; }
 
     .preview {
       margin-top: 20px;
@@ -245,10 +272,22 @@
       gap: 12px;
       margin-top: 28px;
       justify-content: flex-end;
+      padding-top: 24px;
+      border-top: 2px solid #e9edf4;
+    }
+
+    .acciones .label-ir {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: auto;
     }
 
     .acciones button {
-      padding: 12px 28px;
+      padding: 12px 24px;
       border-radius: 40px;
       border: none;
       font-weight: 700;
@@ -259,49 +298,44 @@
       align-items: center;
       gap: 10px;
       font-family: inherit;
-      background: #f6821f;
       color: white;
     }
 
-    .acciones button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(246, 130, 31, 0.25);
-    }
-
-    .acciones .btn-firebase {
-      background: #1a73e8;
-    }
-
+    .acciones .btn-firebase { background: #1a73e8; }
     .acciones .btn-firebase:hover {
       background: #1557b0;
+      transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(26, 115, 232, 0.25);
     }
 
-    .acciones .btn-guardar {
-      background: #10b981;
+    .acciones .btn-cloudflare { background: #1a73e8; }
+    .acciones .btn-cloudflare:hover {
+      background: #1557b0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.25);
     }
 
+    .acciones .btn-guardar { background: #10b981; }
     .acciones .btn-guardar:hover {
       background: #059669;
+      transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
     }
 
-    .acciones .btn-eliminar {
-      background: #dc2626;
-    }
-
+    .acciones .btn-eliminar { background: #dc2626; }
     .acciones .btn-eliminar:hover {
       background: #b91c1c;
+      transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(220, 38, 38, 0.25);
     }
 
-    /* Responsive */
     @media (max-width: 640px) {
       body { padding: 16px; }
       .container { padding: 24px 18px; }
       h1 { font-size: 24px; }
       .acciones { justify-content: center; }
-      .acciones button { width: 100%; justify-content: center; }
+      .acciones button { flex: 1; justify-content: center; }
+      .acciones .label-ir { flex: 1 1 100%; justify-content: center; margin-right: 0; margin-bottom: 8px; }
       .inline-group { flex-wrap: wrap; }
       .inline-group .btn-icon { width: 100%; }
     }
@@ -310,12 +344,31 @@
       .container { padding: 18px 14px; }
       .form-group select,
       .form-group input[type="text"] { font-size: 14px; padding: 10px 14px; }
+      .acciones button { width: 100%; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1><i class="fas fa-cloud"></i> Editar Portada · Cloudflare</h1>
+
+    <!-- ============ NAVEGACIÓN ENTRE INTERFACES ============ -->
+   <!--  <div class="service-selector">
+      <span class="service-label"><i class="fas fa-exchange-alt"></i> Editar con:</span>
+      <a href="../Interfaces-Firebase/Editar-Portada-Serie.html" class="service-btn">
+        <span class="dot firebase"></span>
+        <i class="fas fa-fire"></i> Firebase
+      </a>
+      <a href="../Interfaces-Cloudflare/Editar-Portada-Serie.html" class="service-btn">
+        <span class="dot cloudflare"></span>
+        <i class="fas fa-cloud"></i> Cloudflare
+      </a>
+      <button class="service-btn active">
+        <span class="dot sqlserver"></span>
+        <i class="fas fa-database"></i> SQL Server
+      </button>
+    </div>-->
+
+    <h1><i class="fas fa-database"></i> Editar Portada · SQL Server</h1>
 
     <!-- Serie -->
     <div class="form-group">
@@ -376,19 +429,24 @@
 
     <!-- Acciones -->
     <div class="acciones">
+      <span class="label-ir">
+        <i class="fas fa-arrow-right"></i> Ir a editar con:
+      </span>
       <button class="btn-firebase" onclick="location.href='../Interfaces-Firebase/Editar-Portada-Serie.html'">
-        <i class="fas fa-fire"></i> Editar con Firebase
+        <i class="fas fa-fire"></i> Firebase
+      </button>
+      <button class="btn-cloudflare" onclick="location.href='../Interfaces-Cloudflare/Editar-Portada-Serie.html'">
+        <i class="fas fa-cloud"></i> Cloudflare
       </button>
       <button class="btn-guardar" onclick="guardarCambios()">
         <i class="fas fa-save"></i> Guardar Cambios
       </button>
-      <button class="btn-eliminar" onclick="eliminarPortada()">
+     <!-- <button class="btn-eliminar" onclick="eliminarPortada()">
         <i class="fas fa-trash-alt"></i> Eliminar Portada
-      </button>
+      </button>-->
     </div>
   </div>
 
-  <script src="../../Controllers/js_cloudflare/Editar_PortadaSerie_Controller.js"></script>
-  
+  <script src="../../Controllers/js_azure/Editar_PortadaSerie_Controller.js"></script>
 </body>
 </html>

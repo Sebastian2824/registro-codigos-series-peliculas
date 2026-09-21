@@ -246,21 +246,30 @@
       align-items: center;
       gap: 10px;
       font-family: inherit;
-      background: #1a73e8;
+      background: #10b981;
       color: white;
     }
 
     .acciones button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.25);
+      box-shadow: 0 6px 20px rgba(53, 185, 12, 0.555);
     }
 
     .acciones .btn-cloudflare {
-      background: #f6821f;
+      background: #1a73e8;
     }
 
     .acciones .btn-cloudflare:hover {
-      background: #d96f1a;
+      background: #1557b0;
+      box-shadow: 0 6px 20px rgba(246, 130, 31, 0.25);
+    }
+
+    .acciones .btn-sql-server {
+      background: #1a73e8;
+    }
+
+    .acciones .btn-sql-server:hover {
+      background: #1557b0;
       box-shadow: 0 6px 20px rgba(246, 130, 31, 0.25);
     }
 
@@ -352,7 +361,10 @@
     <!-- Acciones -->
     <div class="acciones">
       <button class="btn-cloudflare" onclick="location.href='../Interfaces-Cloudflare/Editar-Portada-Serie.html'">
-        <i class="fas fa-cloud"></i> Editar con Cloudflare
+        <i class="fas fa-cloud"></i> Cloudflare
+      </button>
+      <button class="btn-sql-server" onclick="location.href='../Interfaces-Azure/Editar-Portada-Serie.html'">
+        <i class="fas fa-server"></i> SQL Server
       </button>
       <button class="btn-guardar" onclick="guardarCambios()">
         <i class="fas fa-save"></i> Guardar Cambios

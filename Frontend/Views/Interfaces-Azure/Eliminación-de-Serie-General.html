@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Eliminación · Cloudflare</title>
-  <!-- Google Fonts (Inter) -->
+  <title>Sistema de Eliminación · SQL Server</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -26,10 +20,7 @@
       min-height: 100vh;
     }
 
-    .container {
-      max-width: 1440px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1440px; margin: 0 auto; }
 
     /* Encabezado */
     .header {
@@ -38,7 +29,7 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       background: #ffffff;
       padding: 20px 28px;
       border-radius: 24px;
@@ -54,13 +45,11 @@
       gap: 12px;
     }
 
-    .header h1 i {
-      color: #f6821f;
-    }
+    .header h1 i { color: #0078D4; }
 
     .header .badge {
-      background: #e9edf4;
-      color: #1e293b;
+      background: #e1f0ff;
+      color: #0b2b5c;
       padding: 6px 14px;
       border-radius: 40px;
       font-size: 14px;
@@ -68,18 +57,72 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      border: 1px solid #b8daff;
     }
 
-    .header .badge i {
-      color: #f6821f;
+    .header .badge i { color: #0078D4; }
+
+    /* ============ NAVEGACIÓN ============ */
+    .service-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 60px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Tabs */
+    .service-selector .service-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #475569;
+      margin-right: 8px;
+    }
+
+    .service-btn {
+      padding: 8px 20px;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      background: white;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      text-decoration: none;
+    }
+
+    .service-btn i { font-size: 16px; }
+    .service-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .service-btn.active {
+      background: #0078D4;
+      color: white;
+      border-color: #0078D4;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+    }
+    .service-btn.active i { color: white; }
+
+    .service-btn .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+    .service-btn .dot.firebase   { background: #34a853; }
+    .service-btn .dot.cloudflare { background: #f6821f; }
+    .service-btn .dot.sqlserver  { background: #0078D4; }
+
+    /* Tabs de tipo de contenido */
     .tabs {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .tab-btn {
@@ -99,34 +142,16 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
-    .tab-btn:hover {
-      background: #f8fafc;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
+    .tab-btn:hover { background: #f8fafc; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 
     .tab-btn.active {
-      background: #f6821f;
-      border-color: #f6821f;
+      background: #0078D4;
+      border-color: #0078D4;
       color: white;
-      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.2);
+      box-shadow: 0 6px 16px rgba(0, 120, 212, 0.2);
     }
 
-    .tab-btn i {
-      font-size: 16px;
-    }
-
-    .tab-btn.firebase {
-      background: #1a73e8;
-      border-color: #1a73e8;
-      color: white;
-    }
-
-    .tab-btn.firebase:hover {
-      background: #1557b0;
-      border-color: #1557b0;
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
-    }
+    .tab-btn i { font-size: 16px; }
 
     /* Paneles */
     .tab-panel {
@@ -138,9 +163,7 @@
       animation: fadeUp 0.35s ease;
     }
 
-    .tab-panel.active {
-      display: block;
-    }
+    .tab-panel.active { display: block; }
 
     @keyframes fadeUp {
       0% { opacity: 0; transform: translateY(12px); }
@@ -159,11 +182,7 @@
       border: 1px solid #e9edf4;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
 
     .form-group label {
       font-weight: 600;
@@ -174,11 +193,7 @@
       gap: 6px;
     }
 
-    .form-group label i {
-      color: #f6821f;
-      width: 18px;
-      text-align: center;
-    }
+    .form-group label i { color: #0078D4; width: 18px; text-align: center; }
 
     select {
       padding: 10px 14px;
@@ -194,16 +209,12 @@
     }
 
     select:focus {
-      border-color: #f6821f;
+      border-color: #0078D4;
       outline: none;
-      box-shadow: 0 0 0 4px rgba(246, 130, 31, 0.1);
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.1);
     }
 
-    select:disabled {
-      background: #f1f5f9;
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
+    select:disabled { background: #f1f5f9; opacity: 0.7; cursor: not-allowed; }
 
     /* Tabla */
     .table-container {
@@ -215,21 +226,10 @@
       overflow-y: auto;
     }
 
-    .table-container::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
+    .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    .table-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
 
     th {
       background: #f1f5f9;
@@ -246,26 +246,16 @@
       z-index: 5;
     }
 
-    td {
-      padding: 12px 18px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-    }
+    td { padding: 12px 18px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    tr:hover td { background: #fafcff; }
 
-    tr:hover td {
-      background: #fafcff;
-    }
-
-    .checkbox-cell {
-      width: 40px;
-      text-align: center;
-    }
+    .checkbox-cell { width: 40px; text-align: center; }
 
     .checkbox-cell input[type="checkbox"] {
       width: 18px;
       height: 18px;
       cursor: pointer;
-      accent-color: #f6821f;
+      accent-color: #0078D4;
     }
 
     /* Wrapper para iframes de Jumpshare */
@@ -282,10 +272,8 @@
     }
     .iframe-wrapper iframe {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       border: none;
     }
 
@@ -314,28 +302,13 @@
       color: #1e293b;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); }
 
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #b91c1c;
-      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
-    }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25); }
 
-    .btn-warning {
-      background: #f6821f;
-      color: white;
-    }
-    .btn-warning:hover {
-      background: #d96f1a;
-      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
-    }
+    .btn-warning { background: #0078D4; color: white; }
+    .btn-warning:hover { background: #005a9e; box-shadow: 0 6px 16px rgba(0, 120, 212, 0.25); }
 
     /* Mensajes */
     .message {
@@ -347,28 +320,10 @@
       border-left: 4px solid transparent;
     }
 
-    .message.success {
-      background: #e6f7e6;
-      color: #0a5e0a;
-      border-color: #34a853;
-      display: block;
-    }
+    .message.success { background: #e6f7e6; color: #0a5e0a; border-color: #34a853; display: block; }
+    .message.error   { background: #fde8e8; color: #991b1b; border-color: #dc2626; display: block; }
+    .message.info    { background: #e8f0fe; color: #1a4b8c; border-color: #1a73e8; display: block; }
 
-    .message.error {
-      background: #fde8e8;
-      color: #991b1b;
-      border-color: #dc2626;
-      display: block;
-    }
-
-    .message.info {
-      background: #e8f0fe;
-      color: #1a4b8c;
-      border-color: #1a73e8;
-      display: block;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
       body { padding: 16px; }
       .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
@@ -384,21 +339,36 @@
 </head>
 <body>
   <div class="container">
+
     <!-- Encabezado -->
     <div class="header">
-      <h1><i class="fas fa-cloud"></i> Sistema de Eliminación</h1>
-      <span class="badge"><i class="fas fa-server"></i> Cloudflare</span>
+      <h1><i class="fas fa-trash-alt"></i> Sistema de Eliminación</h1>
+      <span class="badge"><i class="fas fa-database"></i> SQL Server (Azure)</span>
     </div>
 
-    <!-- Tabs -->
+    <!-- Navegación entre interfaces -->
+    <div class="service-selector">
+      <span class="service-label"><i class="fas fa-exchange-alt"></i> Eliminar con:</span>
+      <a href="../Interfaces-Firebase/Eliminación-de-Series-General.html" class="service-btn">
+        <span class="dot firebase"></span>
+        <i class="fas fa-fire"></i> Firebase
+      </a>
+      <a href="../Interfaces-Cloudflare/Eliminación-de-Serie-General.html" class="service-btn">
+        <span class="dot cloudflare"></span>
+        <i class="fas fa-cloud"></i> Cloudflare
+      </a>
+      <button class="service-btn active">
+        <span class="dot sqlserver"></span>
+        <i class="fas fa-database"></i> SQL Server
+      </button>
+    </div>
+
+    <!-- Tabs de tipo de contenido -->
     <div class="tabs">
       <button class="tab-btn active" data-tab="iframe"><i class="fas fa-film"></i> Iframe</button>
       <button class="tab-btn" data-tab="enlaces"><i class="fas fa-link"></i> Enlaces</button>
       <button class="tab-btn" data-tab="descargas"><i class="fas fa-download"></i> Descargas</button>
       <button class="tab-btn" data-tab="original"><i class="fas fa-crown"></i> Original</button>
-      <button class="tab-btn firebase" onclick="location.href='../Interfaces-Firebase/Eliminación-de-Series-General.html'">
-        <i class="fas fa-fire"></i> Firebase
-      </button>
     </div>
 
     <!-- Panel Iframe -->
@@ -406,27 +376,19 @@
       <div class="filters">
         <div class="form-group">
           <label><i class="fas fa-tv"></i> Serie</label>
-          <select id="iframe-serie" onchange="cargarTemporadas('iframe')">
-            <option value="">Seleccionar serie...</option>
-          </select>
+          <select id="iframe-serie" onchange="cargarTemporadas('iframe')"><option value="">Seleccionar serie...</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-layer-group"></i> Temporada</label>
-          <select id="iframe-temporada" onchange="cargarIdiomas('iframe')" disabled>
-            <option value="">Primero selecciona una serie</option>
-          </select>
+          <select id="iframe-temporada" onchange="cargarIdiomas('iframe')" disabled><option value="">Primero selecciona una serie</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-language"></i> Idioma</label>
-          <select id="iframe-idioma" onchange="cargarServidores('iframe')" disabled>
-            <option value="">Primero selecciona una temporada</option>
-          </select>
+          <select id="iframe-idioma" onchange="cargarServidores('iframe')" disabled><option value="">Primero selecciona una temporada</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-server"></i> Servidor</label>
-          <select id="iframe-servidor" onchange="cargarEpisodios('iframe')" disabled>
-            <option value="">Primero selecciona un idioma</option>
-          </select>
+          <select id="iframe-servidor" onchange="cargarEpisodios('iframe')" disabled><option value="">Primero selecciona un idioma</option></select>
         </div>
       </div>
 
@@ -456,27 +418,19 @@
       <div class="filters">
         <div class="form-group">
           <label><i class="fas fa-tv"></i> Serie</label>
-          <select id="enlaces-serie" onchange="cargarTemporadas('enlaces')">
-            <option value="">Seleccionar serie...</option>
-          </select>
+          <select id="enlaces-serie" onchange="cargarTemporadas('enlaces')"><option value="">Seleccionar serie...</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-layer-group"></i> Temporada</label>
-          <select id="enlaces-temporada" onchange="cargarIdiomas('enlaces')" disabled>
-            <option value="">Primero selecciona una serie</option>
-          </select>
+          <select id="enlaces-temporada" onchange="cargarIdiomas('enlaces')" disabled><option value="">Primero selecciona una serie</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-language"></i> Idioma</label>
-          <select id="enlaces-idioma" onchange="cargarServidores('enlaces')" disabled>
-            <option value="">Primero selecciona una temporada</option>
-          </select>
+          <select id="enlaces-idioma" onchange="cargarServidores('enlaces')" disabled><option value="">Primero selecciona una temporada</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-server"></i> Servidor</label>
-          <select id="enlaces-servidor" onchange="cargarEpisodios('enlaces')" disabled>
-            <option value="">Primero selecciona un idioma</option>
-          </select>
+          <select id="enlaces-servidor" onchange="cargarEpisodios('enlaces')" disabled><option value="">Primero selecciona un idioma</option></select>
         </div>
       </div>
 
@@ -506,27 +460,19 @@
       <div class="filters">
         <div class="form-group">
           <label><i class="fas fa-tv"></i> Serie</label>
-          <select id="descargas-serie" onchange="cargarTemporadas('descargas')">
-            <option value="">Seleccionar serie...</option>
-          </select>
+          <select id="descargas-serie" onchange="cargarTemporadas('descargas')"><option value="">Seleccionar serie...</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-layer-group"></i> Temporada</label>
-          <select id="descargas-temporada" onchange="cargarIdiomas('descargas')" disabled>
-            <option value="">Primero selecciona una serie</option>
-          </select>
+          <select id="descargas-temporada" onchange="cargarIdiomas('descargas')" disabled><option value="">Primero selecciona una serie</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-language"></i> Idioma</label>
-          <select id="descargas-idioma" onchange="cargarServidores('descargas')" disabled>
-            <option value="">Primero selecciona una temporada</option>
-          </select>
+          <select id="descargas-idioma" onchange="cargarServidores('descargas')" disabled><option value="">Primero selecciona una temporada</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-server"></i> Servidor</label>
-          <select id="descargas-servidor" onchange="cargarEpisodios('descargas')" disabled>
-            <option value="">Primero selecciona un idioma</option>
-          </select>
+          <select id="descargas-servidor" onchange="cargarEpisodios('descargas')" disabled><option value="">Primero selecciona un idioma</option></select>
         </div>
       </div>
 
@@ -556,27 +502,19 @@
       <div class="filters">
         <div class="form-group">
           <label><i class="fas fa-tv"></i> Serie</label>
-          <select id="original-serie" onchange="cargarTemporadas('original')">
-            <option value="">Seleccionar serie...</option>
-          </select>
+          <select id="original-serie" onchange="cargarTemporadas('original')"><option value="">Seleccionar serie...</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-layer-group"></i> Temporada</label>
-          <select id="original-temporada" onchange="cargarIdiomas('original')" disabled>
-            <option value="">Primero selecciona una serie</option>
-          </select>
+          <select id="original-temporada" onchange="cargarIdiomas('original')" disabled><option value="">Primero selecciona una serie</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-language"></i> Idioma</label>
-          <select id="original-idioma" onchange="cargarServidores('original')" disabled>
-            <option value="">Primero selecciona una temporada</option>
-          </select>
+          <select id="original-idioma" onchange="cargarServidores('original')" disabled><option value="">Primero selecciona una temporada</option></select>
         </div>
         <div class="form-group">
           <label><i class="fas fa-server"></i> Servidor</label>
-          <select id="original-servidor" onchange="cargarEpisodios('original')" disabled>
-            <option value="">Primero selecciona un idioma</option>
-          </select>
+          <select id="original-servidor" onchange="cargarEpisodios('original')" disabled><option value="">Primero selecciona un idioma</option></select>
         </div>
       </div>
 
@@ -604,7 +542,6 @@
     <div id="message" class="message"></div>
   </div>
 
-  <script src="../../Controllers/js_cloudflare/Eliminación_de_Series_General_Controller.js"></script>
-  
+  <script src="../../Controllers/js_azure/Eliminación_de_Series_General_Controller.js"></script>
 </body>
 </html>

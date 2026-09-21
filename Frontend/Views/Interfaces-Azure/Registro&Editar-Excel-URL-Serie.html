@@ -3,20 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Importar URLs · Cloudflare</title>
-  <!-- Google Fonts (Inter) -->
+  <title>Importar URLs · SQL Server</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* Reset y base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -27,12 +20,64 @@
       min-height: 100vh;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ============ NAVEGACIÓN ============ */
+    .service-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 60px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Encabezado */
+    .service-selector .service-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #475569;
+      margin-right: 8px;
+    }
+
+    .service-btn {
+      padding: 8px 20px;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      background: white;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      text-decoration: none;
+    }
+
+    .service-btn i { font-size: 16px; }
+    .service-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .service-btn.active {
+      background: #0078D4;
+      color: white;
+      border-color: #0078D4;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+    }
+    .service-btn.active i { color: white; }
+
+    .service-btn .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+    .service-btn .dot.firebase   { background: #34a853; }
+    .service-btn .dot.cloudflare { background: #f6821f; }
+    .service-btn .dot.sqlserver  { background: #0078D4; }
+
+    /* ============ HEADER ============ */
     .header {
       display: flex;
       align-items: center;
@@ -55,13 +100,11 @@
       gap: 12px;
     }
 
-    .header h2 i {
-      color: #f6821f;
-    }
+    .header h2 i { color: #0078D4; }
 
     .header .badge {
-      background: #e9edf4;
-      color: #1e293b;
+      background: #e1f0ff;
+      color: #0b2b5c;
       padding: 6px 14px;
       border-radius: 40px;
       font-size: 14px;
@@ -69,26 +112,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      border: 1px solid #b8daff;
     }
 
-    .header .badge i {
-      color: #f6821f;
-    }
+    .header .badge i { color: #0078D4; }
 
-    .header .badge.firebase {
-      background: #1a73e8;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .header .badge.firebase:hover {
-      background: #1557b0;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.2);
-    }
-
-    /* Tarjetas */
+    /* ============ TARJETAS ============ */
     .card {
       background: #ffffff;
       border-radius: 24px;
@@ -110,11 +139,9 @@
       padding-bottom: 10px;
     }
 
-    .card h3 i {
-      color: #f6821f;
-    }
+    .card h3 i { color: #0078D4; }
 
-    /* Área de carga */
+    /* ============ ÁREA DE CARGA ============ */
     .upload-area {
       border: 2px dashed #e2e8f0;
       border-radius: 16px;
@@ -127,13 +154,13 @@
     }
 
     .upload-area:hover {
-      border-color: #f6821f;
-      background: #fef3e8;
+      border-color: #0078D4;
+      background: #e1f0ff;
     }
 
     .upload-area i {
       font-size: 48px;
-      color: #f6821f;
+      color: #0078D4;
       display: block;
       margin-bottom: 12px;
     }
@@ -152,15 +179,13 @@
 
     .upload-area input[type="file"] {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       opacity: 0;
       cursor: pointer;
     }
 
-    /* Botones */
+    /* ============ BOTONES ============ */
     .btn {
       padding: 10px 24px;
       border: none;
@@ -178,54 +203,21 @@
       white-space: nowrap;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .btn-primary {
-      background: #f6821f;
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #d96f1a;
-      box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
-    }
+    .btn-primary { background: #0078D4; color: white; }
+    .btn-primary:hover { background: #005a9e; box-shadow: 0 6px 16px rgba(0, 120, 212, 0.25); }
 
-    .btn-success {
-      background: #10b981;
-      color: white;
-    }
-    .btn-success:hover {
-      background: #059669;
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
-    }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
 
-    .btn-firebase {
-      background: #1a73e8;
-      color: white;
-    }
-    .btn-firebase:hover {
-      background: #1557b0;
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
-    }
+    .btn-firebase { background: #1a73e8; color: white; }
+    .btn-firebase:hover { background: #1557b0; box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25); }
 
-    .btn-outline {
-      background: transparent;
-      color: #1e293b;
-      border: 1px solid #e2e8f0;
-    }
-    .btn-outline:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
+    .btn-cloudflare { background: #f6821f; color: white; }
+    .btn-cloudflare:hover { background: #d96f1a; box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25); }
 
     .actions {
       display: flex;
@@ -235,7 +227,7 @@
       margin-top: 16px;
     }
 
-    /* Tabla de previsualización */
+    /* ============ TABLA ============ */
     .table-container {
       overflow-x: auto;
       border-radius: 16px;
@@ -245,20 +237,10 @@
       overflow-y: auto;
     }
 
-    .table-container::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .table-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
+    .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
     th {
       background: #f1f5f9;
@@ -283,9 +265,7 @@
       word-break: break-word;
     }
 
-    tr:hover td {
-      background: #fafcff;
-    }
+    tr:hover td { background: #fafcff; }
 
     .url-cell {
       font-family: 'Monaco', 'Menlo', monospace;
@@ -293,11 +273,9 @@
       color: #1a73e8;
       max-width: 300px;
       white-space: normal;
-      overflow: visible;
-      text-overflow: clip;
     }
 
-    /* Mensaje vacío */
+    /* ============ MENSAJE VACÍO ============ */
     .empty-message {
       text-align: center;
       padding: 40px 20px;
@@ -312,13 +290,11 @@
       color: #cbd5e1;
     }
 
-    /* Barra de progreso (overlay) */
+    /* ============ PROGRESO ============ */
     .progress-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(6px);
       display: flex;
@@ -352,9 +328,7 @@
       margin-bottom: 16px;
     }
 
-    .progress-title i {
-      color: #f6821f;
-    }
+    .progress-title i { color: #0078D4; }
 
     .progress-info {
       background: #f8fafc;
@@ -364,9 +338,7 @@
       font-size: 14px;
     }
 
-    .progress-info p {
-      margin: 4px 0;
-    }
+    .progress-info p { margin: 4px 0; }
 
     .progress-bar-wrapper {
       background: #e9edf4;
@@ -379,7 +351,7 @@
     .progress-bar {
       width: 0%;
       height: 100%;
-      background: linear-gradient(90deg, #f6821f, #10b981, #1a73e8);
+      background: linear-gradient(90deg, #0078D4, #10b981, #1a73e8);
       transition: width 0.3s ease;
       display: flex;
       align-items: center;
@@ -415,11 +387,7 @@
       border-bottom: 1px solid #e9edf4;
     }
 
-    .progress-details .success-text { color: #10b981; }
-    .progress-details .error-text { color: #dc2626; }
-    .progress-details .info-text { color: #f6821f; }
-
-    /* Responsive */
+    /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
       body { padding: 16px; }
       .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
@@ -439,19 +407,30 @@
   </style>
 </head>
 <body>
-
   <div class="container">
 
     <!-- Encabezado -->
-    <header class="header">
-      <h2><i class="fas fa-link"></i> Importar URLs · Cloudflare</h2>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <span class="badge"><i class="fas fa-cloud"></i> Cloudflare</span>
-        <span class="badge firebase" onclick="location.href='../Registro&Editar-Excel-URL-Serie.html'">
-          <i class="fas fa-fire"></i> Firebase
-        </span>
-      </div>
-    </header>
+    <div class="header">
+      <h2><i class="fas fa-link"></i> Importar URLs</h2>
+      <span class="badge"><i class="fas fa-database"></i> Azure SQL Database</span>
+    </div>
+
+    <!-- Navegación entre interfaces -->
+    <div class="service-selector">
+      <span class="service-label"><i class="fas fa-exchange-alt"></i> Importar con:</span>
+      <a href="../Interfaces-Firebase/Registro&Editar-Excel-URL-Serie.html" class="service-btn">
+        <span class="dot firebase"></span>
+        <i class="fas fa-fire"></i> Firebase
+      </a>
+      <a href="../Interfaces-Cloudflare/Registro&Editar-Excel-URL-Serie.html" class="service-btn">
+        <span class="dot cloudflare"></span>
+        <i class="fas fa-cloud"></i> Cloudflare
+      </a>
+      <button class="service-btn active">
+        <span class="dot sqlserver"></span>
+        <i class="fas fa-database"></i> SQL Server
+      </button>
+    </div>
 
     <!-- Subida de archivo -->
     <div class="card">
@@ -465,10 +444,13 @@
 
       <div class="actions">
         <button class="btn btn-firebase" onclick="location.href='../Interfaces-Firebase/Registro&Editar-Excel-URL-Serie.html'">
-          <i class="fas fa-fire"></i> Ir al registro con Firebase
+          <i class="fas fa-fire"></i> Ir a Firebase
+        </button>
+        <button class="btn btn-cloudflare" onclick="location.href='../Interfaces-Cloudflare/Registro&Editar-Excel-URL-Serie.html'">
+          <i class="fas fa-cloud"></i> Ir a Cloudflare
         </button>
         <button class="btn btn-success" id="saveButton" disabled>
-          <i class="fas fa-save"></i> Guardar en Cloudflare
+          <i class="fas fa-save"></i> Guardar en SQL Server
         </button>
       </div>
     </div>
@@ -488,7 +470,6 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="../../Controllers/js_cloudflare/Registro&Editar_Excel_URLSerie.js"></script>
-
+  <script src="../../Controllers/js_azure/Registro&Editar_Excel_URLSerie.js"></script>
 </body>
 </html>

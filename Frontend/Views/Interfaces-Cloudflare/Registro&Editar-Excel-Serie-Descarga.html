@@ -32,6 +32,62 @@
       margin: 0 auto;
     }
 
+    /* ============ NAVEGACIÓN ============ */
+    .service-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 60px;
+      border: 1px solid #e9edf4;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-selector .service-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #475569;
+      margin-right: 8px;
+    }
+
+    .service-btn {
+      padding: 8px 20px;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      background: white;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      text-decoration: none;
+    }
+
+    .service-btn i { font-size: 16px; }
+    .service-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .service-btn.active {
+      background: #0078D4;
+      color: white;
+      border-color: #0078D4;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
+    }
+    .service-btn.active i { color: white; }
+
+    .service-btn .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+    .service-btn .dot.firebase   { background: #34a853; }
+    .service-btn .dot.cloudflare { background: #f6821f; }
+    .service-btn .dot.sqlserver  { background: #0078D4; }
+
+
     /* Encabezado */
     .header {
       display: flex;
@@ -447,11 +503,25 @@
       <h2><i class="fas fa-cloud"></i> Importar Descargas</h2>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <span class="badge"><i class="fas fa-cloud"></i> Cloudflare</span>
-        <span class="badge firebase" onclick="location.href='../Registro&Editar-Excel-Serie-Descarga.html'">
-          <i class="fas fa-fire"></i> Firebase
-        </span>
       </div>
     </header>
+
+     <!-- Navegación entre interfaces -->
+    <div class="service-selector">
+      <span class="service-label"><i class="fas fa-exchange-alt"></i> Importar con:</span>
+      <a href="../Interfaces-Firebase/Registro&Editar-Excel-Serie-Descarga.html" class="service-btn">
+        <span class="dot firebase"></span>
+        <i class="fas fa-fire"></i> Firebase
+      </a>
+      <a href="../Interfaces-Azure/Registro&Editar-Excel-Serie-Descarga.html" class="service-btn">
+        <span class="dot sqlserver"></span>
+        <i class="fas fa-server"></i> SQL Server
+      </a>
+      <button class="service-btn active">
+        <span class="dot cloudflare"></span>
+        <i class="fas fa-cloud"></i> Cloudflare
+      </button>
+    </div>
 
     <!-- Subida de archivo -->
     <div class="card">
@@ -464,9 +534,6 @@
       </div>
 
       <div class="actions">
-        <button class="btn btn-firebase" onclick="location.href='../Interfaces-Firebase/Registro&Editar-Excel-Serie-Descarga.html'">
-          <i class="fas fa-fire"></i> Ir al registro con Firebase
-        </button>
         <button class="btn btn-success" id="saveButton" disabled>
           <i class="fas fa-save"></i> Guardar en Cloudflare
         </button>

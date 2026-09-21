@@ -1,175 +1,196 @@
-    // ========== CONFIGURACIÓN ==========
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+// ============================================================
+// CONFIGURACIÓN DE ENTORNO
+// ============================================================
+const IS_LOCAL =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.protocol === 'file:';
 
-    // ========== FUNCIONES ==========
+const SQLSERVER_BASE_URL = IS_LOCAL
+    ? 'http://localhost:3001'
+    : 'https://animes-plus-backend-production.up.railway.app';
 
-    function irAFirebase() {
-      window.location.href = '../Registro-Nueva-Descarga.html';
-    }
+console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 
-    function agregarFila() {
-      const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
-      const newRow = table.insertRow();
-      newRow.innerHTML = `
+// ============================================================
+// UTILIDADES DE FILAS
+// ============================================================
+function agregarFila() {
+    const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    newRow.innerHTML = `
         <td><input type="text" placeholder="Ej: Episodio X"></td>
         <td><input type="text" placeholder="https://..."></td>
         <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
-      `;
-    }
+    `;
+}
 
-    function eliminarFila(boton) {
-      const fila = boton.closest('tr');
-      if (fila && fila.parentElement.children.length > 1) {
+function eliminarFila(boton) {
+    const fila = boton.closest('tr');
+    if (fila && fila.parentElement.children.length > 1) {
         fila.remove();
-      } else {
+    } else {
         alert('Debe quedar al menos una fila.');
-      }
     }
+}
 
-    // ========== IMPORTAR TXT ==========
-    document.getElementById('importarTxt').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+// ============================================================
+// IMPORTAR TXT
+// ============================================================
+document.getElementById('importarTxt').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
         const contenido = e.target.result;
         const lineas = contenido.split('\n');
         const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
 
+        let cont = 0;
         lineas.forEach(linea => {
-          if (linea.trim() === '') return;
-          const partes = linea.split(';');
-          if (partes.length !== 2) return;
+            if (linea.trim() === '') return;
+            const partes = linea.split(';');
+            if (partes.length !== 2) return;
 
-          const episodio = partes[0].trim();
-          const url = partes[1].trim();
+            const episodio = partes[0].trim();
+            const url = partes[1].trim();
 
-          const newRow = table.insertRow();
-          newRow.innerHTML = `
-            <td><input type="text" value="${episodio}"></td>
-            <td><input type="text" value="${url}"></td>
-            <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
-          `;
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" value="${episodio}"></td>
+                <td><input type="text" value="${url}"></td>
+                <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+            `;
+            cont++;
         });
 
-        alert('✅ Importación completada.');
+        alert(`✅ Importación completada. Se agregaron ${cont} filas.`);
         event.target.value = '';
-      };
-      reader.readAsText(file);
-    });
+    };
+    reader.readAsText(file);
+});
 
-    // ========== IMPORTAR EXCEL ==========
-    document.getElementById('importarExcel').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+// ============================================================
+// IMPORTAR EXCEL
+// ============================================================
+document.getElementById('importarExcel').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         const table = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
 
+        let cont = 0;
         rows.forEach(row => {
-          if (row.length < 2) return;
-          const episodio = String(row[0]).trim();
-          const url = String(row[1]).trim();
+            if (row.length < 2) return;
+            const episodio = String(row[0]).trim();
+            const url = String(row[1]).trim();
 
-          if (episodio && url) {
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-              <td><input type="text" value="${episodio}"></td>
-              <td><input type="text" value="${url}"></td>
-              <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
-            `;
-          }
+            // Ignorar filas de encabezado
+            if (episodio && url && episodio !== 'Episodio' && !url.startsWith('Enlace')) {
+                const newRow = table.insertRow();
+                newRow.innerHTML = `
+                    <td><input type="text" value="${episodio}"></td>
+                    <td><input type="text" value="${url}"></td>
+                    <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+                `;
+                cont++;
+            }
         });
 
-        alert('✅ Importación desde Excel completada.');
+        alert(`✅ Importación desde Excel completada. Se agregaron ${cont} filas.`);
         event.target.value = '';
-      };
-      reader.readAsArrayBuffer(file);
-    });
+    };
+    reader.readAsArrayBuffer(file);
+});
 
-    // ========== GUARDAR EN CLOUDFLARE ==========
-    async function guardarEnCloudflare() {
-      const nombreSerie = document.getElementById("serieNombre").value.trim();
-      const temporada = document.getElementById("temporada").value.trim();
-      const idioma = document.getElementById("idioma").value.trim();
-      const servidor = document.getElementById("servidor").value.trim();
-      const tabla = document.getElementById("tablaEpisodios").getElementsByTagName("tbody")[0];
-      const filas = tabla.getElementsByTagName("tr");
+// ============================================================
+// GUARDAR EN SQL SERVER
+// ============================================================
+async function guardarEnSQLServer() {
+    const nombreSerie = document.getElementById('serieNombre').value.trim();
+    const temporada   = document.getElementById('temporada').value.trim();
+    const idioma      = document.getElementById('idioma').value.trim();
+    const servidor    = document.getElementById('servidor').value.trim();
+    const tabla       = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
+    const filas       = tabla.getElementsByTagName('tr');
 
-      if (!nombreSerie || !temporada || !idioma || !servidor) {
-        alert("⚠️ Por favor, completa todos los campos antes de guardar.");
+    if (!nombreSerie || !temporada || !idioma || !servidor) {
+        alert('⚠️ Por favor, completa todos los campos antes de guardar.');
         return;
-      }
+    }
 
-      const registros = [];
-      for (let fila of filas) {
-        const episodio = fila.cells[0].querySelector("input").value.trim();
-        const url = fila.cells[1].querySelector("input").value.trim();
+    const registros = [];
+    for (let fila of filas) {
+        const episodio = fila.cells[0].querySelector('input').value.trim();
+        const url      = fila.cells[1].querySelector('input').value.trim();
 
         if (episodio && url) {
-          registros.push({
-            nombreSerie: nombreSerie,
-            temporada: temporada,
-            idioma: idioma,
-            servidor: servidor,
-            episodio: episodio,
-            url: url
-          });
+            registros.push({
+                nombreSerie: nombreSerie,
+                temporada:   temporada,
+                idioma:      idioma,
+                servidor:    servidor,
+                episodio:    episodio,
+                url:         url
+            });
         }
-      }
+    }
 
-      if (registros.length === 0) {
-        alert("No hay episodios para guardar.");
+    if (registros.length === 0) {
+        alert('No hay episodios para guardar.');
         return;
-      }
+    }
 
-      // Deshabilitar botón
-      const btnGuardar = document.getElementById('btnGuardar');
-      btnGuardar.disabled = true;
-      btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    // Deshabilitar botón
+    const btnGuardar = document.getElementById('btnGuardar');
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
-      try {
-        const res = await fetch(`${WORKER_URL}/registrar-descargas`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ registros })
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/registrar-descargas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ registros })
         });
 
         const data = await res.json();
 
         if (res.ok) {
-          alert(data.message || "✅ Datos guardados correctamente en Cloudflare D1.");
-          // Limpiar formulario
-          document.getElementById("serieNombre").value = "";
-          document.getElementById("temporada").value = "";
-          document.getElementById("idioma").value = "";
-          document.getElementById("servidor").value = "";
-          const tablaBody = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
-          tablaBody.innerHTML = `
-            <tr>
-              <td><input type="text" placeholder="Ej: Episodio 1"></td>
-              <td><input type="text" placeholder="https://..."></td>
-              <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
-            </tr>
-          `;
+            alert(data.message || '✅ Datos guardados correctamente en Azure SQL.');
+            // Limpiar formulario
+            document.getElementById('serieNombre').value = '';
+            document.getElementById('temporada').value = '';
+            document.getElementById('idioma').value = '';
+            document.getElementById('servidor').value = '';
+            const tablaBody = document.getElementById('tablaEpisodios').getElementsByTagName('tbody')[0];
+            tablaBody.innerHTML = `
+                <tr>
+                    <td><input type="text" placeholder="Ej: Episodio 1"></td>
+                    <td><input type="text" placeholder="https://..."></td>
+                    <td><button class="btn-eliminar" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+                </tr>
+            `;
         } else {
-          alert("❌ Error al guardar: " + (data.error || res.statusText));
+            alert('❌ Error al guardar: ' + (data.error || res.statusText));
         }
-      } catch (error) {
+    } catch (error) {
         console.error(error);
-        alert("❌ Error al guardar los datos: " + error.message);
-      } finally {
+        alert('❌ Error al guardar los datos: ' + error.message);
+    } finally {
         btnGuardar.disabled = false;
-        btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar en Cloudflare';
-      }
+        btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar en SQL Server';
     }
+}
 
-    // ========== EVENTOS ==========
-    document.getElementById('btnAgregarFila').addEventListener('click', agregarFila);
-    document.getElementById('btnGuardar').addEventListener('click', guardarEnCloudflare);
+// ============================================================
+// EVENTOS
+// ============================================================
+document.getElementById('btnAgregarFila').addEventListener('click', agregarFila);
+document.getElementById('btnGuardar').addEventListener('click', guardarEnSQLServer);

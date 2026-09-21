@@ -308,11 +308,11 @@
     }
 
     .btn-primary {
-      background: #f6821f;
+      background: #10b981;
       color: white;
     }
     .btn-primary:hover {
-      background: #d96f1a;
+      background: #059669;
       box-shadow: 0 6px 16px rgba(246, 130, 31, 0.25);
     }
 
@@ -340,6 +340,15 @@
       color: white;
     }
     .btn-firebase:hover {
+      background: #1557b0;
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
+    }
+
+    .btn-sql-server {
+      background: #1a73e8;
+      color: white;
+    }
+    .btn-sql-server:hover {
       background: #1557b0;
       box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
     }
@@ -432,7 +441,12 @@
           <button class="btn btn-success" id="btnAgregarFila"><i class="fas fa-plus-circle"></i> Agregar fila</button>
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-          <button class="btn btn-firebase" onclick="irAFirebase()"><i class="fas fa-fire"></i> Registrar con Firebase</button>
+          <button class="btn btn-firebase" onclick="location.href='../Interfaces-Firebase/Registro-Nuevo-Enlace.html'">
+            <i class="fas fa-fire"></i> Firebase
+          </button>
+          <button class="btn btn-sql-server" onclick="location.href='../Interfaces-Azure/Registro-Nuevo-Enlace.html'">
+            <i class="fas fa-cloud"></i> SQL Server
+          </button>
           <button class="btn btn-primary" id="btnGuardar"><i class="fas fa-save"></i> Guardar en Cloudflare</button>
         </div>
       </div>

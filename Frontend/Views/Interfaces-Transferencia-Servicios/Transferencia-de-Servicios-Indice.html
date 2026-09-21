@@ -3,20 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transferir Índice · Firebase → Cloudflare</title>
-  <!-- Google Fonts (Inter) -->
+  <title>Transferir Índice · Multiservicio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* Reset y base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -27,12 +20,9 @@
       min-height: 100vh;
     }
 
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1600px; margin: 0 auto; }
 
-    /* Encabezado */
+    /* ============ HEADER ============ */
     .header {
       display: flex;
       align-items: center;
@@ -55,13 +45,11 @@
       gap: 12px;
     }
 
-    .header h2 i {
-      color: #1a73e8;
-    }
+    .header h2 i { color: #0078D4; }
 
     .header .badge {
-      background: #e9edf4;
-      color: #1e293b;
+      background: #e1f0ff;
+      color: #0b2b5c;
       padding: 6px 14px;
       border-radius: 40px;
       font-size: 14px;
@@ -69,18 +57,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      border: 1px solid #b8daff;
     }
 
-    .header .badge i {
-      color: #1a73e8;
-    }
+    .header .badge i { color: #0078D4; }
 
-    .header .badge.cloudflare {
-      background: #f6821f;
-      color: white;
-    }
-
-    /* Tarjetas */
+    /* ============ CARD ============ */
     .card {
       background: #ffffff;
       border-radius: 24px;
@@ -102,17 +84,93 @@
       padding-bottom: 10px;
     }
 
-    .card h3 i {
-      color: #1a73e8;
+    .card h3 i { color: #0078D4; }
+
+    /* ============ SELECTOR ORIGEN/DESTINO ============ */
+    .transfer-selector {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
-    /* Controles */
+    .service-picker {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+
+    .service-picker.source { border-color: #0078D4; background: #e1f0ff; }
+    .service-picker.destination { border-color: #10b981; background: #e6f7e6; }
+
+    .service-picker label {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .service-picker select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      background: white;
+      color: #0b2b5c;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .service-picker select:focus {
+      outline: none;
+      border-color: #0078D4;
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.1);
+    }
+
+    .service-picker .current-info {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .service-picker .current-info i { color: #0078D4; }
+
+    .arrow-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arrow-container i {
+      font-size: 36px;
+      color: #0078D4;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    /* ============ CONTROLES ============ */
     .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       align-items: center;
-      margin-bottom: 16px;
+      margin-top: 16px;
     }
 
     .btn {
@@ -132,60 +190,28 @@
       white-space: nowrap;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .btn-primary {
-      background: #1a73e8;
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #1557b0;
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.25);
-    }
+    .btn-primary { background: #0078D4; color: white; }
+    .btn-primary:hover:not(:disabled) { background: #005a9e; box-shadow: 0 6px 16px rgba(0, 120, 212, 0.25); }
 
-    .btn-success {
-      background: #10b981;
-      color: white;
-    }
-    .btn-success:hover {
-      background: #059669;
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
-    }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover:not(:disabled) { background: #059669; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
 
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #b91c1c;
-      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25);
-    }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25); }
 
-    .btn-outline {
-      background: transparent;
-      color: #1e293b;
-      border: 1px solid #e2e8f0;
-    }
-    .btn-outline:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
+    .btn-outline { background: transparent; color: #1e293b; border: 1px solid #e2e8f0; }
+    .btn-outline:hover:not(:disabled) { background: #f1f5f9; border-color: #cbd5e1; }
 
-    /* Sección de búsqueda y filtros */
+    /* ============ FILTROS ============ */
     .search-section {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 14px;
+      margin-top: 16px;
       margin-bottom: 12px;
     }
 
@@ -204,11 +230,7 @@
       gap: 6px;
     }
 
-    .search-field label i {
-      color: #1a73e8;
-      width: 16px;
-      text-align: center;
-    }
+    .search-field label i { color: #0078D4; width: 16px; text-align: center; }
 
     .search-field input {
       padding: 8px 14px;
@@ -222,9 +244,9 @@
     }
 
     .search-field input:focus {
-      border-color: #1a73e8;
+      border-color: #0078D4;
       outline: none;
-      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.08);
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.08);
     }
 
     .filter-actions {
@@ -234,7 +256,7 @@
       margin-top: 4px;
     }
 
-    /* Tabla */
+    /* ============ TABLA ============ */
     .table-container {
       overflow-x: auto;
       border-radius: 16px;
@@ -244,21 +266,10 @@
       margin-top: 12px;
     }
 
-    .table-container::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
+    .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    .table-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
     th {
       background: #f1f5f9;
@@ -283,9 +294,7 @@
       word-break: break-word;
     }
 
-    tr:hover td {
-      background: #fafcff;
-    }
+    tr:hover td { background: #fafcff; }
 
     .text-cell {
       max-width: 120px;
@@ -319,7 +328,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .badge {
+    .badge-tag {
       display: inline-block;
       padding: 3px 10px;
       border-radius: 30px;
@@ -328,24 +337,11 @@
       margin: 2px;
     }
 
-    .badge-categoria {
-      background: #e1f5fe;
-      color: #01579b;
-    }
-    .badge-idioma {
-      background: #f3e5f5;
-      color: #4a148c;
-    }
-    .badge-año {
-      background: #e8f5e8;
-      color: #1b5e20;
-    }
+    .badge-categoria { background: #e1f5fe; color: #01579b; }
+    .badge-idioma { background: #f3e5f5; color: #4a148c; }
+    .badge-anio { background: #e8f5e8; color: #1b5e20; }
 
-    .actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
     .actions .btn-sm {
       padding: 4px 12px;
@@ -360,28 +356,13 @@
       color: #1e293b;
     }
 
-    .actions .btn-sm:hover {
-      background: #d1d9e6;
-      transform: translateY(-1px);
-    }
+    .actions .btn-sm:hover { background: #d1d9e6; transform: translateY(-1px); }
+    .actions .btn-sm.primary { background: #0078D4; color: white; }
+    .actions .btn-sm.primary:hover { background: #005a9e; }
+    .actions .btn-sm.success { background: #10b981; color: white; }
+    .actions .btn-sm.success:hover { background: #059669; }
 
-    .actions .btn-sm.primary {
-      background: #1a73e8;
-      color: white;
-    }
-    .actions .btn-sm.primary:hover {
-      background: #1557b0;
-    }
-
-    .actions .btn-sm.success {
-      background: #10b981;
-      color: white;
-    }
-    .actions .btn-sm.success:hover {
-      background: #059669;
-    }
-
-    /* Paginación */
+    /* ============ PAGINACIÓN ============ */
     .pagination {
       display: flex;
       justify-content: center;
@@ -410,19 +391,11 @@
       transform: translateY(-2px);
     }
 
-    .pagination button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    .pagination-info {
-      font-weight: 600;
-      color: #0b2b5c;
-      padding: 0 12px;
-    }
+    .pagination-info { font-weight: 600; color: #0b2b5c; padding: 0 12px; }
 
-    /* Barras de progreso */
+    /* ============ PROGRESO ============ */
     .progress-container {
       margin: 16px 0 8px;
       background: #f8fafc;
@@ -442,7 +415,7 @@
     .progress-bar {
       height: 100%;
       width: 0;
-      background: linear-gradient(90deg, #1a73e8, #10b981);
+      background: linear-gradient(90deg, #0078D4, #10b981);
       border-radius: 60px;
       transition: width 0.4s ease;
       display: flex;
@@ -456,12 +429,12 @@
     .progress-text {
       margin-top: 8px;
       font-weight: 600;
-      color: #1a73e8;
+      color: #0078D4;
       text-align: center;
       font-size: 14px;
     }
 
-    /* Estadísticas */
+    /* ============ ESTADÍSTICAS ============ */
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -477,21 +450,12 @@
       border: 1px solid #e9edf4;
     }
 
-    .stat-box h4 {
-      font-size: 14px;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 4px;
-    }
+    .stat-box h4 { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 4px; }
 
-    .stat-box .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a73e8;
-    }
+    .stat-box .stat-value { font-size: 28px; font-weight: 700; color: #0078D4; }
 
-    /* Depuración */
-    .debug-info {
+    /* ============ LOG ============ */
+    .log-info {
       background: #f8fafc;
       border: 1px solid #e9edf4;
       border-radius: 16px;
@@ -504,22 +468,20 @@
       color: #1e293b;
     }
 
-    .debug-info div {
-      padding: 4px 0;
-      border-bottom: 1px solid #e9edf4;
+    .log-info div { padding: 4px 0; border-bottom: 1px solid #e9edf4; }
+    .log-info strong { color: #0078D4; }
+    .log-info hr { border: none; border-top: 1px solid #e9edf4; margin: 6px 0; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 900px) {
+      .transfer-selector { grid-template-columns: 1fr; }
+      .arrow-container i { transform: rotate(90deg); }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: rotate(90deg) scale(1); }
+        50% { opacity: 0.6; transform: rotate(90deg) scale(1.1); }
+      }
     }
 
-    .debug-info strong {
-      color: #1a73e8;
-    }
-
-    .debug-info hr {
-      border: none;
-      border-top: 1px solid #e9edf4;
-      margin: 6px 0;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
       body { padding: 16px; }
       .header { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
@@ -529,7 +491,6 @@
       .btn { justify-content: center; }
       .search-section { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr 1fr; }
-      .pagination button { font-size: 13px; padding: 4px 12px; }
     }
 
     @media (max-width: 480px) {
@@ -541,28 +502,57 @@
   </style>
 </head>
 <body>
-
   <div class="container">
 
-    <!-- Encabezado -->
+    <!-- Header -->
     <header class="header">
-      <h2><i class="fas fa-cloud-upload-alt"></i> Transferir Índice</h2>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <span class="badge"><i class="fas fa-fire"></i> Firebase</span>
-        <span class="badge cloudflare"><i class="fas fa-cloud"></i> Cloudflare</span>
-      </div>
+      <h2><i class="fas fa-book"></i> Transferir Índice · Multiservicio</h2>
+      <span class="badge"><i class="fas fa-database"></i> Firebase · Cloudflare · SQL Server</span>
     </header>
 
     <!-- Configuración -->
     <div class="card">
-      <h3><i class="fas fa-sliders-h"></i> Configuración</h3>
+      <h3><i class="fas fa-sliders-h"></i> Configuración de Transferencia</h3>
+
+      <div class="transfer-selector">
+        <div class="service-picker source">
+          <label><i class="fas fa-sign-out-alt"></i> Origen (de dónde leer)</label>
+          <select id="selectSource">
+            <option value="firebase">🔥 Firebase</option>
+            <option value="cloudflare">☁️ Cloudflare</option>
+            <option value="sqlserver">🗄️ SQL Server</option>
+          </select>
+          <div class="current-info">
+            <i class="fas fa-info-circle"></i>
+            <span id="sourceInfo">Lee datos desde Firestore</span>
+          </div>
+        </div>
+
+        <div class="arrow-container">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <div class="service-picker destination">
+          <label><i class="fas fa-sign-in-alt"></i> Destino (a dónde escribir)</label>
+          <select id="selectDestination">
+            <option value="cloudflare">☁️ Cloudflare</option>
+            <option value="sqlserver">🗄️ SQL Server</option>
+            <option value="firebase">🔥 Firebase</option>
+          </select>
+          <div class="current-info">
+            <i class="fas fa-info-circle"></i>
+            <span id="destinationInfo">Escribe en Cloudflare Worker</span>
+          </div>
+        </div>
+      </div>
+
       <div class="controls">
-        <button class="btn btn-primary" id="btnCargarFirebase"><i class="fas fa-database"></i> Cargar Índice de Firebase</button>
-        <button class="btn btn-success" id="btnTransferir" disabled><i class="fas fa-cloud-upload-alt"></i> Transferir a Cloudflare</button>
+        <button class="btn btn-primary" id="btnCargar"><i class="fas fa-download"></i> Cargar Índice del Origen</button>
+        <button class="btn btn-success" id="btnTransferir" disabled><i class="fas fa-cloud-upload-alt"></i> Transferir al Destino</button>
         <button class="btn btn-danger" id="btnLimpiar"><i class="fas fa-trash-alt"></i> Limpiar Tabla</button>
       </div>
 
-      <!-- Barra de progreso de carga -->
+      <!-- Progreso de carga -->
       <div id="loadingProgress" class="progress-container" style="display: none;">
         <div class="progress-bar-wrapper">
           <div id="loadingProgressBar" class="progress-bar">0%</div>
@@ -596,19 +586,18 @@
       </div>
     </div>
 
-    <!-- Datos -->
+    <!-- Tabla -->
     <div class="card">
       <h3><i class="fas fa-list-ul"></i> Índice de Series</h3>
       <div class="table-container">
         <div id="tablaDatos">
           <p style="text-align: center; padding: 40px; color: #94a3b8;">
             <i class="fas fa-info-circle" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
-            Carga el índice de Firebase para visualizarlo
+            Selecciona origen y destino, luego haz clic en "Cargar Índice del Origen"
           </p>
         </div>
       </div>
 
-      <!-- Paginación -->
       <div id="pagination" class="pagination" style="display: none;">
         <button id="btnFirstPage">Primera</button>
         <button id="btnPrevPage">Anterior</button>
@@ -623,7 +612,7 @@
       <div class="progress-bar-wrapper">
         <div id="transferProgressBar" class="progress-bar">0%</div>
       </div>
-      <div id="transferProgressText" class="progress-text">Transferiendo...</div>
+      <div id="transferProgressText" class="progress-text">Transfiriendo...</div>
     </div>
 
     <!-- Estadísticas -->
@@ -649,12 +638,12 @@
       </div>
     </div>
 
-    <!-- Depuración -->
+    <!-- Log -->
     <div class="card">
-      <h3><i class="fas fa-bug"></i> Información de Depuración</h3>
-      <button class="btn btn-outline" id="btnToggleDebug"><i class="fas fa-eye"></i> Mostrar/Ocultar</button>
-      <div id="debugInfo" class="debug-info" style="display: none;">
-        <div id="debugContent"></div>
+      <h3><i class="fas fa-bug"></i> Log de Operaciones</h3>
+      <button class="btn btn-outline" id="btnToggleLog"><i class="fas fa-eye"></i> Mostrar/Ocultar</button>
+      <div id="logInfo" class="log-info" style="display: none;">
+        <div id="logContent"></div>
       </div>
     </div>
 
@@ -664,6 +653,5 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../../Controllers/js_multi_servidor/Transferencia de Servicios_Indice.js"></script>
-
 </body>
 </html>

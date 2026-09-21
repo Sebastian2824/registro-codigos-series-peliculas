@@ -1,369 +1,409 @@
-// ========== CONFIGURACIÓN ==========
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+// ============================================================
+// CONFIGURACIÓN DE ENTORNO
+// ============================================================
+const IS_LOCAL =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.protocol === 'file:';
 
-    // ========== DOM REFERENCES ==========
-    const serieSelect = document.getElementById('serieSelect');
-    const temporadaSelect = document.getElementById('temporadaSelect');
-    const idiomaSelect = document.getElementById('idiomaSelect');
-    const servidorSelect = document.getElementById('servidorSelect');
-    const episodiosContainer = document.getElementById('episodiosContainer');
-    const formDimension = document.getElementById('formDimension');
-    const btnModificarGroup = document.getElementById('btnModificarGroup');
+const SQLSERVER_BASE_URL = IS_LOCAL
+    ? 'http://localhost:3001'
+    : 'https://animes-plus-backend-production.up.railway.app';
 
-    // Variables globales para mantener los valores actuales
-    let serieActual = "";
-    let temporadaActual = "";
-    let idiomaActual = "";
-    let servidorActual = "";
+console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 
-    // ========== FUNCIONES ==========
+// ============================================================
+// DOM REFERENCIAS
+// ============================================================
+const serieSelect         = document.getElementById('serieSelect');
+const temporadaSelect     = document.getElementById('temporadaSelect');
+const idiomaSelect        = document.getElementById('idiomaSelect');
+const servidorSelect      = document.getElementById('servidorSelect');
+const episodiosContainer  = document.getElementById('episodiosContainer');
+const formDimension       = document.getElementById('formDimension');
+const btnModificarGroup   = document.getElementById('btnModificarGroup');
 
-    window.onload = () => {
-      cargarSeries();
-    };
+// Variables globales para mantener los valores actuales
+let serieActual     = '';
+let temporadaActual = '';
+let idiomaActual    = '';
+let servidorActual  = '';
 
-    async function cargarSeries() {
-      try {
-        const res = await fetch(`${WORKER_URL}/nombres-series`);
+// ============================================================
+// INICIALIZACIÓN
+// ============================================================
+window.onload = () => {
+    cargarSeries();
+};
+
+// ============================================================
+// CARGAR SERIES
+// ============================================================
+async function cargarSeries() {
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/nombres-series`);
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const series = await res.json();
 
         serieSelect.innerHTML = `<option value="">Selecciona una serie</option>`;
         series.forEach(serie => {
-          const option = document.createElement('option');
-          option.value = serie;
-          option.textContent = serie;
-          serieSelect.appendChild(option);
+            const option = document.createElement('option');
+            option.value = serie;
+            option.textContent = serie;
+            serieSelect.appendChild(option);
         });
 
         temporadaSelect.disabled = true;
         idiomaSelect.disabled = true;
         servidorSelect.disabled = true;
-      } catch (error) {
+    } catch (error) {
         console.error('Error cargando series:', error);
         alert('Error al cargar las series');
-      }
     }
+}
 
-    async function cargarTemporadas() {
-      const serie = serieSelect.value;
-      serieActual = serie;
+// ============================================================
+// CARGAR TEMPORADAS
+// ============================================================
+async function cargarTemporadas() {
+    const serie = serieSelect.value;
+    serieActual = serie;
 
-      temporadaSelect.innerHTML = `<option value="">Selecciona una temporada</option>`;
-      idiomaSelect.innerHTML = `<option value="">Selecciona un idioma</option>`;
-      servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
-      limpiarContenedores();
+    temporadaSelect.innerHTML = `<option value="">Selecciona una temporada</option>`;
+    idiomaSelect.innerHTML = `<option value="">Selecciona un idioma</option>`;
+    servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
+    limpiarContenedores();
 
-      if (!serie) {
+    if (!serie) {
         temporadaSelect.disabled = true;
         idiomaSelect.disabled = true;
         servidorSelect.disabled = true;
         return;
-      }
+    }
 
-      try {
-        const res = await fetch(`${WORKER_URL}/temporadas?serie=${encodeURIComponent(serie)}`);
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/temporadas?serie=${encodeURIComponent(serie)}`);
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const temporadas = await res.json();
 
         temporadaSelect.innerHTML = `<option value="">Selecciona una temporada</option>`;
         temporadas.forEach(temp => {
-          const option = document.createElement('option');
-          option.value = temp;
-          option.textContent = temp;
-          temporadaSelect.appendChild(option);
+            const option = document.createElement('option');
+            option.value = temp;
+            option.textContent = temp;
+            temporadaSelect.appendChild(option);
         });
 
         temporadaSelect.disabled = false;
         idiomaSelect.disabled = true;
         servidorSelect.disabled = true;
-      } catch (error) {
+    } catch (error) {
         console.error('Error cargando temporadas:', error);
-      }
     }
+}
 
-    async function cargarIdiomas() {
-      const serie = serieSelect.value;
-      const temporada = temporadaSelect.value;
-      temporadaActual = temporada;
+// ============================================================
+// CARGAR IDIOMAS
+// ============================================================
+async function cargarIdiomas() {
+    const serie = serieSelect.value;
+    const temporada = temporadaSelect.value;
+    temporadaActual = temporada;
 
-      idiomaSelect.innerHTML = `<option value="">Selecciona un idioma</option>`;
-      servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
-      limpiarContenedores();
+    idiomaSelect.innerHTML = `<option value="">Selecciona un idioma</option>`;
+    servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
+    limpiarContenedores();
 
-      if (!temporada) {
+    if (!temporada) {
         idiomaSelect.disabled = true;
         servidorSelect.disabled = true;
         return;
-      }
+    }
 
-      try {
-        const res = await fetch(`${WORKER_URL}/idiomas?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/idiomas?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}`);
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const idiomas = await res.json();
 
         idiomaSelect.innerHTML = `<option value="">Selecciona un idioma</option>`;
         idiomas.forEach(idioma => {
-          const option = document.createElement('option');
-          option.value = idioma;
-          option.textContent = idioma;
-          idiomaSelect.appendChild(option);
+            const option = document.createElement('option');
+            option.value = idioma;
+            option.textContent = idioma;
+            idiomaSelect.appendChild(option);
         });
 
         idiomaSelect.disabled = false;
         servidorSelect.disabled = true;
-      } catch (error) {
+    } catch (error) {
         console.error('Error cargando idiomas:', error);
-      }
     }
+}
 
-    async function cargarServidores() {
-      const serie = serieSelect.value;
-      const temporada = temporadaSelect.value;
-      const idioma = idiomaSelect.value;
-      idiomaActual = idioma;
+// ============================================================
+// CARGAR SERVIDORES
+// ============================================================
+async function cargarServidores() {
+    const serie = serieSelect.value;
+    const temporada = temporadaSelect.value;
+    const idioma = idiomaSelect.value;
+    idiomaActual = idioma;
 
-      servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
-      limpiarContenedores();
+    servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
+    limpiarContenedores();
 
-      if (!idioma) {
+    if (!idioma) {
         servidorSelect.disabled = true;
         return;
-      }
+    }
 
-      try {
-        const res = await fetch(`${WORKER_URL}/servidores?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}`);
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/servidores?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}`);
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const servidores = await res.json();
 
         servidorSelect.innerHTML = `<option value="">Selecciona un servidor</option>`;
         servidores.forEach(servidor => {
-          const option = document.createElement('option');
-          option.value = servidor;
-          option.textContent = servidor;
-          servidorSelect.appendChild(option);
+            const option = document.createElement('option');
+            option.value = servidor;
+            option.textContent = servidor;
+            servidorSelect.appendChild(option);
         });
 
         servidorSelect.disabled = false;
-      } catch (error) {
+    } catch (error) {
         console.error('Error cargando servidores:', error);
-      }
     }
+}
 
-    async function cargarEpisodios() {
-      const serie = serieSelect.value;
-      const temporada = temporadaSelect.value;
-      const idioma = idiomaSelect.value;
-      const servidor = servidorSelect.value;
-      servidorActual = servidor;
+// ============================================================
+// CARGAR EPISODIOS
+// ============================================================
+async function cargarEpisodios() {
+    const serie = serieSelect.value;
+    const temporada = temporadaSelect.value;
+    const idioma = idiomaSelect.value;
+    const servidor = servidorSelect.value;
+    servidorActual = servidor;
 
-      limpiarContenedores();
+    limpiarContenedores();
 
-      if (!servidor) return;
+    if (!servidor) return;
 
-      try {
-        const res = await fetch(`${WORKER_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/episodios?serie=${encodeURIComponent(serie)}&temporada=${encodeURIComponent(temporada)}&idioma=${encodeURIComponent(idioma)}&servidor=${encodeURIComponent(servidor)}`);
         if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
         const episodios = await res.json();
 
         if (!Array.isArray(episodios) || episodios.length === 0) {
-          episodiosContainer.innerHTML = `
-            <div class="empty-message">
-              <i class="fas fa-info-circle"></i>
-              No hay episodios en este servidor
-            </div>
-          `;
-          btnModificarGroup.style.display = 'none';
-          return;
+            episodiosContainer.innerHTML = `
+                <div class="empty-message">
+                    <i class="fas fa-info-circle"></i>
+                    No hay episodios en este servidor
+                </div>
+            `;
+            btnModificarGroup.style.display = 'none';
+            return;
         }
 
         let tablaHTML = `
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width: 12%">Episodio</th>
-                  <th style="width: 50%">Código iframe</th>
-                  <th style="width: 15%">Width</th>
-                  <th style="width: 15%">Height</th>
-                </tr>
-              </thead>
-              <tbody>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 12%">Episodio</th>
+                            <th style="width: 50%">Código iframe</th>
+                            <th style="width: 15%">Width</th>
+                            <th style="width: 15%">Height</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
         episodios.forEach(ep => {
-          const episodio = ep.episodio;
-          const iframe = ep.iframe || "";
+            const episodio = ep.episodio;
+            const iframe = ep.iframe || '';
 
-          const widthMatch = iframe.match(/(?:\s|^)width\s*=\s*(?:"([^"]+)"|(\d+))/i);
-          const heightMatch = iframe.match(/(?:\s|^)height\s*=\s*(?:"([^"]+)"|(\d+))/i);
-          const width = widthMatch ? (widthMatch[1] || widthMatch[2]) : '';
-          const height = heightMatch ? (heightMatch[1] || heightMatch[2]) : '';
+            const widthMatch = iframe.match(/(?:\s|^)width\s*=\s*(?:"([^"]+)"|(\d+))/i);
+            const heightMatch = iframe.match(/(?:\s|^)height\s*=\s*(?:"([^"]+)"|(\d+))/i);
+            const width = widthMatch ? (widthMatch[1] || widthMatch[2]) : '';
+            const height = heightMatch ? (heightMatch[1] || heightMatch[2]) : '';
 
-          tablaHTML += `
-            <tr>
-              <td><strong>${episodio}</strong></td>
-              <td>
-                <textarea data-episodio="${episodio}">${iframe}</textarea>
-              </td>
-              <td><span class="dimension-badge">${width || '—'}</span></td>
-              <td><span class="dimension-badge">${height || '—'}</span></td>
-            </tr>
-          `;
+            tablaHTML += `
+                <tr>
+                    <td><strong>${episodio}</strong></td>
+                    <td>
+                        <textarea data-episodio="${episodio}">${iframe}</textarea>
+                    </td>
+                    <td><span class="dimension-badge">${width || '—'}</span></td>
+                    <td><span class="dimension-badge">${height || '—'}</span></td>
+                </tr>
+            `;
         });
 
         tablaHTML += `
-              </tbody>
-            </table>
-          </div>
+                    </tbody>
+                </table>
+            </div>
         `;
 
         episodiosContainer.innerHTML = tablaHTML;
         btnModificarGroup.style.display = 'block';
         formDimension.classList.remove('visible');
 
-      } catch (error) {
+    } catch (error) {
         console.error('Error cargando episodios:', error);
         alert('Error al cargar los episodios');
-      }
     }
+}
 
-    function limpiarContenedores() {
-      episodiosContainer.innerHTML = '';
-      formDimension.classList.remove('visible');
-      btnModificarGroup.style.display = 'none';
-    }
+// ============================================================
+// UTILIDADES
+// ============================================================
+function limpiarContenedores() {
+    episodiosContainer.innerHTML = '';
+    formDimension.classList.remove('visible');
+    btnModificarGroup.style.display = 'none';
+}
 
-    function mostrarFormulario() {
-      formDimension.classList.toggle('visible');
-    }
+function mostrarFormulario() {
+    formDimension.classList.toggle('visible');
+}
 
-    function ocultarFormulario() {
-      formDimension.classList.remove('visible');
-    }
+function ocultarFormulario() {
+    formDimension.classList.remove('visible');
+}
 
-    function aplicarCambiosDimension() {
-      const nuevoWidth = document.getElementById('nuevoWidth').value.trim();
-      const nuevoHeight = document.getElementById('nuevoHeight').value.trim();
+// ============================================================
+// APLICAR CAMBIOS DE DIMENSIONES (local, antes de guardar)
+// ============================================================
+function aplicarCambiosDimension() {
+    const nuevoWidth = document.getElementById('nuevoWidth').value.trim();
+    const nuevoHeight = document.getElementById('nuevoHeight').value.trim();
 
-      if (!nuevoWidth || !nuevoHeight) {
+    if (!nuevoWidth || !nuevoHeight) {
         alert('⚠️ Debes ingresar valores para width y height.');
         return;
-      }
+    }
 
-      const textareas = document.querySelectorAll('#episodiosContainer textarea');
-      if (textareas.length === 0) {
+    const textareas = document.querySelectorAll('#episodiosContainer textarea');
+    if (textareas.length === 0) {
         alert('No hay episodios para modificar.');
         return;
-      }
+    }
 
-      textareas.forEach(textarea => {
+    textareas.forEach(textarea => {
         let iframe = textarea.value;
 
         const widthMatch = iframe.match(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/);
         if (widthMatch) {
-          const atributo = widthMatch[1];
-          iframe = iframe.replace(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoWidth}"`);
+            const atributo = widthMatch[1];
+            iframe = iframe.replace(/\b(width|WIDTH)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoWidth}"`);
         } else {
-          iframe = iframe.replace(/<iframe/i, `<iframe width="${nuevoWidth}"`);
+            iframe = iframe.replace(/<iframe/i, `<iframe width="${nuevoWidth}"`);
         }
 
         const heightMatch = iframe.match(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/);
         if (heightMatch) {
-          const atributo = heightMatch[1];
-          iframe = iframe.replace(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoHeight}"`);
+            const atributo = heightMatch[1];
+            iframe = iframe.replace(/\b(height|HEIGHT)\s*=\s*("[^"]*"|\d+)/, `${atributo}="${nuevoHeight}"`);
         } else {
-          iframe = iframe.replace(/<iframe/i, `<iframe height="${nuevoHeight}"`);
+            iframe = iframe.replace(/<iframe/i, `<iframe height="${nuevoHeight}"`);
         }
 
         textarea.value = iframe;
 
         const fila = textarea.closest('tr');
         if (fila) {
-          const badges = fila.querySelectorAll('.dimension-badge');
-          if (badges.length >= 2) {
-            badges[0].textContent = nuevoWidth;
-            badges[1].textContent = nuevoHeight;
-          }
+            const badges = fila.querySelectorAll('.dimension-badge');
+            if (badges.length >= 2) {
+                badges[0].textContent = nuevoWidth;
+                badges[1].textContent = nuevoHeight;
+            }
         }
-      });
+    });
 
-      alert('✅ Las dimensiones han sido actualizadas en los campos mostrados. Pulsa "Guardar cambios" para persistir.');
-      ocultarFormulario();
-    }
+    alert('✅ Las dimensiones han sido actualizadas en los campos mostrados. Pulsa "Guardar cambios" para persistir.');
+    ocultarFormulario();
+}
 
-    async function guardarCambios() {
-      const serie = serieActual;
-      const temporada = temporadaActual;
-      const idioma = idiomaActual;
-      const servidor = servidorActual;
+// ============================================================
+// GUARDAR CAMBIOS
+// ============================================================
+async function guardarCambios() {
+    const serie = serieActual;
+    const temporada = temporadaActual;
+    const idioma = idiomaActual;
+    const servidor = servidorActual;
 
-      if (!serie || !temporada || !idioma || !servidor) {
+    if (!serie || !temporada || !idioma || !servidor) {
         alert('⚠️ Asegúrate de haber seleccionado todos los filtros.');
         return;
-      }
+    }
 
-      const textareas = document.querySelectorAll('#episodiosContainer textarea');
-      if (textareas.length === 0) {
+    const textareas = document.querySelectorAll('#episodiosContainer textarea');
+    if (textareas.length === 0) {
         alert('No hay episodios para guardar.');
         return;
-      }
+    }
 
-      const registros = [];
-      for (const textarea of textareas) {
+    const registros = [];
+    for (const textarea of textareas) {
         const episodio = textarea.dataset.episodio;
         const nuevoCodigo = textarea.value.trim();
         if (episodio && nuevoCodigo) {
-          registros.push({
-            nombreSerie: serie,
-            temporada: temporada,
-            idioma: idioma,
-            servidor: servidor,
-            episodio: episodio,
-            iframe: nuevoCodigo
-          });
+            registros.push({
+                nombreSerie: serie,
+                temporada:   temporada,
+                idioma:      idioma,
+                servidor:    servidor,
+                episodio:    episodio,
+                iframe:      nuevoCodigo
+            });
         }
-      }
+    }
 
-      if (registros.length === 0) {
+    if (registros.length === 0) {
         alert('No hay cambios para guardar.');
         return;
-      }
+    }
 
-      try {
-        const res = await fetch(`${WORKER_URL}/registrar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ registros })
+    try {
+        const res = await fetch(`${SQLSERVER_BASE_URL}/registrar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ registros })
         });
 
         const data = await res.json();
 
         if (res.ok) {
-          alert(`✅ ${registros.length} episodios guardados correctamente en Cloudflare.`);
+            alert(`✅ ${registros.length} episodios guardados correctamente en Azure SQL.`);
         } else {
-          alert('❌ Error al guardar: ' + (data.error || res.statusText));
+            alert('❌ Error al guardar: ' + (data.error || res.statusText));
         }
-      } catch (error) {
+    } catch (error) {
         console.error(error);
         alert('❌ Error al guardar: ' + error.message);
-      }
     }
+}
 
-    // ========== EVENT LISTENERS ==========
-    serieSelect.addEventListener('change', cargarTemporadas);
-    temporadaSelect.addEventListener('change', cargarIdiomas);
-    idiomaSelect.addEventListener('change', cargarServidores);
-    servidorSelect.addEventListener('change', cargarEpisodios);
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+serieSelect.addEventListener('change', cargarTemporadas);
+temporadaSelect.addEventListener('change', cargarIdiomas);
+idiomaSelect.addEventListener('change', cargarServidores);
+servidorSelect.addEventListener('change', cargarEpisodios);
 
-    // Deshabilitar selects inicialmente
-    temporadaSelect.disabled = true;
-    idiomaSelect.disabled = true;
-    servidorSelect.disabled = true;
+// Deshabilitar selects inicialmente
+temporadaSelect.disabled = true;
+idiomaSelect.disabled = true;
+servidorSelect.disabled = true;
 
-    // Cerrar formulario con Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && formDimension.classList.contains('visible')) {
+// Cerrar formulario con Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && formDimension.classList.contains('visible')) {
         ocultarFormulario();
-      }
-    });
+    }
+});
