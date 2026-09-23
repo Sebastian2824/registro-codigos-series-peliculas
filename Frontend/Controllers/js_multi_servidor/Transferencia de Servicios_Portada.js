@@ -8,9 +8,9 @@ const IS_LOCAL =
 
 const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'
-    : 'https://animes-plus-backend-production.up.railway.app';
+    : window.ENV.VITE_AZURE_API_KEY_URL;
 
-const CLOUDFLARE_BASE_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+const CLOUDFLARE_BASE_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
 
 console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 console.log(`☁️  Backend Cloudflare: ${CLOUDFLARE_BASE_URL}`);
@@ -19,13 +19,13 @@ console.log(`☁️  Backend Cloudflare: ${CLOUDFLARE_BASE_URL}`);
 // FIREBASE
 // ============================================================
 const firebaseConfig = {
-    apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
-    authDomain: "animes-plus-89b93.firebaseapp.com",
-    projectId: "animes-plus-89b93",
-    storageBucket: "animes-plus-89b93.appspot.com",
-    messagingSenderId: "402867181985",
-    appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
-    measurementId: "G-DN632G7XJT"
+    apiKey: window.ENV.VITE_FIREBASE_API_KEY,
+      authDomain: window.ENV.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: window.ENV.VITE_FIREBASE_PROYECT_ID,
+      storageBucket: window.ENV.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window.ENV.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: window.ENV.VITE_FIREBASE_APP_ID,
+      measurementId: window.ENV.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 firebase.initializeApp(firebaseConfig);

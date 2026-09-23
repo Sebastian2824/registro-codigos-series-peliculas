@@ -1,5 +1,5 @@
  // ========== CONFIGURACIÓN ==========
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
 
     // ========== ESTADO GLOBAL ==========
     let datosCargados = [];

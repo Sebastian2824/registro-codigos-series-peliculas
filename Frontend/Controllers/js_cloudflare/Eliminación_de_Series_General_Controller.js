@@ -1,4 +1,4 @@
-const API_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+const API_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
     let episodiosData = {
       iframe: [],
       enlaces: [],
@@ -326,3 +326,13 @@ const API_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
     cargarSeries('enlaces');
     cargarSeries('descargas');
     cargarSeries('original');
+
+    Object.assign(window, {
+  cargarTemporadas,
+  cargarIdiomas,
+  cargarServidores,
+  cargarEpisodios,
+  seleccionarTodos,
+  eliminarSeleccionados,
+  eliminarServidorCompleto
+});

@@ -13,7 +13,7 @@
     let idiomaActual = "";
     let servidorActual = "";
 
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
 
     // ========== PROGRESO ==========
     function mostrarProgreso(titulo, totalItems) {
@@ -830,3 +830,17 @@
       configurarImportacionTxt();
       configurarImportacionExcel();
     });
+
+    Object.assign(window, {
+  agregarFila,
+  guardarCambios,
+  resetearInterfaz,
+  nuevaEntrada,
+  cancelarEntrada,
+  guardarNuevaEntrada,
+  actualizarDominiosSerie,
+  actualizarDominiosTodasSeries,
+  actualizarMarcoDominio,
+  configurarImportacionTxt,     
+  configurarImportacionExcel
+});

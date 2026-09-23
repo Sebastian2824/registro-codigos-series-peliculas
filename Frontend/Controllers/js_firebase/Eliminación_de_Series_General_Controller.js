@@ -1,11 +1,11 @@
 // ========== CONFIGURACIÓN FIREBASE ==========
     const firebaseConfig = {
-      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
-      authDomain: "animes-plus-89b93.firebaseapp.com",
-      projectId: "animes-plus-89b93",
-      storageBucket: "animes-plus-89b93.appspot.com",
-      messagingSenderId: "402867181985",
-      appId: "1:402867181985:web:d695b12977fe4270dbd3e0"
+      apiKey: window.ENV.VITE_FIREBASE_API_KEY,
+      authDomain: window.ENV.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: window.ENV.VITE_FIREBASE_PROYECT_ID,
+      storageBucket: window.ENV.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window.ENV.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: window.ENV.VITE_FIREBASE_APP_ID
     };
 
     firebase.initializeApp(firebaseConfig);

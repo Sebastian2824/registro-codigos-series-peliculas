@@ -1,3 +1,6 @@
+    // ========== CONFIGURACIÓN ==========
+    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
+    
     // ========== VARIABLES ==========
     let datosPreview = [];
 
@@ -168,7 +171,7 @@
           );
 
           try {
-            const response = await fetch("https://proyect-cloud-flare.apiprueba2025.workers.dev/registrar", {
+            const response = await fetch(`${WORKER_URL}/registrar`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ registros: chunk }),

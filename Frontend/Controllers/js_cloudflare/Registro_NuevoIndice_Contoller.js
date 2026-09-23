@@ -1,5 +1,5 @@
     // ========== CONFIGURACIÓN ==========
-    const WORKER_URL = 'https://proyect-cloud-flare.apiprueba2025.workers.dev';
+    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
 
     // ========== DOM REFERENCES ==========
     const enlaceImagenInput = document.getElementById('enlaceImagen');
@@ -10,7 +10,7 @@
     const imagenError = document.getElementById('imagenError');
     const btnGuardar = document.getElementById('btnGuardar');
 
-    // ========== FUNCIÓN DE VISTA PREVIA ==========
+    // ========== FUNCIÓN DE VISTA PREVIA ==========d
     function actualizarVistaPrevia() {
       const url = enlaceImagenInput.value.trim();
 

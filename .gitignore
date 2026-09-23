@@ -1,6 +1,11 @@
 # Credenciales
 Credentials/
 
+# API
+Frontend/.env
+
+Frontend/node_modules
+
 # Bancked
 Bancked/
 

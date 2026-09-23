@@ -8,7 +8,7 @@ const IS_LOCAL =
 
 const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'
-    : 'https://animes-plus-backend-production.up.railway.app';
+    : window.ENV.VITE_AZURE_API_KEY_URL;
 
 console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 

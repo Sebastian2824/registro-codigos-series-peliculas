@@ -1,16 +1,67 @@
 // ========== CONFIGURACIÓN FIREBASE ==========
     const firebaseConfig = {
-      apiKey: "AIzaSyB6MY2y5uyum87PdUHUpY8NNh4D73Yhx4U",
-      authDomain: "animes-plus-89b93.firebaseapp.com",
-      projectId: "animes-plus-89b93",
-      storageBucket: "animes-plus-89b93.appspot.com",
-      messagingSenderId: "402867181985",
-      appId: "1:402867181985:web:d695b12977fe4270dbd3e0",
-      measurementId: "G-DN632G7XJT"
+      apiKey: window.ENV.VITE_FIREBASE_API_KEY,
+      authDomain: window.ENV.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: window.ENV.VITE_FIREBASE_PROYECT_ID,
+      storageBucket: window.ENV.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window.ENV.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: window.ENV.VITE_FIREBASE_APP_ID,
+      measurementId: window.ENV.VITE_FIREBASE_MEASUREMENT_ID
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+// ============================================================
+// DOM REFERENCES
+// ============================================================
+const enlaceImagenInput    = document.getElementById('enlaceImagen');
+const previewContainer     = document.getElementById('previewContainer');
+const previewPlaceholder   = document.getElementById('previewPlaceholder');
+const previewImage         = document.getElementById('previewImage');
+
+// ============================================================
+// VISTA PREVIAx
+// ============================================================
+function actualizarVistaPrevia() {
+    const url = enlaceImagenInput.value.trim();
+
+    // Si la URL es válida (jpg, jpeg, png, webp, gif)
+    if (url && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(url)) {
+        previewImage.src = url;
+        previewImage.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        previewContainer.classList.add('has-image');
+
+        // Manejar error de carga
+        previewImage.onerror = function () {
+            previewImage.style.display = 'none';
+            previewPlaceholder.style.display = 'flex';
+            previewPlaceholder.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i>
+                <span class="preview-error">Error al cargar imagen</span>
+            `;
+            previewContainer.classList.remove('has-image');
+        };
+
+        previewImage.onload = function () {
+            // Ya está mostrando la imagen, no hacer nada
+        };
+
+    } else {
+        // Mostrar placeholder
+        previewImage.style.display = 'none';
+        previewPlaceholder.style.display = 'flex';
+        previewPlaceholder.innerHTML = `
+            <i class="fas fa-image"></i>
+            <span>${url ? 'Formato no válido' : 'Ingresa un enlace de imagen'}</span>
+        `;
+        previewContainer.classList.remove('has-image');
+    }
+}
+
+// Evento en tiempo real
+enlaceImagenInput.addEventListener('input', actualizarVistaPrevia);
 
     // ========== FUNCIONES ==========
 
@@ -57,6 +108,9 @@
         document.getElementById("enlaceSitio").value = "";
         document.getElementById("enlaceSitio02").value = "";
 
+         // Resetear vista previa
+          actualizarVistaPrevia();
+
       } catch (error) {
         console.error("Error al guardar en Firebase:", error);
         alert("❌ Error al guardar: " + error.message);
@@ -70,3 +124,6 @@
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('btnGuardar').addEventListener('click', guardarEnFirebase);
     });
+
+    // Inicializar vista previa
+actualizarVistaPrevia();
