@@ -1,12 +1,13 @@
-    // ========== CONFIGURACIÓN FIREBASE ==========
+  import { ENV } from '../../Config/config.js';
+  // ========== CONFIGURACIÓN FIREBASE ==========
     const firebaseConfig = {
-      apiKey: window.ENV.VITE_FIREBASE_API_KEY,
-      authDomain: window.ENV.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: window.ENV.VITE_FIREBASE_PROYECT_ID,
-      storageBucket: window.ENV.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: window.ENV.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: window.ENV.VITE_FIREBASE_APP_ID,
-      measurementId: window.ENV.VITE_FIREBASE_MEASUREMENT_ID
+      apiKey: ENV.FIREBASE_API_KEY,
+  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: ENV.FIREBASE_PROYECT_ID,
+  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: ENV.FIREBASE_MESSAGING_SENDER_ID,
+  appId: ENV.FIREBASE_APP_ID,
+  measurementId: ENV.FIREBASE_MEASUREMENT_ID
     };
 
     firebase.initializeApp(firebaseConfig);
