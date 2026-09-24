@@ -227,3 +227,10 @@ import { ENV } from '../../Config/config.js';
     document.addEventListener("DOMContentLoaded", () => {
       cargarSeries();
     });
+
+    Object.assign(window, {
+    nuevaTemporada,
+    guardarNuevaTemporada,
+    guardarCambios,
+    
+});

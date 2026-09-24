@@ -305,3 +305,13 @@
         ocultarFormulario();
       }
     });
+
+    Object.assign(window, {
+    cargarTemporadas,
+    cargarIdiomas,
+    cargarServidores,
+    cargarEpisodios,
+    mostrarFormulario,
+    aplicarCambiosDimension,
+    guardarCambios
+});

@@ -409,3 +409,12 @@
     });
 
     document.addEventListener("DOMContentLoaded", cargarSeries);
+
+    Object.assign(window, {
+    nuevaEntrada,
+    guardarNuevaEntrada,
+    agregarFila,
+    guardarNuevoEpisodio,
+    eliminarFila,
+    guardarCambios
+});

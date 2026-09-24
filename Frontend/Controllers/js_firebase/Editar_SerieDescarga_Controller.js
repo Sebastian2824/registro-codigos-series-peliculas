@@ -409,3 +409,12 @@ import { ENV } from '../../Config/config.js';
     });
 
     document.addEventListener("DOMContentLoaded", cargarSeries);
+
+    Object.assign(window, {
+    nuevaEntrada,
+    eliminarFila,
+    agregarFila,
+    guardarNuevaEntrada,
+    guardarNuevoEpisodio,
+    guardarCambios
+});

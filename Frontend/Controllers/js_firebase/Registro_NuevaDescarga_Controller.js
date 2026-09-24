@@ -186,3 +186,7 @@ import { ENV } from '../../Config/config.js';
     // ========== EVENTOS ==========
     document.getElementById('btnAgregarFila').addEventListener('click', agregarFila);
     document.getElementById('btnGuardar').addEventListener('click', guardarEnFirebase);
+
+    Object.assign(window, {
+    eliminarFila
+});

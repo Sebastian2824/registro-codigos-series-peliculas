@@ -232,3 +232,8 @@ import { ENV } from '../../Config/config.js';
 
     // ========== INICIALIZACIÓN ==========
     window.onload = cargarDatos;
+
+    Object.assign(window, {
+    resetearFiltros,
+    exportarTablaAExcel
+});

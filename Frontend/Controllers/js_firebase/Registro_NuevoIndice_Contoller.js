@@ -184,3 +184,7 @@
 
        // Inicializar vista previa
     actualizarVistaPrevia();
+
+    Object.assign(window, {
+    validarCampos
+});

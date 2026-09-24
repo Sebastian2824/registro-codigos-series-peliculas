@@ -147,3 +147,7 @@ import { ENV } from '../../Config/config.js';
         mostrarPreview(null);
       }
     });
+
+    Object.assign(window, {
+    guardarCambios
+});
