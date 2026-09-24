@@ -1,3 +1,5 @@
+   import { ENV } from '../../Config/config.js';
+
 // ============================================================
 // CONFIGURACIÓN DE ENTORNO
 // =============================================================
@@ -8,7 +10,7 @@ const IS_LOCAL =
 
 const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'
-    : window.ENV.VITE_AZURE_API_KEY_URL;
+    : ENV.AZURE_API_KEY_URL;
 
 console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 
@@ -295,3 +297,9 @@ document.getElementById('buscarInput').addEventListener('keypress', function (ev
 // INICIALIZACIÓN
 // ============================================================
 window.onload = cargarDatos;
+
+   Object.assign(window, {
+    resetearFiltros,
+    aplicarFiltros,
+    exportarTablaAExcel
+});
