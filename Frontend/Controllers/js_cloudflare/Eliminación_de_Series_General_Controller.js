@@ -1,4 +1,5 @@
-const API_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
+   import { ENV } from '../../Config/config.js';
+const API_URL = ENV.CLOUDFLARE_API_KEY_URL;
     let episodiosData = {
       iframe: [],
       enlaces: [],
@@ -327,7 +328,7 @@ const API_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
     cargarSeries('descargas');
     cargarSeries('original');
 
-    Object.assign(window, {
+Object.assign(window, {
   cargarTemporadas,
   cargarIdiomas,
   cargarServidores,

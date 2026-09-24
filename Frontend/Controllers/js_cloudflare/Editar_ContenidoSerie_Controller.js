@@ -1,3 +1,5 @@
+   import { ENV } from '../../Config/config.js';
+
  // ========== CONFIGURACIÓN Y VARIABLES GLOBALES ==========
     const serieSelect = document.getElementById("serieSelect");
     const temporadaSelect = document.getElementById("temporadaSelect");
@@ -13,7 +15,7 @@
     let idiomaActual = "";
     let servidorActual = "";
 
-    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
+    const WORKER_URL = ENV.CLOUDFLARE_API_KEY_URL;
 
     // ========== PROGRESO ==========
     function mostrarProgreso(titulo, totalItems) {

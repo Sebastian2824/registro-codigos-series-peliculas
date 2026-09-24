@@ -1,5 +1,6 @@
+   import { ENV } from '../../Config/config.js';
  // ========== CONFIGURACIÓN ==========
-    const WORKER_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
+    const WORKER_URL = ENV.CLOUDFLARE_API_KEY_URL;
 
     // ========== DOM ELEMENTS ==========
     const serieSelect = document.getElementById("serieSelect");
@@ -313,3 +314,10 @@
       cargarSeries();
       ocultarErrorImagen();
     });
+
+    Object.assign(window, {
+    nuevaTemporada,
+    guardarNuevaTemporada,
+    guardarCambios,
+    eliminarPortada 
+});
