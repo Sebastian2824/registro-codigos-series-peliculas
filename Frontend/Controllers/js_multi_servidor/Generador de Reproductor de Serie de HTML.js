@@ -1,4 +1,5 @@
    // ========== IMPORTS ==========
+  import { ENV } from '../../Config/config.js';
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
   import { getFirestore, collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
