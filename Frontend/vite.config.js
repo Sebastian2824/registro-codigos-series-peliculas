@@ -12,7 +12,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'Views/Login.html'), // Si tienes un index en la raíz
+        main: resolve(__dirname, 'index.html'), // Si tienes un index en la raíz
         envConfig: resolve(__dirname, 'Config/config.js'), 
         menu: resolve(__dirname, 'Views/Menu-Principal.html'),
         // Añade aquí las rutas de tus interfaces críticas para que Vite las procese al compilar:
