@@ -112,9 +112,7 @@ export default defineConfig({
   generadorReproductorSerieHtml: resolve(__dirname, 'Views/Generador-Reproductor-Serie-HTML.html'),
   vistaPreviaEpisodio: resolve(__dirname, 'Views/Vista-Previa-Episodio.html')
       },
-      external: [
-          /Controllers\/.*\.js$/,
-          /Config\/config\.js$/,
+       external: [
         /Controllers\/.*\.js$/,
         /Config\/config\.js$/
       ]
