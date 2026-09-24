@@ -53,7 +53,7 @@ import { ENV } from '../../Config/config.js';
           const userId = snapshot.docs[0].id;
           localStorage.setItem('usuarioId', userId);
           alert('✅ Inicio de sesión exitoso');
-          window.location.href = 'Menu-Principal.html';
+          window.location.href = '../Views/Menu-Principal.html';
         } else {
           alert('❌ Correo o contraseña incorrectos.');
         }
