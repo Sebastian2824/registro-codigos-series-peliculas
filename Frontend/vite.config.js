@@ -111,7 +111,15 @@ export default defineConfig({
   buscadorSeriesPortadas: resolve(__dirname, 'Views/Buscador-Series-Portadas.html'),
   generadorReproductorSerieHtml: resolve(__dirname, 'Views/Generador-Reproductor-Serie-HTML.html'),
   vistaPreviaEpisodio: resolve(__dirname, 'Views/Vista-Previa-Episodio.html')
-      }
+      },
+       external: [
+        /Controllers\/.*\.js$/,
+        /Config\/config\.js$/
+      ]
     }
+  },
+  optimizeDeps: {
+    // Evita que Vite intente pre-empaquetar los controladores
+    exclude: ['Controllers']
   }
 });
