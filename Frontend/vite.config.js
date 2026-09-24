@@ -1,18 +1,37 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { cpSync, existsSync } from 'fs';
 
 export default defineConfig({
   base: '/registro-codigos-series-peliculas/',
-  root: './', // Define la carpeta Frontend como raíz
+  root: './',
   server: {
     port: 5173,
-    open: '/Views/Menu-Principal.html' // Abre automáticamente tu menú principal al iniciar
+    open: '/index.html'
   },
+  plugins: [
+    {
+      name: 'copiar-carpetas-estaticas',
+      closeBundle() {
+        const carpetas = ['Controllers', 'Config'];
+        carpetas.forEach(carpeta => {
+          const src = resolve(__dirname, carpeta);
+          const dest = resolve(__dirname, 'dist', carpeta);
+          if (existsSync(src)) {
+            cpSync(src, dest, { recursive: true });
+            console.log(`✅ Copiada carpeta: ${carpeta} → dist/${carpeta}`);
+          } else {
+            console.warn(`⚠️ No existe: ${carpeta}`);
+          }
+        });
+      }
+    }
+  ],
   build: {
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'), // Si tienes un index en la raíz
+        main: resolve(__dirname, 'index.html'),
         envConfig: resolve(__dirname, 'Config/config.js'), 
         menu: resolve(__dirname, 'Views/Menu-Principal.html'),
         // Añade aquí las rutas de tus interfaces críticas para que Vite las procese al compilar:
