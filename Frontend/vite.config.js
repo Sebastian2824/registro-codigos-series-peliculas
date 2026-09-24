@@ -32,7 +32,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        envConfig: resolve(__dirname, 'Config/config.js'), 
         menu: resolve(__dirname, 'Views/Menu-Principal.html'),
         // Añade aquí las rutas de tus interfaces críticas para que Vite las procese al compilar:
         
