@@ -8,9 +8,9 @@ const IS_LOCAL =
 
 const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'
-    : window.ENV.VITE_AZURE_API_KEY_URL;
+    : ENV.AZURE_API_KEY_URL;
 
-const CLOUDFLARE_BASE_URL = window.ENV.VITE_CLOUDFLARE_API_KEY_URL;
+const CLOUDFLARE_BASE_URL = ENV.CLOUDFLARE_API_KEY_URL;
 
 console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 console.log(`☁️  Backend Cloudflare: ${CLOUDFLARE_BASE_URL}`);
@@ -19,13 +19,13 @@ console.log(`☁️  Backend Cloudflare: ${CLOUDFLARE_BASE_URL}`);
 // FIREBASE
 // ============================================================
 const firebaseConfig = {
-    apiKey: window.ENV.VITE_FIREBASE_API_KEY,
-      authDomain: window.ENV.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: window.ENV.VITE_FIREBASE_PROYECT_ID,
-      storageBucket: window.ENV.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: window.ENV.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: window.ENV.VITE_FIREBASE_APP_ID,
-      measurementId: window.ENV.VITE_FIREBASE_MEASUREMENT_ID
+    apiKey: ENV.FIREBASE_API_KEY,
+  authDomain: ENV.FIREBASE_AUTH_DOMAIN,
+  projectId: ENV.FIREBASE_PROYECT_ID,
+  storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: ENV.FIREBASE_MESSAGING_SENDER_ID,
+  appId: ENV.FIREBASE_APP_ID,
+  measurementId: ENV.FIREBASE_MEASUREMENT_ID
 };
 
 firebase.initializeApp(firebaseConfig);
