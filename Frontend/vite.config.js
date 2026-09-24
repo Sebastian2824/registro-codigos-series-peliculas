@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: './',
+  base: '/registro-codigos-series-peliculas/',
   root: './', // Define la carpeta Frontend como raíz
   server: {
     port: 5173,
