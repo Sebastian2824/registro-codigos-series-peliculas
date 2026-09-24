@@ -11,7 +11,7 @@ const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'
     : ENV.AZURE_API_KEY_URL;
 
-console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
+console.log(`🔌 Backend SQL Server: (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 
 // ============================================================
 // VARIABLES

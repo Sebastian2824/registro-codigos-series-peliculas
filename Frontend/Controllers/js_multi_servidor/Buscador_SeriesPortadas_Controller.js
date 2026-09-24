@@ -24,7 +24,7 @@ const SQLSERVER_BASE_URL = IS_LOCAL
     ? 'http://localhost:3001'                         // 💻 Desarrollo
     : ENV.AZURE_API_KEY_URL;         // 🌐 Producción
 
-console.log(`🔌 Backend SQL Server: ${SQLSERVER_BASE_URL} (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
+console.log(`🔌 Backend SQL Server: (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
 
     const GOOGLE_SHEETS_CONFIG = {
       SPREADSHEET_ID: ENV.GOOGLESHEETS_API_KEY_URL,
