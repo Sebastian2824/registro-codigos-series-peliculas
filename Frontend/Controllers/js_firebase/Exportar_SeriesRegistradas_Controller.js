@@ -278,6 +278,7 @@ import { ENV } from '../../Config/config.js';
     Object.assign(window, {
     copiarIframe,
     copiarTodosIframe,
+    aplicarFiltros,
     resetearFiltros,
     exportarTablaAExcel
 });

@@ -411,6 +411,7 @@
     document.addEventListener("DOMContentLoaded", cargarSeries);
 
     Object.assign(window, {
+    cancelarEntrada,
     nuevaEntrada,
     guardarNuevaEntrada,
     agregarFila,

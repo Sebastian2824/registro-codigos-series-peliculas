@@ -224,5 +224,6 @@ import { ENV } from '../../Config/config.js';
 
     Object.assign(window, {
     resetearFiltros,
+    aplicarFiltros,
     exportarTablaAExcel
 });

@@ -411,6 +411,7 @@ import { ENV } from '../../Config/config.js';
     document.addEventListener("DOMContentLoaded", cargarSeries);
 
     Object.assign(window, {
+    cancelarEntrada,
     nuevaEntrada,
     eliminarFila,
     agregarFila,

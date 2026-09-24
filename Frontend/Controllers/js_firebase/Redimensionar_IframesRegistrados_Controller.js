@@ -312,6 +312,7 @@
     cargarServidores,
     cargarEpisodios,
     mostrarFormulario,
+    ocultarFormulario,
     aplicarCambiosDimension,
     guardarCambios
 });

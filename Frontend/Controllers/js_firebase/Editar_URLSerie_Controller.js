@@ -741,6 +741,7 @@ import { ENV } from '../../Config/config.js';
     Object.assign(window, {
     actualizarDominiosSerie,
     actualizarDominiosTodasSeries,
+    cancelarEntrada,
     nuevaEntrada,
     guardarNuevaEntrada,
     agregarFila,

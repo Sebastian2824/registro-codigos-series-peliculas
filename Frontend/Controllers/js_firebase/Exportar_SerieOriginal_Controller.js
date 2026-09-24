@@ -276,5 +276,6 @@ import { ENV } from '../../Config/config.js';
     copiarIframe,
     copiarTodosIframe,
     resetearFiltros,
+    aplicarFiltros,
     exportarTablaAExcel
 });

@@ -695,6 +695,7 @@
     Object.assign(window, {
     actualizarDominiosSerie,
     actualizarDominiosTodasSeries,
+    cancelarEntrada,
     nuevaEntrada,
     guardarNuevaEntrada,
     agregarFila,
