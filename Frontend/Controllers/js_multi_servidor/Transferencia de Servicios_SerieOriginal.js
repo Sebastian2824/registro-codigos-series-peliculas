@@ -14,7 +14,6 @@ const SQLSERVER_BASE_URL = IS_LOCAL
 const CLOUDFLARE_BASE_URL = ENV.CLOUDFLARE_API_KEY_URL;
 
 console.log(`🔌 Backend SQL Server: (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
-console.log(`☁️  Backend Cloudflare: ${CLOUDFLARE_BASE_URL}`);
 
 // ============================================================
 // FIREBASE
