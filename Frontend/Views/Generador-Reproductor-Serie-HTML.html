@@ -100,6 +100,35 @@
   border-color: #0078D4;
   box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25);
 }
+
+.btn-copy {
+  background: #ffffff;
+  color: #0d47a1;
+  border: 2px solid #0d47a1;
+  padding: 14px 32px;
+  border-radius: 60px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Inter', sans-serif;
+  margin-left: 12px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.btn-copy.active { opacity: 1; pointer-events: auto; }
+.btn-copy.active:hover {
+  background: #0d47a1;
+  color: #fff;
+  transform: scale(1.03);
+  box-shadow: 0 6px 24px rgba(26,115,232,0.4);
+}
+@media (max-width: 768px) {
+  .btn-copy { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+}
   </style>
 </head>
 <body>
@@ -156,10 +185,13 @@
 
   <!-- Botón generar -->
   <div class="generate-area">
-    <button id="btnGenerar" class="btn-generate">
-      <i class="fas fa-file-export"></i> Generar HTML
-    </button>
-  </div>
+  <button id="btnGenerar" class="btn-generate">
+    <i class="fas fa-file-export"></i> Generar HTML
+  </button>
+  <button id="btnCopiar" class="btn-copy">
+    <i class="fas fa-copy"></i> Copiar código
+  </button>
+</div>
   <div id="statusMsg" class="status-msg">Selecciona los filtros para habilitar la generación</div>
 
 </div>

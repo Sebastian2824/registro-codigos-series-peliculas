@@ -40,6 +40,7 @@ console.log(`🔌 Backend SQL Server: (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
   const btnSQLServer = document.getElementById('btnSQLServer');  
   const servicioInfo = document.getElementById('servicioInfo');
   const btnGenerar = document.getElementById('btnGenerar');
+  const btnCopiar = document.getElementById('btnCopiar');
   const statusMsg = document.getElementById('statusMsg');
 
   // ========== ESTADO ==========
@@ -79,19 +80,21 @@ console.log(`🔌 Backend SQL Server: (${IS_LOCAL ? 'LOCAL' : 'PRODUCCIÓN'})`);
   }
 
   function actualizarBoton() {
-    const serie = selectSerie.value;
-    const temp = selectTemporada.value;
-    const idioma = selectIdioma.value;
-    if (serie && temp && idioma) {
-      btnGenerar.classList.add('active');
-      statusMsg.textContent = 'Listo para generar el HTML.';
-      statusMsg.className = 'status-msg';
-    } else {
-      btnGenerar.classList.remove('active');
-      statusMsg.textContent = 'Selecciona serie, temporada e idioma para habilitar la generación.';
-      statusMsg.className = 'status-msg';
-    }
+  const serie = selectSerie.value;
+  const temp = selectTemporada.value;
+  const idioma = selectIdioma.value;
+  if (serie && temp && idioma) {
+    btnGenerar.classList.add('active');
+    btnCopiar.classList.add('active');
+    statusMsg.textContent = 'Listo para generar o copiar el HTML.';
+    statusMsg.className = 'status-msg';
+  } else {
+    btnGenerar.classList.remove('active');
+    btnCopiar.classList.remove('active');
+    statusMsg.textContent = 'Selecciona serie, temporada e idioma para habilitar la generación.';
+    statusMsg.className = 'status-msg';
   }
+}
 
   // ========== FUNCIONES DE CARGA (Firebase) ==========
   async function cargarSeriesFirebase() {
@@ -379,6 +382,27 @@ function cargarEpisodios(serie, temporada, idioma) {
     return resultado;
 }
 
+// ========== LIMPIAR NOMBRE DE ARCHIVO ==========
+// ========== LIMPIAR NOMBRE DE ARCHIVO ==========
+function limpiarNombreArchivo(nombre) {
+  return nombre
+    // 1. Quitar extensión .html si viniera incluida
+    .replace(/\.html$/i, '')
+    // 2. Normalizar: separar caracteres de sus diacríticos (acentos, ñ → n + ~)
+    .normalize('NFD')
+    // 3. Eliminar los diacríticos (tildes, diéresis, virgulilla de la ñ)
+    .replace(/[\u0300-\u036f]/g, '')
+    // 4. Quitar símbolos problemáticos
+    .replace(/[,;!?¿¡.:"'`´()\[\]{}<>|*@#$%^&+=~\\\/]/g, '')
+    // 5. Reemplazar espacios por guiones
+    .replace(/\s+/g, '-')
+    // 6. Evitar guiones duplicados
+    .replace(/-+/g, '-')
+    // 7. Quitar guiones al inicio y al final
+    .replace(/^-+|-+$/g, '')
+    + '.html';
+}
+
   // ========== GENERAR HTML COMPLETO (CON COMILLAS SIMPLES) ==========
   function generarHTMLCompleto(serie, temporada, idioma, episodioSeleccionado, datos) {
     const esEpisodioUnico = episodioSeleccionado && episodioSeleccionado !== '';
@@ -395,7 +419,7 @@ function cargarEpisodios(serie, temporada, idioma) {
         }
       }
       const episodesArray = Array.from(episodesMap.values());
-      const nombreArchivo = `${serie} ${temporada} ${idioma}.html`;
+      const nombreArchivo = limpiarNombreArchivo(`${serie} ${temporada} ${idioma}`);
       // Usamos JSON.stringify para el array, pero luego reemplazamos las comillas dobles escapadas por comillas simples
       // para que los iframes no tengan escapes.
       let episodesJSON = JSON.stringify(episodesArray, null, 2);
@@ -651,7 +675,7 @@ document.addEventListener("keydown", function (event) {
         throw new Error(`Episodio "${episodioSeleccionado}" no encontrado en los datos.`);
       }
 
-      const nombreArchivo = `${serie} ${temporada} ${idioma} - ${episodioSeleccionado}.html`;
+      const nombreArchivo = limpiarNombreArchivo(`${serie} ${temporada} ${idioma} - ${episodioSeleccionado}`);
 
       // Generamos el objeto embedMap con comillas simples
       const embedMapStr = platforms.map(key => {
@@ -842,6 +866,110 @@ document.addEventListener("keydown", function (event) {
     }
   }
 
+  // ========== MANEJAR COPIADO ==========
+async function handleCopy() {
+  const serie = selectSerie.value;
+  const temporada = selectTemporada.value;
+  const idioma = selectIdioma.value;
+  const episodio = selectEpisodio.value;
+
+  if (!serie || !temporada || !idioma) {
+    statusMsg.textContent = 'Debes seleccionar serie, temporada e idioma.';
+    statusMsg.className = 'status-msg error';
+    return;
+  }
+
+  statusMsg.textContent = 'Generando código para copiar...';
+  statusMsg.className = 'status-msg';
+
+  try {
+    const datos = await obtenerDatosParaGenerar(serie, temporada, idioma, episodio);
+    if (!datos.servidores || datos.servidores.length === 0) {
+      statusMsg.textContent = 'No se encontraron datos para los filtros seleccionados.';
+      statusMsg.className = 'status-msg error';
+      return;
+    }
+
+    const { html } = generarHTMLCompleto(serie, temporada, idioma, episodio, datos);
+
+    const copiado = await copiarAlPortapapeles(html);
+
+    if (copiado) {
+      statusMsg.textContent = '✅ Código HTML copiado al portapapeles.';
+      statusMsg.className = 'status-msg success';
+    } else {
+      statusMsg.textContent = '⚠️ No se pudo copiar automáticamente. Se abrió una ventana con el código para que lo copies manualmente.';
+      statusMsg.className = 'status-msg error';
+    }
+  } catch (e) {
+    console.error(e);
+    statusMsg.textContent = 'Error al copiar: ' + e.message;
+    statusMsg.className = 'status-msg error';
+  }
+}
+
+// ========== COPIAR CON MÚLTIPLES ESTRATEGIAS ==========
+async function copiarAlPortapapeles(texto) {
+  // 1. Intentar Clipboard API moderna (requiere foco + HTTPS)
+  try {
+    // Asegurar que la ventana tenga el foco
+    window.focus();
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    }
+  } catch (err) {
+    console.warn('Clipboard API falló, usando fallback:', err.message);
+  }
+
+  // 2. Fallback: textarea + execCommand('copy')  (funciona sin foco y sin HTTPS)
+  try {
+    const textarea = document.createElement('textarea');
+    textarea.value = texto;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '-9999px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+
+    // Seleccionar todo el contenido
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, texto.length);
+
+    const ok = document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    if (ok) return true;
+  } catch (err) {
+    console.warn('execCommand falló:', err.message);
+  }
+
+  // 3. Último recurso: abrir una ventana con el código seleccionado
+  try {
+    const win = window.open('', '_blank', 'width=700,height=600');
+    if (win) {
+      win.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:10px;">'
+        + texto.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>');
+      win.document.close();
+      // Seleccionar todo automáticamente
+      const range = win.document.createRange();
+      range.selectNodeContents(win.document.body);
+      const sel = win.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return false; // el usuario deberá copiar manualmente
+    }
+  } catch (err) {
+    console.warn('No se pudo abrir ventana de respaldo:', err.message);
+  }
+
+  return false;
+}
+
+btnCopiar.addEventListener('click', handleCopy);
+
   // ========== MANEJAR GENERACIÓN ==========
   async function handleGenerate() {
     const serie = selectSerie.value;
@@ -955,3 +1083,9 @@ function cambiarServicio(nuevo) {
   resetSelects(selectTemporada, selectIdioma, selectEpisodio);
   cargarSeries();
   actualizarBoton();
+
+  
+    Object.assign(window, {
+    setLoading,
+    handleCopy
+});
